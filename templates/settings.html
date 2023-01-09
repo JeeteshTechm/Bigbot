@@ -1,0 +1,524 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <link rel="stylesheet" href="{% static 'app-assets/css/plugins/forms/bootstrap-tagsinput.css' %}" />
+    <link rel="stylesheet" href="{% static 'app-assets/css/plugins/pickers/color/colorPick.css' %}" />
+    <script src="{% static 'core/base.js' %}"></script>
+{% endblock %}
+
+
+{% block breadcrumb %}
+    <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+            <div class="col-12">
+                <h2 class="content-header-title float-left mb-0">Adapter Configuration</h2>
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="/adapter_config/">Adapter Configuration</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <style>
+        .list-group-item{
+            z-index: 2;
+        }
+        .leftList,.rightList{
+            min-height: 100px;
+            border: 2px dashed #D9D9D9;
+            border-radius: 5px;
+        }
+        .rightList:after {
+            content: 'Drag & Drop Skill(s) Back';
+            position: absolute;
+            z-index: 0;
+            left: calc(50% - 105px);
+            margin-top: 36px;
+        }
+        .leftList:after {
+            content: 'Drag & Drop Skill(s)';
+            position: absolute;
+            z-index: 0;
+            left: calc(50% - 85px);
+            margin-top: 36px;
+        }
+        .listBody{
+            min-height: 200px;
+        }
+        .custom-switch{
+            right: 10px;
+            top: 20px;
+
+        }
+        .adapter_active,.adapter_active:hover{
+            background: #F8F8F8;
+        }
+        i.icon-star{
+            vertical-align: text-bottom;
+        }
+        .theme_color{
+            max-width: 72px;
+            height: 72px !important;
+
+        }
+        .label-info {
+            background: #0090bc;
+            padding: 4px 6px;
+            border-radius: 4px;
+        }
+        .bootstrap-tagsinput{
+            display: block;
+            width: 100%;
+            height: calc(1.25em + 1.4rem + 1px);
+            padding: 0.7rem 0.7rem;
+            font-size: 0.96rem;
+            font-weight: 400;
+            line-height: 1.25;
+            color: #4E5154;
+            background-color: #FFFFFF;
+            background-clip: padding-box;
+            border: 1px solid rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            -webkit-transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+            transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+        }
+        .colorPickSelector {
+            border-radius: 5px;
+            width: 64px;
+            height: 64px;
+            cursor: pointer;
+            -webkit-transition: all linear .2s;
+            -moz-transition: all linear .2s;
+            -ms-transition: all linear .2s;
+            -o-transition: all linear .2s;
+            transition: all linear .2s;
+        }
+        .colorPickWrapper{
+            border: 1px solid #D9D9D9;
+            width: 85px;
+            padding: 10px;
+            border-radius: 6px;
+        }
+    </style>
+
+    <!-- Complex headers table -->
+    <!-- Nav Centered And Nav End Starts -->
+    <section id="nav-tabs-centered">
+        <div class="row">
+            <div class="col-sm-12">
+                <form id="formView" action="" method="post">
+                    {% csrf_token %}
+                    <div class="card overflow-hidden">
+                        <div class="card-header">
+                            <h4 class="card-title"></h4>
+                        </div>
+                        <div class="card-content">
+                            <div class="card-body">
+                                <ul class="nav nav-tabs justify-content-center" role="tablist">
+                                    <li class="nav-item">
+                                        <a class="nav-link active" id="home-tab-center" data-toggle="tab" href="#home-center"
+                                           aria-controls="home-center" role="tab" aria-selected="true">General</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="service-tab-center" data-toggle="tab" href="#service-center"
+                                           aria-controls="service-center" role="tab" aria-selected="false">Logic Adapters</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="audio-tab-center" data-toggle="tab" href="#audio-center"
+                                           aria-controls="service-center" role="tab" aria-selected="false">Audio Settings</a>
+                                    </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link" id="account-tab-center" data-toggle="tab" href="#account-center"
+                                           aria-controls="account-center" role="tab" aria-selected="false">Integration Key</a>
+                                    </li>
+                                </ul>
+
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="home-center" aria-labelledby="home-tab-center" role="tabpanel">
+
+                                        <!-- General content starts here -->
+
+
+                                        <p class="font-medium-3 mb-2 mt-2"> Theme Color</p>
+                                        <div class="colorPickWrapper">
+                                            <div class="colorPickSelector"></div>
+                                            <input id="themeColor" type="hidden" name="themeColor" value="{{themeColor}}" />
+                                        </div>
+
+
+
+                                        <p class="font-medium-3 mb-2 mt-2"> Skill Cancellation</p>
+                                        <div class="form-group validate">
+                                            <div class="controls">
+                                                <input id="skill_cancel" type="text" name="skill_cancel" class="form-control" value="" data-role="tagsinput" required="" data-validation-required-message="Skill Cancellation is required" aria-invalid="false" autocomplete="off">
+                                                <div class="help-block"></div></div>
+                                        </div>
+
+
+                                        <p class="font-medium-3 mb-2 mt-2"> Comparison Function</p>
+                                        <fieldset class="form-label-group mb-0">
+
+                                            <select name="comp_funct" class="form-control" id="basicSelect">
+                                                <option {% if comp_funct == 'chatterbot.comparisons.JaccardSimilarity' %} selected {% endif %} value="chatterbot.comparisons.JaccardSimilarity">Jaccard Similarity</option>
+                                                <option {% if comp_funct == 'chatterbot.comparisons.LevenshteinDistance' %} selected {% endif %} value="chatterbot.comparisons.LevenshteinDistance">Levenshtein Distance</option>
+                                                <option {% if comp_funct == 'chatterbot.comparisons.SentimentComparison' %} selected {% endif %} value="chatterbot.comparisons.SentimentComparison">Sentiment Comparison</option>
+                                                <option {% if comp_funct == 'chatterbot.comparisons.SynsetDistance' %} selected {% endif %} value="chatterbot.comparisons.SynsetDistance">Synset Distance</option>
+
+
+
+
+                                            </select>
+                                        </fieldset>
+
+
+                                        <div class="row mt-1">
+                                            <div class="col-lg-12">
+                                                <p class="font-medium-3 mb-2 mt-2">Sendgrid APIKEY</p>
+                                                <div class="form-group validate">
+                                                    <div class="controls">
+                                                        <textarea name="sendgrid_apikey" class="form-control"  placeholder="Enter your Sendgrid APIKEY" required="" data-validation-required-message="This Name field is required" aria-invalid="false" autocomplete="off">{{sendgrid_apikey}}</textarea>
+                                                        <div class="help-block"></div></div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+                                        <!-- General content ends here -->
+
+                                    </div>
+                                    <div class="tab-pane" id="service-center" aria-labelledby="service-tab-center" role="tabpanel">
+
+                                        <!-- Logic Adapter content starts here -->
+
+                                        <!-- Nav Centered And Nav End Ends -->
+
+
+                                        <section id="headers">
+                                            <div class="row">
+                                                <div class="col-12">
+
+
+                                                    <div class="card" >
+                                                        <div class="card-header">
+                                                            <h4 class="card-title"><i class="feather icon-cpu"></i> Bot(s) Logical Adapters</h4>
+                                                        </div>
+                                                        <div class="card-content">
+                                                            <div class="card-body listBody">
+
+                                                                <ul id="example2-right" class="list-group">
+                                                                    {% for adapters_info in adapters  %}
+
+                                                                        <li id="{{adapters_info.package}}" data-text="{{adapters_info.name}}" class="list-group-item d-flex"><p class="float-left mb-0"><i class="feather icon-box mr-1"></i></p><span>{{adapters_info.name}}<small class="display-block text-muted">'{{adapters_info.package}}</small></span><div class="custom-control custom-switch position-absolute"><input {% if adapters_info.active %}checked {% else %} {% endif %}type="checkbox" class="custom-control-input" id="customSwitch{{adapters_info.package}}"><label class="custom-control-label" for="customSwitch{{adapters_info.package}}"></label></div></li>
+
+                                                                    {% endfor %}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div>
+
+
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </section>
+                                        <!--/ Complex headers table -->
+
+                                        <!-- Logic Adapter content ends here -->
+
+
+
+                                    </div>
+                                    <div class="tab-pane" id="audio-center" aria-labelledby="audio-tab-center" role="tabpanel">
+
+                                        <!-- audio tab content starts here -->
+                                        <p class="font-medium-3 mb-0 mt-3">Audio Service</p>
+                                        <ul class="list-unstyled mb-0 mt-2">
+                                            <li class="d-inline-block mr-2">
+                                                <fieldset>
+                                                    <div class="vs-radio-con">
+                                                        <input type="radio" {% if vueradio == 'aws' %}checked{% endif %} name="vueradio" value="aws">
+                                                        <span class="vs-radio">
+                      <span class="vs-radio--border"></span>
+                      <span class="vs-radio--circle"></span>
+                    </span>
+                                                        <span class="">AWS</span>
+                                                    </div>
+                                                </fieldset>
+                                            </li>
+                                            <li class="d-inline-block mr-2">
+                                                <fieldset>
+                                                    <div class="vs-radio-con">
+                                                        <input {% if vueradio == 'google' %}checked{% endif %} type="radio" name="vueradio" value="google">
+                                                        <span class="vs-radio">
+                      <span class="vs-radio--border"></span>
+                      <span class="vs-radio--circle"></span>
+                    </span>
+                                                        <span class="">Google</span>
+                                                    </div>
+                                                </fieldset>
+                                            </li>
+                                            <li class="d-inline-block mr-2">
+                                                <fieldset>
+                                                    <div class="vs-radio-con">
+                                                        <input {% if vueradio == 'none' %}checked{% endif %} type="radio" name="vueradio" value="none">
+                                                        <span class="vs-radio">
+                      <span class="vs-radio--border"></span>
+                      <span class="vs-radio--circle"></span>
+                    </span>
+                                                        <span class="">None</span>
+                                                    </div>
+                                                </fieldset>
+                                            </li>
+                                        </ul>
+
+
+                                        <div class="row mt-2">
+                                            <div class="col-lg-6">
+                                                <p class="font-medium-3 mb-2 mt-2">AWS Access ID</p>
+                                                <div class="form-group validate">
+                                                    <div class="controls">
+                                                        <input type="text" name="aws_access_id" class="form-control" value="{{aws_access_id}}" placeholder="AWS Access ID" required="" data-validation-required-message="This Name field is required" aria-invalid="false" autocomplete="off">
+                                                        <div class="help-block"></div></div>
+                                                </div>
+                                            </div>
+                                            <div class="col-lg-6">
+                                                <p class="font-medium-3 mb-2 mt-2">AWS Secret Key</p>
+                                                <div class="form-group validate">
+                                                    <div class="controls">
+                                                        <input type="text" name="aws_secret_key" value="{{aws_secret_key}}"   class="form-control" placeholder="AWS Secret Key" required="" data-validation-required-message="Default Response is required" aria-invalid="false" autocomplete="off">
+                                                        <div class="help-block"></div></div>
+                                                </div>
+
+                                            </div>
+
+                                        </div>
+
+
+                                        <div class="row mt-1">
+                                            <div class="col-lg-12">
+                                                <p class="font-medium-3 mb-2 mt-2">Google TTS Credentials</p>
+                                                <div class="form-group validate">
+                                                    <div class="controls">
+                                                        <textarea name="google_tts_cred" class="form-control"  placeholder="Google TTS Credentials" required="" data-validation-required-message="This Name field is required" aria-invalid="false" autocomplete="off">{{google_tts_cred}}</textarea>
+                                                        <div class="help-block"></div></div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+
+
+
+                                        <!-- audio tab content ends here -->
+
+
+                                    </div>
+                                    <div class="tab-pane" id="account-center" aria-labelledby="account-tab-center" role="tabpanel">
+
+                                        <!-- Integration tab content starts here -->
+
+                                        <p class="font-medium-3 mb-2 mt-2" ></i> Key</p>
+                                        <fieldset class="form-label-group mb-0">
+                                            <input data-length="20" name="api_key" type="text" value="{{api_key}}"  id="firstText"
+                                                   class="form-control char-textarea active"  placeholder="Provide a name"
+                                                   autocomplete="off" style="color: rgb(78, 81, 84);" disabled />
+                                            <label for="firstText">ID</label>
+                                        </fieldset>
+
+                                        <p class="font-medium-3 mb-2 mt-2" ><i class="feather flag-icon-cl"></i> Secret</p>
+                                        <fieldset class="form-label-group mb-2">
+                                            <input data-length="20" name="api_secret" type="password" value="{{api_secret}}"
+                                                   id="api_secret_id" class="form-control char-textarea active"
+                                                   placeholder="Provide a package"  autocomplete="off" style="color: rgb(78, 81, 84);" disabled/>
+                                            <label for="secondText">Token</label>
+                                            <div class="form-control-position">
+                                                <i data-toggle="tooltip" data-placement="top" title="" data-original-title="Show" id="showHideSecret" class="feather icon-eye cursor-pointer" onclick="show_object()"></i>
+                                            </div>
+                                        </fieldset>
+                                        <!-- Integration tab content ends here -->
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+            </div>
+            <button id="toolbar_action_delete" style="width: 100%;" class="btn btn-primary mb-2 waves-effect waves-light" onclick="save_object()"
+                    {% if not record %}{% endif %}><strong><i class="feather icon-chevrons-up"></i> Update Configuration </strong></button>
+            </form>
+        </div>
+        </div>
+    </section>
+
+
+{% endblock %}
+
+{% block footer %}
+    <script src="{% static 'app-assets/vendors/js/forms/spinner/jquery.bootstrap-touchspin.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/forms/number-input.min.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/extensions/sortable.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/forms/bootstrap-tagsinput.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/pickers/color/colorPick.js' %}"></script>
+    <script type="application/javascript">
+
+        function getData(){
+            var adapter_seq = [];
+            $('#example2-right').children().each(function () {
+                var active = $(this).find('.custom-control-input').prop("checked");
+                adapter_seq.push({'package':$(this).attr('id'),'active':active});
+            });
+            return adapter_seq;
+        }
+
+
+        var example2Right = document.getElementById('example2-right');
+
+
+        new Sortable(example2Right, {
+            multiDrag: true, // Enable multi-drag
+            selectedClass: 'adapter_active', // The class applied to the selected items
+            animation: 150,
+            onSort:function (event) {
+                if($('#example2-right').children().length > 0){
+                    $('#example2-right').removeClass('rightList');
+
+                    $('#example2-right .list-group-item').each(function(){
+                        if($(this).children("input[name='delegate_skill']").length > 0){
+                            $(this).children("input[name='delegate_skill']").remove();
+                        }else{
+
+                        }
+                    });
+
+                }else{
+                    $('#example2-right').addClass('rightList');
+                }
+                var adapter_seq = [];
+                $('#example2-right').children().each(function () {
+                    adapter_seq.push($(this).attr('id'));
+                });
+                console.log(adapter_seq);
+            }
+        });
+
+    </script>
+
+    <script>
+        function checkBox(){
+            $('input[type="checkbox"]').unbind().click(function(){
+                if($(this).prop("checked") == true){
+                    console.log($(this).attr("id")+" Checkbox is checked.");
+                }
+                else if($(this).prop("checked") == false){
+                    console.log($(this).attr("id")+" Checkbox is unchecked.");
+                }
+            });
+        }
+
+
+
+        $(document).ready(function () {
+            var skillArr = {{skill_cancel_hidden |safe}};
+            for(var i = 0;i<skillArr.length;++i){
+                $('#skill_cancel').tagsinput('add',skillArr[i]);
+            }
+
+            $('.bootstrap-tagsinput input').keypress(function(event){
+                var keycode = (event.keyCode ? event.keyCode : event.which);
+                if(keycode == '13'){
+                    event.preventDefault();
+                }
+            });
+
+            checkBox();
+            $(".colorPickSelector").colorPick({
+                'initialColor' : '{{themeColor}}',
+                'onColorSelected': function() {
+                    $('#themeColor').val(this.color);
+                    console.log("The user has selected the color: " + $('#themeColor').val());
+                    this.element.css({'backgroundColor': this.color, 'color': this.color});
+                }
+            });
+
+
+
+        });
+
+    </script>
+
+    <script>
+
+        function save_object() {
+            var form = document.getElementById("formView");
+            var input = document.createElement('input');//prepare a new input DOM element
+            input.setAttribute('name', 'action');//set the param name
+            input.setAttribute('value', 'save');//set the value
+            input.setAttribute('type', 'hidden');//set the type, like "hidden" or other
+
+            var body = document.createElement('input');//prepare a new input DOM element
+            body.setAttribute('name', 'body');//set the param name
+            body.setAttribute('value', JSON.stringify(getData()));//set the value
+            body.setAttribute('type', 'hidden');
+
+            var arr_tags = $("#skill_cancel").tagsinput('items');
+            for(var i=0; i < arr_tags.length; ++i){
+                var arr = document.createElement('input');//prepare a new input DOM element
+                arr.setAttribute('name', 'skill_cancel_hidden');//set the param name
+                arr.setAttribute('value',arr_tags[i]);//set the value
+                arr.setAttribute('type', 'hidden');
+                form.appendChild(arr);
+            }
+
+
+
+            form.appendChild(input);
+            form.appendChild(body);
+            //console.log(getData());
+            form.submit();
+        }
+
+        function delete_response(object) {
+            var form = document.getElementById("formView");
+            var input = document.createElement('input');//prepare a new input DOM element
+            input.setAttribute('name', 'action');//set the param name
+            input.setAttribute('value', 'delete_response');//set the value
+            input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            form.appendChild(input);
+
+            var extra = document.createElement('input');//prepare a new input DOM element
+            extra.setAttribute('name', 'response_id');//set the param name
+            extra.setAttribute('value', object);//set the value
+            extra.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            form.appendChild(extra);
+
+            form.submit();
+        }
+        function show_object() {
+            var x = document.getElementById("api_secret_id");
+            if (x.type === "password") {
+                x.type = "text";
+                $('#showHideSecret').attr('data-original-title', 'Hide').tooltip('show');
+                $('#showHideSecret').removeClass('icon-eye').addClass('icon-eye-off');
+            } else {
+                $('#showHideSecret').attr('data-original-title', 'Show').tooltip('show');
+                $('#showHideSecret').removeClass('icon-eye-off').addClass('icon-eye');
+                x.type = "password";
+            }
+        }
+
+    </script>
+
+{% endblock %}

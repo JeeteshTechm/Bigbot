@@ -1,0 +1,337 @@
+{% load static %}
+{% load core_filter %}
+<div class="main-menu menu-fixed menu-light menu-accordion menu-shadow" data-scroll-to-active="true">
+    <div class="navbar-header">
+        <ul class="nav navbar-nav flex-row">
+            <li class="nav-item mr-auto">
+                <a class="navbar-brand" href="/">
+                    <h2 class="brand-text mb-0">
+                        <img width="24px" src="{% static 'images/logo.png' %}"  style="margin-left: -8px;"/> Bigbot
+                    </h2>
+                </a>
+            </li>
+
+        </ul>
+    </div>
+    <div class="shadow-bottom">
+    </div>
+    <div class="main-menu-content">
+
+        <ul class="navigation navigation-main" data-menu="menu-navigation" id="main-menu-navigation">
+            <li class=" navigation-header">
+      <span>
+       BILLING
+      </span>
+            </li>
+
+
+            {% with menu_uri='/dashboard' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-activity">
+                    </i>
+                    <span class="menu-title" data-i18n="Dashboard">
+                     Dashboard
+                    </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/invoices' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-file-text">
+                    </i>
+                    <span class="menu-title" data-i18n="Invoices">
+                     Invoices
+                    </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% if user.is_superuser %}
+            <li class=" navigation-header">
+                  <span>
+                   Administration
+                  </span>
+            </li>
+            {% with menu_uri='/console/stack/project' %}
+                <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                    <a href="{{menu_uri}}">
+                        <i class="feather icon-layers"></i>
+                        <span class="menu-title">
+                       Project
+                   </span>
+                    </a>
+                </li>
+            {% endwith %}
+            {% with menu_uri='/console/settings' %}
+                    <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                        <a href="{{menu_uri}}">
+                            <i class="feather icon-server"></i>
+                            <span class="menu-title">
+                       Configurations
+                   </span>
+                        </a>
+                    </li>
+            {% endwith %}
+            {% endif %}
+
+
+
+
+
+            <li class=" navigation-header">
+                  <span>
+                   BIGBOT
+                  </span>
+            </li>
+
+
+<!--            <li class=" nav-item {% if uri == '/users/' %}active{% endif %}">-->
+<!--                <a href="/users/">-->
+<!--                    <i class="feather icon-user">-->
+<!--                    </i>-->
+<!--                    <span class="menu-title" data-i18n="User">-->
+<!--                      User Management-->
+<!--                    </span>-->
+<!--                </a>-->
+<!--            </li>-->
+
+
+            {% with menu_uri='/credential-view' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-lock">
+                    </i>
+                    <span class="menu-title" data-i18n="User">Integrations (Keys)
+                   </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/drop' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-droplet">
+                    </i>
+                    <span class="menu-title" data-i18n="Extra Components">
+                   Big Bot Corpus
+                 </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/list-trainer' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-list">
+                    </i>
+                    <span class="menu-title" data-i18n="Extra Components">
+                   List Trainer
+                 </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/settings' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-settings">
+                    </i>
+                    <span class="menu-title" data-i18n="Extra Components">
+                   Settings
+                 </span>
+                </a>
+            </li>
+            {% endwith %}
+
+
+
+
+
+            <li class=" navigation-header">
+              <span>
+               DELEGATE
+              </span>
+            </li>
+            {% with menu_uri='/console/project/bot.delegate' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-hash"></i>
+                    <span class="menu-title">
+                       Delegate Directory
+                   </span>
+                </a>
+            </li>
+            {% endwith %}
+
+
+            {% with menu_uri='/console/project/input.pattern' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-inbox">
+                    </i>
+                    <span class="menu-title" data-i18n="Colors">
+                      Corpus Builder
+                   </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/corpora-visual' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-monitor">
+                    </i>
+                    <span class="menu-title" data-i18n="Colors">
+                     Corpora Visualizer
+                   </span>
+                </a>
+            </li>
+            {% endwith %}
+            <li class=" navigation-header">
+      <span>
+       SKILLS
+      </span>
+            </li>
+
+
+            {% with menu_uri='/console/project/delegate.utterance' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-message-circle">
+                    </i>
+                    <span class="menu-title" data-i18n="Colors">
+                      Skill Utterances
+                   </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/console/project/delegate.intent' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-git-merge">
+                    </i>
+                    <span class="menu-title" data-i18n="Extra Components">
+                   Intent Glossary
+                 </span>
+                </a>
+            </li>
+            {% endwith %}
+
+
+            {% with menu_uri='/console/project/delegate.skill' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-box">
+                    </i>
+                    <span class="menu-title" data-i18n="Colors">
+                    Skill Interchange
+               </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/skill-builder' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-airplay">
+                    </i>
+                    <span class="menu-title" data-i18n="Colors">
+                    Skill Builder
+                   </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            <li class=" navigation-header">
+      <span>
+       BOT STAND
+      </span>
+            </li>
+
+            {% with menu_uri='/skill-store' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-shopping-cart">
+                    </i>
+                    <span class="menu-title" data-i18n="Dashboard">
+                     Skill Store
+                    </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/feature-request' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-heart">
+                    </i>
+                    <span class="menu-title" data-i18n="Invoices">
+                      Feature Requests 05
+                    </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/hire-developer' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-users">
+                    </i>
+                    <span class="menu-title" data-i18n="Invoices">
+                       Hire a Developer
+                    </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            <li class=" navigation-header">
+      <span>
+       SUPPORT
+      </span>
+            </li>
+
+            {% with menu_uri='/documentation' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-shopping-cart">
+                    </i>
+                    <span class="menu-title" data-i18n="Dashboard">
+                      Documentation
+                    </span>
+                </a>
+            </li>
+            {% endwith %}
+
+
+            {% with menu_uri='/forum' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-message-square">
+                    </i>
+                    <span class="menu-title" data-i18n="Invoices">
+                      Forum
+                    </span>
+                </a>
+            </li>
+            {% endwith %}
+
+            {% with menu_uri='/enterprise-support' %}
+            <li class="{% if uri|startswith:menu_uri %}active{% endif %}">
+                <a href="{{menu_uri}}">
+                    <i class="feather icon-life-buoy">
+                    </i>
+                <span class="menu-title" data-i18n="Invoices">
+                  Enterprise Support
+                </span>
+                </a>
+            </li>
+            {% endwith %}
+
+
+        </ul>
+    </div>
+</div>

@@ -1,0 +1,9 @@
+<properties>
+    <attr name="required" format="boolean"/>
+    <attr name="selections" format="array">
+        <attr name="required" format="object">
+            <attr name="key" format="string"/>
+            <attr name="value" format="string"/>
+        </attr>
+    </attr>
+</properties>

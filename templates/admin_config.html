@@ -1,0 +1,235 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <meta name="form_content" content="{{FORM_META_JSON}}">
+    <script src="{% static 'core/base.js' %}"></script>
+{% endblock %}
+
+
+{% block breadcrumb %}
+    <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+            <div class="col-12">
+                <h2 class="content-header-title float-left mb-0">Configurations</h2>
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <style>
+        .list-group-item{
+            z-index: 2;
+        }
+        .leftList,.rightList{
+            min-height: 100px;
+            border: 2px dashed #D9D9D9;
+            border-radius: 5px;
+        }
+        .rightList:after {
+            content: 'Drag & Drop Skill(s) Back';
+            position: absolute;
+            z-index: 0;
+            left: calc(50% - 105px);
+            margin-top: 36px;
+        }
+        .leftList:after {
+            content: 'Drag & Drop Skill(s)';
+            position: absolute;
+            z-index: 0;
+            left: calc(50% - 85px);
+            margin-top: 36px;
+        }
+        .listBody{
+            min-height: 300px;
+        }
+    </style>
+
+    <!-- Complex headers table -->
+    <section id="headers">
+        <div class="row">
+            <div class="col-12">
+                <div>
+
+                    <button id="toolbar_action_save" class="btn btn-outline-primary mb-2 waves-effect waves-light" onclick="save_object();"><strong><i class="feather icon-save"></i> Save </strong></button>
+
+                </div>
+                <form id="formView" action="" method="post" novalidate>
+                    <div class="card">
+
+
+                        {% csrf_token %}
+                        <div class="card-content">
+                            <div class="card-body card-dashboard">
+
+
+                                <h2 class="font-medium-3 mb-2 mt-2">Sengrid APIKEY</h2>
+                                <fieldset class="form-label-group">
+                                    <input name="SENDGRID_APIKEY" placeholder="Enter your APIKEY." type="text" value="{% if SENDGRID_APIKEY  %}{{SENDGRID_APIKEY}}{% endif %}"
+                                           class="form-control required"
+                                           autocomplete="off" style="color: rgb(78, 81, 84);" />
+                                </fieldset>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Drag & Drop System starts here -->
+
+                    <button id="saveButton" type="submit" class="btn btn-outline-primary mb-2 waves-effect waves-light display-hidden"><strong><i class="feather icon-save"></i> Save </strong></button>
+                    <!-- Drag & Drop System ends here -->
+                </form>
+            </div>
+        </div>
+    </section>
+    <!--/ Complex headers table -->
+
+{% endblock %}
+
+{% block footer %}
+    <script src="{% static 'app-assets/vendors/js/forms/spinner/jquery.bootstrap-touchspin.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/forms/number-input.min.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/extensions/sortable.js' %}"></script>
+    <script type="application/javascript">
+        var example2Left = document.getElementById('example2-left'),
+            example2Right = document.getElementById('example2-right');
+
+        new Sortable(example2Left, {
+            group: 'shared', // set both lists to same group
+            multiDrag: true, // Enable multi-drag
+            selectedClass: 'active', // The class applied to the selected items
+            animation: 150,
+            onSort: function (event) {
+                if($('#example2-left').children().length > 0){
+                    $('#example2-left').removeClass('leftList');
+
+                    $('#example2-left .list-group-item').each(function(){
+                        if($(this).children("input[name='delegate_skill']").length > 0){
+                            console.log('Already There')
+                        }else{
+                            $(this).append('<input type="hidden" name="delegate_skill" value="'+$(this).attr('id')+'">')
+
+                        }
+
+
+                    });
+
+                }else{
+                    $('#example2-left').addClass('leftList');
+                }
+                console.log("LENGTH - ",$('#example2-left').children().length);
+            },
+            onEnd:function (event) {
+                $(this).children();
+//console.log("LENGTH - ",$('#example2-left').children().length);
+            }
+        });
+
+        new Sortable(example2Right, {
+            group: 'shared',
+            multiDrag: true, // Enable multi-drag
+            selectedClass: 'active', // The class applied to the selected items
+            animation: 150,
+            onSort:function (event) {
+                if($('#example2-right').children().length > 0){
+                    $('#example2-right').removeClass('rightList');
+
+                    $('#example2-right .list-group-item').each(function(){
+                        if($(this).children("input[name='delegate_skill']").length > 0){
+                            $(this).children("input[name='delegate_skill']").remove();
+                        }else{
+
+                        }
+                    });
+
+                }else{
+                    $('#example2-right').addClass('rightList');
+                }
+                console.log("LENGTH - ",$('#example2-right').children().length);
+            }
+        });
+
+    </script>
+
+    <script>
+        $(document).ready(function () {
+            $('#firstText').trigger('keyup');
+
+        });
+        $('#firstText').on('keyup',function(){
+
+            $('#example2-right').html('');
+            var u_id = [];
+            $('#example2-left .list-group-item').each(function(){
+
+                var id = parseInt($(this).attr('id'));
+                u_id.push(id);
+            });
+            console.log(u_id);
+            const query = $(this).val();
+            // console.log($(this).val());
+            const ctn = JSON.parse(Util.getMetaContent('form_content'));
+            const jsonrpc = new JsonRPC(ctn.host);
+            const model = new ModelRequest(jsonrpc, ctn.endpoint, ctn.uuid, ctn.token, 'delegate.skill');
+
+            model.search_read([['name__icontains', query]],['name','package']).then(function (result) {
+                for(var i=0;i < result.length; ++i){
+                    //     console.log(i+" - DATA - ",result[i]);
+                    if (u_id.indexOf(result[i].id) > -1) {
+
+                    } else {
+                        $('#example2-right').append('<li id="'+result[i].id+'" data-text="'+result[i].name+'" class="list-group-item d-flex"><p class="float-left mb-0"><i class="feather icon-package mr-1"></i></p><span>'+result[i].name+'</span></li>');
+                    }
+
+                }
+                if($("#example2-right").children().length == 0){
+                    $("#example2-right").addClass('rightList');
+                }else{
+                    $("#example2-right").removeClass('rightList');
+                }
+            });
+
+        });
+    </script>
+
+    <script>
+
+        function save_object() {
+            var form = document.getElementById("formView");
+            var input = document.createElement('input');//prepare a new input DOM element
+            input.setAttribute('name', 'action');//set the param name
+            input.setAttribute('value', 'save');//set the value
+            input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            // form.appendChild(input);
+            document.getElementById('saveButton').click();
+            //form.submit();
+        }
+
+        function delete_response(object) {
+            var form = document.getElementById("formView");
+            var input = document.createElement('input');//prepare a new input DOM element
+            input.setAttribute('name', 'action');//set the param name
+            input.setAttribute('value', 'delete_response');//set the value
+            input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            form.appendChild(input);
+
+            var extra = document.createElement('input');//prepare a new input DOM element
+            extra.setAttribute('name', 'response_id');//set the param name
+            extra.setAttribute('value', object);//set the value
+            extra.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            form.appendChild(extra);
+
+            form.submit();
+        }
+
+
+    </script>
+
+{% endblock %}

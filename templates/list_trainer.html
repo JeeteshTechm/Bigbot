@@ -1,0 +1,297 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<script src="{% static 'core/base.js' %}"></script>
+{% endblock %}
+
+
+{% block breadcrumb %}
+<div class="content-header-left col-md-9 col-12 mb-2">
+    <div class="row breadcrumbs-top">
+        <div class="col-12">
+            <h2 class="content-header-title float-left mb-0">List Trainer</h2>
+            <div class="breadcrumb-wrapper col-12">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item"><a href="/list-trainer/">List Trainer</a>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<style>
+    .list-group-item{
+        z-index: 2;
+    }
+    .leftList,.rightList{
+        min-height: 100px;
+        border: 2px dashed #D9D9D9;
+        border-radius: 5px;
+    }
+    .rightList:after {
+        content: 'Drag & Drop Utterances Back';
+        position: absolute;
+        z-index: 0;
+        left: calc(50% - 105px);
+        margin-top: 36px;
+    }
+    .leftList:after {
+        content: 'Drag & Drop Utterances';
+        position: absolute;
+        z-index: 0;
+        left: calc(50% - 85px);
+        margin-top: 36px;
+    }
+    .listBody{
+        min-height: 300px;
+    }
+    code[class*=language-], pre[class*=language-]{
+        background: #2d2d2d;
+        padding: 1em;
+        margin: .5em 0;
+        text-align: left;
+        border-radius: .5rem!important;
+        overflow: auto;
+        color: #ccc;
+        font-family: Consolas,Monaco,Andale Mono,Ubuntu Mono,monospace;
+        font-size: 1em;
+        white-space: pre;
+        word-spacing: normal;
+        word-break: normal;
+        word-wrap: normal;
+        line-height: 1.5;
+        -moz-tab-size: 4;
+        -o-tab-size: 4;
+        tab-size: 4;
+        -webkit-hyphens: none;
+        -ms-hyphens: none;
+        hyphens: none;
+    }
+    code {
+        padding: .1rem .3rem;
+        border-radius: 3px;
+    }
+    .token.punctuation {
+        color: #ccc;
+    }
+    .token.attr-value, .token.char, .token.regex, .token.string, .token.variable {
+        color: #7ec699;
+    }
+    .list-group{
+        border: none;
+
+
+    }
+    .list-group-item {
+        padding: 0.55rem 1.25rem;
+        margin-bottom: 0px;
+        background-color: #FFFFFF;
+        border-bottom: 1px solid rgba(34, 41, 47, 0.125) !important;
+        border-top: none;
+        border-right: none;
+        border-left: none;
+        font-weight: 700;
+        color: #424242;
+    }
+    .list-group-item:last-child{
+        border-radius: 0px;
+    }
+    .btn-flat-danger{
+        position: absolute;right: 0;top: 3px;
+        color: #424242;
+    }
+</style>
+
+<!-- Complex headers table -->
+<section id="headers">
+    <div class="row">
+        <div class="col-12">
+            <div>
+                <button id="toolbar_action_delete" class="btn btn-primary mb-2 waves-effect waves-light" onclick="clear_all()"><strong><i class="feather icon-trash"></i> Clear All </strong></button>
+
+                <button id="toolbar_action_save" class="btn btn-outline-primary mb-2 waves-effect waves-light" onclick="save_object();"><strong><i class="feather icon-save"></i> Train </strong></button>
+
+            </div>
+            <form id="formView" action="" method="post">
+                {% csrf_token %}
+                <!-- Drag & Drop System starts here -->
+                <section id="list-group-icons">
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12">
+                            {% if posted %}
+                            <div class="alert alert-success mb-2" role="alert">
+                                Bigbot has been successfully trained !!!
+                            </div>
+                            {% endif %}
+                            <div class="card">
+                                <div class="card-header">
+                                    <h4 class="card-title">Input & Response</h4>
+                                </div>
+                                <div class="card-content">
+                                    <div class="card-body listBody">
+                                        <p></p>
+                                        <fieldset class="form-label-group">
+                                            <input data-length="20" name="name" type="text" value="{{record.name}}"  id="firstText"
+                                                   class="form-control char-textarea active"  placeholder="Type input or response"
+                                                   autocomplete="off" style="color: rgb(78, 81, 84);" />
+                                            <label for="firstText">eg. how are you?</label>
+                                        </fieldset>
+                                        <ul id="example2-left" class="list-group firstList">
+
+
+
+                                        </ul>
+
+                                        <!-- <PRE> starts here -->
+        <pre id="codeVisual" class="rounded-lg language-js mt-2">
+        </pre>
+                                        <!-- <PRE> ends here -->
+
+
+
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                    </div>
+                </section>
+                <!-- Drag & Drop System ends here -->
+            </form>
+        </div>
+    </div>
+</section>
+<!--/ Complex headers table -->
+
+{% endblock %}
+
+{% block footer %}
+<script src="{% static 'app-assets/js/scripts/extensions/sortable.js' %}"></script>
+<script type="application/javascript">
+
+    $('#firstText').keypress(function(event){
+
+        var keycode = (event.keyCode ? event.keyCode : event.which);
+        if(keycode == '13'){
+            event.preventDefault();
+           // alert('You pressed a "enter" key in textbox');
+            if($.trim($(this).val()) != ''){
+              addToList($(this).val());
+                makeVisual();
+                $(this).val('');
+            }
+
+        }
+    });
+
+
+
+
+    function addToList(text){
+$('.list-group').append('<li id="" data-text="'+text+'" class="list-group-item d-flex"><span>'+text+'</span><input type="hidden" name="data_list" value="'+text+'"><button type="button" class="btn btn-icon deleteList btn-flat-danger mr-1 mb-1 waves-effect waves-light"><i class="feather icon-x"></i></button></li>');
+        deleteList();
+    }
+
+    function makeVisual(){
+    var codeContent = '';
+    var listGroup = $('#example2-left .list-group-item');
+
+    codeContent += '<code  class="language-js">';
+
+    if(listGroup.length == 0){
+    codeContent += '<span class="token punctuation">[]</span>';
+    }else{
+    codeContent += '<span class="token punctuation">[</span><br> ';
+    $('#example2-left .list-group-item').each(function(index){
+    var punctuation = '<span class="token punctuation">,</span>';
+    if(index == (listGroup.length - 1)){
+    punctuation = '';
+    }
+    codeContent += '  <span class="token string">"'+ $(this).attr('data-text')+'"</span>'+punctuation+'<br> ';
+
+    });
+
+    codeContent += ' <span class="token punctuation">]</span><br>';
+    }
+    codeContent += '</code>';
+
+
+
+
+$('#codeVisual').html(codeContent);
+
+    }
+
+    function deleteList(){
+        $('.deleteList').on('click',function(){
+    $(this).parent().remove();
+            makeVisual();
+        });
+
+    }
+
+
+
+    var example2Left = document.getElementById('example2-left');
+
+    new Sortable(example2Left, {
+        multiDrag: true, // Enable multi-drag
+        selectedClass: 'active', // The class applied to the selected items
+        animation: 150,
+        onSort: function (event) {
+            makeVisual();
+
+        },
+        onEnd:function (event) {
+            $(this).children();
+//console.log("LENGTH - ",$('#example2-left').children().length);
+        }
+    });
+
+
+</script>
+
+<script>
+    $(document).ready(function () {
+        makeVisual();
+      //  $('#firstText').trigger('keyup');
+
+    });
+
+</script>
+
+<script>
+
+    function save_object() {
+        var form = document.getElementById("formView");
+        var input = document.createElement('input');//prepare a new input DOM element
+        input.setAttribute('name', 'action');//set the param name
+        input.setAttribute('value', 'save');//set the value
+        input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+       // form.appendChild(input);
+        form.submit();
+    }
+
+    function clear_all(object) {
+        var form = document.getElementById("formView");
+        var input = document.createElement('input');//prepare a new input DOM element
+        input.setAttribute('name', 'action');//set the param name
+        input.setAttribute('value', 'delete');//set the value
+        input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+        form.appendChild(input);
+
+        form.submit();
+    }
+
+
+</script>
+
+{% endblock %}

@@ -1,0 +1,338 @@
+swagger: '2.0'
+info:
+  description: This is a Bigbot Skill documentation
+  version: 3.0.0
+  title: Bigbot Skill Builder
+  termsOfService: 'https://abigbot.com/legal/terms-of-use'
+  contact:
+    email: api@bigitsystems.com
+  license:
+    name: Apache 2.0
+    url: 'http://www.apache.org/licenses/LICENSE-2.0.html'
+host: 'console.igotbot.com'
+#host: 'localhost'
+basePath: /api/v3
+tags:
+  - name: builder
+    description: This API helpful to retrive building blocks of skill builder.
+  - name: store
+    description: This API helpful to making Bigbot store queries.
+  - name: console
+    description: This API helpful to draft and publishing your skill.
+schemes:
+  - https
+  #- http
+paths:
+
+  /skill/builder/blocks:
+    get:
+      tags:
+        - builder
+      summary: Retrive all available blocks.
+      operationId: builder_blocks
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters: []
+      responses:
+        '200':
+          description: Returns list of one or more channel
+          schema:
+            example: [ { "component": "apps.bigbot.component.TerminalBlock", "descriptor": { "name": "Terminal", "summary": "For starting and ending of workflow.", "icon": "terminal" }, "template": [ { "name": "type", "format": "enum", "enum": [ { "name": "start", "value": 0 }, { "name": "end", "value": 1 } ] }, { "name": "exit", "format": "string" } ], "connections": [ [ null, null ] ] } ]
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed
+        
+  /skill/builder/connections:
+    post:
+      tags:
+        - builder
+      summary: Retrive all possible connections.
+      operationId: builder_connections
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters:
+        - in: query
+          name: component
+          description: Block component
+          required: true
+          type: "string"
+        - in: body
+          name: body
+          description: Post current properties along with value
+          required: true
+          schema:
+            example: [{"name":"type","value":"start"},{"name":"exit","value":null}]
+          
+      responses:
+        '200':
+          description: Returns list of one or more channel
+          schema:
+            example: [[null,null]]
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed
+  
+  /skill/builder/validate:
+    post:
+      tags:
+        - builder
+      summary: Validate entire workflow by posting properties values.
+      operationId: validate_skill
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters:
+        - in: body
+          name: body
+          description: Post current properties along with properties values.
+          required: true
+          schema:
+            example: [{"key":"ce3e922d-8941-4981-b790-1789bc30c30d","component":"apps.bigbot.component.TerminalBlock","properties":[{"name":"type","value":"start"},{"name":"exit","value":null}]},"connections":[[-1,"08446b41-8b55-4b97-ad1f-a84c4e5dc88f"]]]
+          
+      responses:
+        '200':
+          description: Returns list of one or more channel
+          schema:
+            example: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed
+  
+  /store/package:
+    get:
+      tags:
+        - store
+      summary: Get Information about published skill on Bigbot store.
+      operationId: get_package
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters: 
+          - in: query
+            name: package
+            description: Unique package name of your skill
+            required: true
+            type: "string"
+      responses:
+        '200':
+          description: Returns information about this package.
+          schema:
+            example: {}
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed
+  
+  /store/component:
+    get:
+      tags:
+        - store
+      summary: Get Information about published component on Bigbot store.
+      operationId: get_component
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters: 
+          - in: query
+            name: query
+            description: Free search query, type name, vendor
+            required: true
+            type: "string"
+      responses:
+        '200':
+          description: Returns information about this component.
+          schema:
+            example: {}
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed
+          
+  /console/skill/draft:
+    get:
+      tags:
+        - console
+      summary: Retrive all draft skill.
+      operationId: get_draft_skills
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters: []
+      responses:
+        '200':
+          description: Returns list of one or more channel
+          schema:
+            example: [{ "id":54, "name": "Google Event", "summary": "Post event to your google calendar.", "description": "Helps to create google calendar event using google api.", "category": 1, "package": "com.big.bot.google.event", "component": "apps.bigbot.google.GoogleAdapter", "data": [ { "key": "ce3e922d-8941-4981-b790-1789bc30c30d", "component": "apps.bigbot.component.TerminalBlock", "properties": [ { "name": "type", "value": "start" }, { "name": "exit", "value": null } ] }, { "connections": [ [ -1, "08446b41-8b55-4b97-ad1f-a84c4e5dc88f" ] ] } ] }]
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed
+    post:
+      tags:
+        - console
+      summary: Create new draft skill.
+      operationId: create_draft_skill
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters:
+        - in: body
+          name: body
+          description: Post current properties along with value
+          required: true
+          schema:
+            example: {"name":"Google Event","summary":"Post event to your google calendar.","description":"Helps to create google calendar event using google api.","category":1,"package":"com.big.bot.google.event","component":"apps.bigbot.google.GoogleAdapter","data":[]}
+          
+      responses:
+        '200':
+          description: It returns ID of draft skill.
+          schema:
+            example: 54
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed          
+    put:
+      tags:
+        - console
+      summary: Update draft skill.
+      operationId: update_draft_skill
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters:
+        - in: query
+          name: id
+          description: ID of draft skill.
+          required: true
+          type: "integer"
+        - in: body
+          name: body
+          description: Post current properties along with value
+          required: true
+          schema:
+            example: {"name":"Google Event","summary":"Post event to your google calendar.","description":"Helps to create google calendar event using google api.","category":1,"package":"com.big.bot.google.event","component":"apps.bigbot.google.GoogleAdapter","data":[{"key":"ce3e922d-8941-4981-b790-1789bc30c30d","component":"apps.bigbot.component.TerminalBlock","properties":[{"name":"type","value":"start"},{"name":"exit","value":null}]},"connections":[[-1,"08446b41-8b55-4b97-ad1f-a84c4e5dc88f"]]]}
+          
+      responses:
+        '200':
+          description: It returns ID of draft skill.
+          schema:
+            example: 54
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed        
+    delete:
+      tags:
+        - console
+      summary: Delete draft skill.
+      operationId: delete_draft_skill
+      consumes:
+        - application/json
+      produces:
+        - text/plain
+      security:
+        - uuid: []
+          token: []
+      parameters:
+        - in: query
+          name: id
+          description: ID of draft skill.
+          required: true
+          type: "integer"
+          
+      responses:
+        '200':
+          description: It returns ID of draft skill.
+          schema:
+            example: OK
+        '400':
+          description: Bad Request
+        '401':
+          description: Unauthorized
+        '403':
+          description: Access Denied
+        '405':
+          description: Method Not Allowed     
+        '410':
+          description: Gone  
+          
+  
+securityDefinitions:
+  uuid:
+    type: apiKey
+    in: query
+    name: uuid
+  token:
+    type: apiKey
+    in: query
+    name: token

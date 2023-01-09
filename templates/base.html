@@ -1,0 +1,305 @@
+{% load static %}
+{% load static %}
+<!DOCTYPE html>
+<html class="loading" data-textdirection="ltr" lang="en">
+<!-- BEGIN: Head-->
+<head>
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible">
+    <meta content="width=device-width, initial-scale=1.0, user-scalable=0, minimal-ui" name="viewport">
+    <meta content="Vuexy admin is super flexible, powerful, clean &amp; modern responsive bootstrap 4 admin template with unlimited possibilities." name="description">
+    <meta content="admin template, Vuexy admin template, dashboard template, flat admin template, responsive admin template, web app" name="keywords">
+    <meta content="PIXINVENT" name="author">
+    <title>
+        Bigbot
+    </title>
+    <link href="{% static '/images/favicon.png' %}" rel="shortcut icon"/>
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:300,400,500,600" rel="stylesheet">
+    <!-- BEGIN: Vendor CSS-->
+    <link href="{% static 'app-assets/vendors/css/vendors.min.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/select/select2.min.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/vendors/css/forms/spinner/jquery.bootstrap-touchspin.css' %}">
+    <link href="{% static 'app-assets/vendors/css/charts/apexcharts.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/vendors/css/extensions/tether-theme-arrows.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/vendors/css/extensions/tether.min.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/vendors/css/extensions/shepherd-theme-default.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/vendors/css/file-uploaders/dropzone.min.css' %}" rel="stylesheet" type="text/css">
+    <!-- END: Vendor CSS-->
+    <!-- BEGIN: Theme CSS-->
+    <link href="{% static 'app-assets/css/bootstrap.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/bootstrap-extended.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/colors.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/components.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/themes/dark-layout.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/themes/semi-dark-layout.css' %}" rel="stylesheet" type="text/css">
+    <!-- BEGIN: Page CSS-->
+    <link href="{% static 'app-assets/css/core/menu/menu-types/vertical-menu.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/core/colors/palette-gradient.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/pages/dashboard-analytics.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/pages/card-analytics.css' %}" rel="stylesheet" type="text/css">
+    <link href="{% static 'app-assets/css/plugins/tour/tour.css' %}" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/app-user.css' %}">
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/plugins/file-uploaders/dropzone.css' %}">
+    <link href="{% static 'app-assets/css/pages/knowledge-base.css' %}" rel="stylesheet" type="text/css"/>
+    <link href="{% static 'app-assets/css/plugins/forms/validation/form-validation.css' %}" rel="stylesheet" type="text/css"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'app-assets/css/pages/app-ecommerce-shop.css'%}">
+
+    <!-- END: Page CSS-->
+    <!-- BEGIN: Custom CSS-->
+    <link href="{% static 'assets/css/style.css' %}" rel="stylesheet" type="text/css">
+    <!-- END: Custom CSS-->
+    {% block head %}
+    {% endblock %}
+</head>
+<!-- END: Head-->
+<!-- BEGIN: Body-->
+<body class="vertical-layout vertical-menu-modern 2-columns ecommerce-application navbar-floating footer-static " data-col="2-columns" data-menu="vertical-menu-modern" data-open="click">
+<!-- BEGIN: Header-->
+{% include 'header.html' %}
+
+<ul class="main-search-list-defaultlist d-none">
+    <li class="d-flex align-items-center">
+        <a class="pb-25" href="#">
+            <h6 class="text-primary mb-0">
+                Files
+            </h6>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between w-100" href="#">
+            <div class="d-flex">
+                <div class="mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/icons/xls.png' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        Two new item submitted
+                    </p>
+                    <small class="text-muted">
+                        Marketing Manager
+                    </small>
+                </div>
+            </div>
+            <small class="search-data-size mr-50 text-muted">
+                &amp;apos;17kb
+            </small>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between w-100" href="#">
+            <div class="d-flex">
+                <div class="mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/icons/jpg.png' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        52 JPG file Generated
+                    </p>
+                    <small class="text-muted">
+                        FontEnd Developer
+                    </small>
+                </div>
+            </div>
+            <small class="search-data-size mr-50 text-muted">
+                &amp;apos;11kb
+            </small>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between w-100" href="#">
+            <div class="d-flex">
+                <div class="mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/icons/pdf.png' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        25 PDF File Uploaded
+                    </p>
+                    <small class="text-muted">
+                        Digital Marketing Manager
+                    </small>
+                </div>
+            </div>
+            <small class="search-data-size mr-50 text-muted">
+                &amp;apos;150kb
+            </small>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between w-100" href="#">
+            <div class="d-flex">
+                <div class="mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/icons/doc.png' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        Anna_Strong.doc
+                    </p>
+                    <small class="text-muted">
+                        Web Designer
+                    </small>
+                </div>
+            </div>
+            <small class="search-data-size mr-50 text-muted">
+                &amp;apos;256kb
+            </small>
+        </a>
+    </li>
+    <li class="d-flex align-items-center">
+        <a class="pb-25" href="#">
+            <h6 class="text-primary mb-0">
+                Members
+            </h6>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between py-50 w-100" href="#">
+            <div class="d-flex align-items-center">
+                <div class="avatar mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/portrait/small/avatar-s-8.jpg' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        John Doe
+                    </p>
+                    <small class="text-muted">
+                        UI designer
+                    </small>
+                </div>
+            </div>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between py-50 w-100" href="#">
+            <div class="d-flex align-items-center">
+                <div class="avatar mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/portrait/small/avatar-s-1.jpg' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        Michal Clark
+                    </p>
+                    <small class="text-muted">
+                        FontEnd Developer
+                    </small>
+                </div>
+            </div>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between py-50 w-100" href="#">
+            <div class="d-flex align-items-center">
+                <div class="avatar mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/portrait/small/avatar-s-14.jpg' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        Milena Gibson
+                    </p>
+                    <small class="text-muted">
+                        Digital Marketing Manager
+                    </small>
+                </div>
+            </div>
+        </a>
+    </li>
+    <li class="auto-suggestion d-flex align-items-center cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between py-50 w-100" href="#">
+            <div class="d-flex align-items-center">
+                <div class="avatar mr-50">
+                    <img alt="png" height="32" src="{% static 'app-assets/images/portrait/small/avatar-s-6.jpg' %}"/>
+                </div>
+                <div class="search-data">
+                    <p class="search-data-title mb-0">
+                        Anna Strong
+                    </p>
+                    <small class="text-muted">
+                        Web Designer
+                    </small>
+                </div>
+            </div>
+        </a>
+    </li>
+</ul>
+<ul class="main-search-list-defaultlist-other-list d-none">
+    <li class="auto-suggestion d-flex align-items-center justify-content-between cursor-pointer">
+        <a class="d-flex align-items-center justify-content-between w-100 py-50">
+            <div class="d-flex justify-content-start">
+      <span class="mr-75 feather icon-alert-circle">
+      </span>
+                <span>
+       No results found.
+      </span>
+            </div>
+        </a>
+    </li>
+</ul>
+<!-- END: Header-->
+<!-- BEGIN: Main Menu-->
+{% include 'navigation.html' %}
+<!-- END: Main Menu-->
+<!-- BEGIN: Content-->
+<div class="app-content content">
+    <div class="content-overlay">
+    </div>
+    <div class="header-navbar-shadow">
+    </div>
+    <div class="content-wrapper">
+        <div class="content-header row">
+            {% block breadcrumb %}
+            {% endblock %}
+        </div>
+        <div class="content-body">
+            <!-- Dashboard Analytics Start -->
+            {% block content %}
+            {% endblock %}
+            <!-- Dashboard Analytics end -->
+        </div>
+    </div>
+</div>
+<!-- END: Content-->
+<div class="sidenav-overlay">
+</div>
+<div class="drag-target">
+</div>
+<!-- BEGIN: Footer-->
+<footer class="footer footer-static footer-light">
+
+    <script src="{% static 'app-assets/vendors/js/vendors.min.js' %}">
+    </script>
+    <!-- BEGIN Vendor JS-->
+    <!-- BEGIN: Page Vendor JS-->
+    <!-- BEGIN: Page Vendor JS-->
+    <script src="{% static 'app-assets/vendors/js/forms/select/select2.full.min.js' %}"></script>
+    <!-- END: Page Vendor JS-->
+
+    <script src="{% static 'app-assets/vendors/js/charts/apexcharts.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/extensions/tether.min.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/forms/validation/jqBootstrapValidation.js' %}"></script>
+    <script src="{% static 'app-assets/vendors/js/extensions/dropzone.min.js' %}"></script>
+
+    <!-- END: Page Vendor JS-->
+    <!-- BEGIN: Theme JS-->
+    <script src="{% static 'app-assets/js/core/app-menu.js' %}">
+    </script>
+    <script src="{% static 'app-assets/js/core/app.js' %}">
+    </script>
+    <script src="{% static 'app-assets/js/scripts/components.js' %}">
+    </script>
+    <!-- END: Theme JS-->
+    <!-- BEGIN: Page JS-->
+    <script src="{% static 'app-assets/js/scripts/forms/select/form-select2.min.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/pages/dashboard-analytics.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/forms/validation/form-validation.js' %}"></script>
+    <script src="{% static 'app-assets/js/scripts/extensions/dropzone.js' %}"></script>
+
+    {% block footer %}
+    {% endblock %}
+</footer>
+<!-- END: Footer-->
+<!-- BEGIN: Vendor JS-->
+
+<!-- END: Page JS-->
+</body>
+<!-- END: Body-->
+</html>

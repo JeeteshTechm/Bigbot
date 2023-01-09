@@ -1,0 +1,13 @@
+{% extends "admin/change_form.html" %}
+
+<!-- -->
+
+{% block submit_buttons_bottom %}
+<!-- -->
+<div class="submit-row">
+  <input id="_sync_realm" name="_sync_realm" type="submit" value="Sync Users" />
+</div>
+
+{{ block.super }}
+<!-- -->
+{% endblock %}

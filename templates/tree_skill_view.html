@@ -1,0 +1,28 @@
+{% extends 'tree.html' %}
+{% load static %}
+{% block actions %}
+    <button onclick="upload_object()"  class="btn btn-primary mb-2 waves-effect waves-light" >
+        <strong><i class="feather icon-upload"></i> Import </strong></button>
+    <form action="/import_skill/" style="display: none;" class="dropzone dropzone-area" id="dropzoneForm">
+        {% csrf_token %}
+        <div class="dz-message">Drop Files Here To Upload</div>
+    </form>
+{% endblock %}
+{% block tree_footer %}
+    <script>
+        var myDropzone = false;
+        Dropzone.options.dropzoneForm = {
+            init: function () {
+                myDropzone = this;
+                this.on("success", function(response) {
+                    window.location = '/console/project/delegate.skill'
+                });
+            },
+            paramName: "file"
+        };
+        function upload_object() {
+            myDropzone.hiddenFileInput.click()
+        }
+    </script>
+
+{% endblock %}

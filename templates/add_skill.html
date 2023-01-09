@@ -1,0 +1,321 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+<meta name="tree_content" content="{{TREE_META_JSON}}">
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script src="{% static 'core/base.js' %}"></script>
+{% endblock %}
+
+{% block breadcrumb %}
+<div class="content-header-left col-md-9 col-12 mb-2">
+    <div class="row breadcrumbs-top">
+        <div class="col-12">
+            <h2 class="content-header-title float-left mb-0">Add New</h2>
+            <div class="breadcrumb-wrapper col-12">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="/">Home</a>
+                    </li>
+                    <li class="breadcrumb-item"><a href="/plain-skill/">Skill Trainer</a>
+                    </li>
+                    <li class="breadcrumb-item active"><a href="#">New Input</a>
+                    </li>
+                </ol>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block content %}
+<!-- Complex headers table -->
+<section id="headers">
+    <div class="row">
+        <div class="col-12">
+            <div>
+
+                <button id="toolbar_action_delete" class="btn btn-primary mb-2 waves-effect waves-light" onclick="deleteSelected()" {% if not record %}disabled{% endif %}><strong><i class="feather icon-trash"></i> Delete </strong></button>
+
+                <button id="toolbar_action_save" class="btn btn-outline-primary mb-2 waves-effect waves-light" onclick="" ><strong><i class="feather icon-save"></i> Save </strong></button>
+
+                <button id="toolbar_action_export" class="btn btn-outline-primary mb-2 waves-effect waves-light" onclick="export_object()"
+                        {% if not record %}disabled{% endif %}><strong><i class="feather icon-external-link"></i> Export </strong></button>
+
+                <button id="toolbar_action_duplicate" class="btn btn-outline-primary mb-2 waves-effect waves-light" onclick="send_action('clone');"
+                        {% if not record %}disabled{% endif %}><strong><i class="feather icon-copy"></i> Clone </strong></button>
+
+
+            </div>
+            <div class="card">
+
+                <div class="card-header">
+                    <h4 class="card-title">Add Input Pattern</h4>
+                </div>
+                <form id="skillForm" action="" method="post">
+                    {% csrf_token %}
+                    <div class="card-content">
+                        <div class="card-body card-dashboard">
+
+                            <fieldset class="form-label-group mt-1 mb-3">
+                                <div class="vs-checkbox-con vs-checkbox-primary">
+                                    <input type="checkbox" {% if record.active %}checked {% endif %} name="active_status">
+                                    <span class="vs-checkbox">
+                                                            <span class="vs-checkbox--check">
+                                                                <i class="vs-icon feather icon-check"></i>
+                                                            </span>
+                                                        </span>
+                                    <span class="">Active</span>
+                                </div>
+                            </fieldset>
+
+                            <p class="font-medium-3 mb-2 mt-2" ><i class="feather icon-italic"></i> Name</p>
+                            <fieldset class="form-label-group mb-0">
+                                <input data-length="20" name="name" type="text" value="{{record.name}}"  id="firstText" class="form-control char-textarea active"  placeholder="Provide a name" autocomplete="off" style="color: rgb(78, 81, 84);" />
+                                <label for="firstText">Name</label>
+                            </fieldset>
+
+                            <p class="font-medium-3 mb-2 mt-2" ><i class="feather icon-github"></i> Integration Code</p>
+                            <fieldset class="form-label-group mb-0">
+                                <input data-length="20" name="provider" type="text" value="{{record.provider.1}}"  class="form-control char-textarea active"  placeholder="Provider Code" autocomplete="off" style="color: rgb(78, 81, 84);" readonly/>
+                                <label for="firstText">eg. odoo</label>
+                            </fieldset>
+
+                            <p class="font-medium-3 mb-2 mt-2" ><i class="feather icon-box"></i> Package</p>
+                            <fieldset class="form-label-group mb-0">
+                                <input data-length="20" name="package" type="text" value="{{record.package}}" id="secondText" class="form-control char-textarea active"  placeholder="Provide a package" autocomplete="off" style="color: rgb(78, 81, 84);" />
+                                <label for="secondText">Unique Package</label>
+                            </fieldset>
+
+                            <section id="nav-filled">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <div class="card overflow-hidden">
+
+                                            <div class="card-content">
+                                                <div class="card-body">
+                                                    <!-- Nav tabs -->
+                                                    <ul class="nav nav-tabs nav-fill" id="myTab" role="tablist">
+                                                        <li class="nav-item">
+                                                            <a class="nav-link active" id="home-tab-fill" data-toggle="tab" href="#home-fill" role="tab" aria-controls="home-fill" aria-selected="false"> <p class="font-medium-3 mb-2 mt-1" ><i class="feather icon-edit-1"></i> Input Architecture</p></a>
+                                                        </li>
+                                                        <li class="nav-item">
+                                                            <a class="nav-link" id="profile-tab-fill" data-toggle="tab" href="#profile-fill" role="tab" aria-controls="profile-fill" aria-selected="false">  <p class="font-medium-3 mb-2 mt-1" ><i class="feather icon-file-text"></i> Response Architecture</p></a>
+                                                        </li>
+
+                                                    </ul>
+
+                                                    <!-- Tab panes -->
+                                                    <div class="tab-content pt-1">
+                                                        <div class="tab-pane active" id="home-fill" role="tabpanel" aria-labelledby="home-tab-fill">
+                                                            <fieldset class="form-label-group mb-0">
+                                                                <textarea name="input_arch" class="form-control char-textarea active" id="textarea-counter" rows="6" placeholder="Provide an input JSON" autocomplete="off" style="color: rgb(78, 81, 84);display: none">{% if record.input_arch  %}{{ record.input_arch }}{% else %}[]{% endif %}</textarea>
+                                                                <div style="border:1px solid #D9D9D9;border-radius:5px;padding: 5px">
+                                                                    <pre id="input-display"></pre>
+                                                                </div>
+
+                                                            </fieldset>
+                                                        </div>
+                                                        <div class="tab-pane" id="profile-fill" role="tabpanel" aria-labelledby="profile-tab-fill">
+
+                                                            <fieldset class="form-label-group mb-2">
+                                                                <textarea name="response_arch" class="form-control char-textarea active display-hidden" id="textarea-counter2" rows="6" placeholder="Provide a response JSON" autocomplete="off" style="color: rgb(78, 81, 84);">{% if record.response_arch  %}{{ record.response_arch }}{% else %}[]{% endif %}</textarea>
+                                                                <div style="border:1px solid #D9D9D9;border-radius:5px;padding: 5px">
+
+                                                                    <pre id="response-display"></pre>
+                                                                </div>
+                                                            </fieldset>
+                                                        </div>
+
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+
+
+
+
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+<!--/ Complex headers table -->
+
+
+{% endblock %}
+
+{% block footer %}
+<script type="text/javascript" src="{% static 'app-assets/js/scripts/pages/jquery.json-editor.min.js' %}"></script>
+<script type="text/javascript">
+    function getCaretPosition(editableDiv) {
+        var caretPos = 0,
+            sel, range;
+        if (window.getSelection) {
+            sel = window.getSelection();
+            if (sel.rangeCount) {
+                range = sel.getRangeAt(0);
+                if (range.commonAncestorContainer.parentNode == editableDiv) {
+                    caretPos = range.endOffset;
+                }
+            }
+        } else if (document.selection && document.selection.createRange) {
+            range = document.selection.createRange();
+            if (range.parentElement() == editableDiv) {
+                var tempEl = document.createElement("span");
+                editableDiv.insertBefore(tempEl, editableDiv.firstChild);
+                var tempRange = range.duplicate();
+                tempRange.moveToElementText(tempEl);
+                tempRange.setEndPoint("EndToEnd", range);
+                caretPos = tempRange.text.length;
+            }
+        }
+        return caretPos;
+    }
+
+    function getPos(ele) {
+        var element = ele;
+        var contentEdit = element && element.contentEditable;
+
+
+        if(contentEdit){
+            element.focus();
+            let _range = document.getSelection().getRangeAt(0);
+            let range = _range.cloneRange();
+            range.selectNodeContents(element);
+            range.setEnd(_range.endContainer, _range.endOffset);
+            return range.toString().length;
+        }
+        // for texterea/input element
+        return element.selectionStart;
+
+    }
+
+    function setPos(ele,pos) {
+        var element = ele;
+        var contentEdit = element && element.contentEditable;
+        // for contentedit field
+        if (contentEdit) {
+            element.focus();
+            window.getSelection().collapse(element, pos);
+            return
+        }
+        element.setSelectionRange(pos, pos);
+    }
+
+
+
+
+    function getJson() {
+        try {
+            return JSON.parse($('#textarea-counter').val());
+        } catch (ex) {
+            console.log('Wrong JSON Format: ' + ex);
+            return $('#textarea-counter').val();
+            // return false;
+        }
+    }
+    function getJson2() {
+        try {
+            return JSON.parse($('#textarea-counter2').val());
+        } catch (ex) {
+            console.log('Wrong JSON Format: ' + ex);
+            return $('#textarea-counter2').val();
+        }
+    }
+
+    var editor = new JsonEditor('#input-display', getJson());
+    editor.load(getJson());
+    var editor2 = new JsonEditor('#response-display', getJson2());
+    editor2.load(getJson2());
+
+    $("#input-display").on("blur",function () {
+
+        editor.load(getJson());
+
+    });
+
+    $("#response-display").on("blur",function () {
+
+        editor2.load(getJson2());
+
+    });
+
+    $("#input-display").on("keyup",function () {
+
+        try {
+            $('#textarea-counter').val(JSON.stringify(JSON.parse($(this).text())));
+            console.log(typeof $('#textarea-counter').val());
+            $("#input-display .json-string").css({"color":""});
+            //   editor.load(getJson());
+
+
+        } catch (ex) {
+            $("#input-display .json-string").css({"color":"red"});
+            console.log('Wrong JSON Format: ' + ex);
+            return false;
+        }
+    });
+    $("#response-display").on("keyup",function () {
+        try {
+            $('#textarea-counter2').val(JSON.stringify(JSON.parse($(this).text())));
+            console.log($('#textarea-counter2').val());
+            $("#response-display .json-string").css({"color":""});
+        } catch (ex) {
+            $("#response-display .json-string").css({"color":"red"});
+            console.log('Wrong JSON Format: ' + ex);
+
+            return false;
+        }
+    });
+    document.getElementById('toolbar_action_save').addEventListener("click",function () {
+        save_object();
+    });
+    document.getElementById('toolbar_action_delete').addEventListener("click",function () {
+        delete_object();
+    });
+    function delete_object() {
+        var form = document.getElementById("skillForm");
+        var input = document.createElement('input');//prepare a new input DOM element
+        input.setAttribute('name', 'action');//set the param name
+        input.setAttribute('value', 'delete');//set the value
+        input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+        form.appendChild(input);
+        form.submit();
+    }
+    function save_object() {
+        var form = document.getElementById("skillForm");
+        var input = document.createElement('input');//prepare a new input DOM element
+        // input.setAttribute('name', 'action');//set the param name
+        // input.setAttribute('value', 'save');//set the value
+        //input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+        //form.appendChild(input);
+        form.submit();
+    }
+
+    function export_object() {
+        var form = document.getElementById("skillForm");
+        var input = document.createElement('input');//prepare a new input DOM element
+        input.setAttribute('name', 'action');//set the param name
+        input.setAttribute('value', 'export');//set the value
+        input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+        form.appendChild(input);
+        form.submit();
+    }
+
+    function send_action(action) {
+        var form = document.getElementById("skillForm");
+        var input = document.createElement('input');
+        input.setAttribute('name', 'action');
+        input.setAttribute('value', action);
+        input.setAttribute('type', 'hidden');
+        form.appendChild(input);
+        form.submit();
+    }
+
+</script>
+{% endblock %}

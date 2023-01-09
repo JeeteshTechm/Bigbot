@@ -1,0 +1,187 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <meta name="tree_content" content="{{TREE_META_JSON}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'core/base.js' %}"></script>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+            <div class="col-12">
+                <h2 class="content-header-title float-left mb-0">Add New</h2>
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a>
+                        </li>
+                        <li class="breadcrumb-item"><a href="/utterances/">Utterances</a>
+                        </li>
+                        <li class="breadcrumb-item active"><a href="#">New Utterance</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <!-- Complex headers table -->
+    <section id="headers">
+        <div class="row">
+            <div class="col-12">
+                <div>
+
+                    <button id="toolbar_action_delete" class="btn btn-primary mb-2 waves-effect waves-light" onclick="deleteSelected()" {% if not record %}disabled{% endif %}><strong><i class="feather icon-trash"></i> Delete </strong></button>
+
+                    <button id="toolbar_action_save" class="btn btn-outline-primary mb-2 waves-effect waves-light" ><strong><i class="feather icon-save"></i> Save </strong></button>
+
+
+
+                </div>
+                <div class="card">
+
+                    <div class="card-header">
+                        <h4 class="card-title">Add Utterance</h4>
+                    </div>
+                    <div class="card-content">
+                        <form id="formView" action="" method="post">
+                            {% csrf_token %}
+
+                            <div class="card-body card-dashboard">
+                                <p class="font-medium-3 mb-2" ><i class="feather icon-edit-1"></i> Body</p>
+
+                                <fieldset class="form-label-group mb-0">
+                                    <textarea data-length="200" class="form-control char-textarea active" id="textarea-counter" rows="3" placeholder="Provide an input" name="body" autocomplete="off" style="color: rgb(78, 81, 84);">{{ record.body }}</textarea>
+                                    <label for="textarea-counter">Body</label>
+                                </fieldset>
+                                <small class="counter-value float-right"><span class="char-count">0</span> / 200 </small>
+
+                            </div>
+
+
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <!--/ Complex headers table -->
+
+
+{% endblock %}
+
+{% block footer %}
+    <script>
+        jQuery.fn.selectText = function(){
+            this.find('input').each(function() {
+                if($(this).prev().length == 0 || !$(this).prev().hasClass('p_copy')) {
+                    $('<p class="p_copy" style="position: absolute; z-index: -1;"></p>').insertBefore($(this));
+                }
+                $(this).prev().html($(this).val());
+            });
+            var doc = document;
+            var element = this[0];
+            console.log(this, element);
+            if (doc.body.createTextRange) {
+                var range = document.body.createTextRange();
+                range.moveToElementText(element);
+                range.select();
+            } else if (window.getSelection) {
+                var selection = window.getSelection();
+                var range = document.createRange();
+                range.selectNodeContents(element);
+                selection.removeAllRanges();
+                selection.addRange(range);
+            }
+        };
+        function save_object() {
+            var form = document.getElementById("formView");
+            var input = document.createElement('input');//prepare a new input DOM element
+            input.setAttribute('name', 'action');//set the param name
+            input.setAttribute('value', 'save');//set the value
+            input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            //form.appendChild(input);
+            form.submit();
+        }
+
+        $('#add_new_response').on('click',function () {
+            $('#response_list').append('<li class="list-group-item d-flex"><span class="responseArea" contenteditable="true" data-placeholder="Enter a response"></span><input type="hidden" class="response" value="" name="response" /></li>');
+            showPlaceholder();
+            updateHiddenValue();
+            // selectAllText();
+        });
+        function updateHiddenValue(){
+            console.log('i am loaded');
+            $('.responseArea').on('keyup',function () {
+                $(this).siblings('.response').val($(this).text());
+                console.log($(this).siblings('.response').val());
+            });
+        }
+        function selectAllText(){
+            $('.responseArea').on('focus',function () {
+                console.log('Select Text Loaded');
+                $(this).selectText();
+
+            });
+        }
+        function showPlaceholder(){
+            var ele = $('.responseArea');
+            ele.each(function () {
+                if($(this).text().length == 0){
+                    console.log($(this));
+                    $(this).text($(this).attr('data-placeholder')).css({"opacity":0.4});
+                }
+            });
+
+            $('.responseArea').on('blur',function () {
+                var self = $(this);
+                if(self.text().length == 0){
+                    // self.parent().remove();
+                    self.text(self.attr('data-placeholder')).css({"opacity":0.4});
+                }
+            });
+            $('.responseArea').on('focus',function () {
+                var self = $(this);
+                if(self.text() == self.attr('data-placeholder')){
+                    self.text('').css({"opacity":1.0});
+                }
+            });
+        }
+        showPlaceholder();
+        updateHiddenValue();
+        //selectAllText();
+        document.getElementById('toolbar_action_save').addEventListener("click",function () {
+            save_object();
+        });
+        document.getElementById('toolbar_action_delete').addEventListener("click",function () {
+            delete_object();
+        });
+        function delete_object() {
+            var form = document.getElementById("formView");
+            var input = document.createElement('input');//prepare a new input DOM element
+            input.setAttribute('name', 'action');//set the param name
+            input.setAttribute('value', 'delete');//set the value
+            input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            form.appendChild(input);
+            form.submit();
+        }
+        function delete_response(object) {
+            var form = document.getElementById("formView");
+            var input = document.createElement('input');//prepare a new input DOM element
+            input.setAttribute('name', 'action');//set the param name
+            input.setAttribute('value', 'delete_response');//set the value
+            input.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            form.appendChild(input);
+
+            var extra = document.createElement('input');//prepare a new input DOM element
+            extra.setAttribute('name', 'response_id');//set the param name
+            extra.setAttribute('value', object);//set the value
+            extra.setAttribute('type', 'hidden')//set the type, like "hidden" or other
+            form.appendChild(extra);
+            form.submit();
+        }
+    </script>
+{% endblock %}

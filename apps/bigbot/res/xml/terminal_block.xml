@@ -1,0 +1,7 @@
+<properties>
+    <attr name="type" format="enum">
+        <attr name="start" value="0"/>
+        <attr name="end" value="1"/>
+    </attr>
+    <attr name="exit" format="string"/>
+</properties>

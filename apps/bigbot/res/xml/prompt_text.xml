@@ -1,0 +1,6 @@
+<properties>
+    <attr name="type" format="array">
+        <attr name="text" format="string"/>
+    </attr>
+    <attr name="delay" format="integer"/>
+</properties>

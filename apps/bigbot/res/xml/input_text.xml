@@ -1,0 +1,7 @@
+<properties>
+    <attr name="required" format="boolean"/>
+    <attr name="format" format="enum">
+        <attr name="text" value="0"/>
+        <attr name="email" value="1"/>
+    </attr>
+</properties>

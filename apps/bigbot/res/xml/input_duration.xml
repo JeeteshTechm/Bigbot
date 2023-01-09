@@ -1,0 +1,6 @@
+<properties>
+    <attr name="required" format="boolean"/>
+    <attr name="hours" format="boolean"/>
+    <attr name="minutes" format="boolean"/>
+    <attr name="seconds" format="boolean"/>
+</properties>

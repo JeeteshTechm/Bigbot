@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block head %}
+    <meta name="tree_content" content="{{TREE_META_JSON}}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="{% static 'core/base.js' %}"></script>
+{% endblock %}
+
+{% block breadcrumb %}
+    <div class="content-header-left col-md-9 col-12 mb-2">
+        <div class="row breadcrumbs-top">
+            <div class="col-12">
+                <h2 class="content-header-title float-left mb-0">{{tree_title}}</h2>
+                <div class="breadcrumb-wrapper col-12">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="/">Home</a>
+                        </li>
+                        <li class="breadcrumb-item active"><a href="#">{{tree_title}}</a>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block content %}
+    <!-- Complex headers table -->
+    <section id="headers">
+        <div class="row">
+            <div class="col-12">
+                <div>
+
+                    <button id="toolbar_action_delete" class="btn btn-primary mb-2 waves-effect waves-light" onclick="deleteSelected()" disabled><strong><i class="feather icon-trash"></i> Delete </strong></button>
+
+                    <button id="toolbar_action_new" class="btn btn-outline-primary mb-2 waves-effect waves-light" onclick="window.location.href='/console/project/{{MODEL_NAME}}/create';" ><strong><i class="feather icon-plus"></i> Add New </strong></button>
+
+
+
+                    <span style="position: absolute;right: 20px;">
+                        <button id="toolbar_action_prev" class="btn btn-primary mb-2 p-1 waves-effect waves-light" onclick="onPagePrevious()" disabled><strong><i class="feather icon-arrow-left"></i></strong></button>
+                        <button id="toolbar_action_next" class="btn btn-primary mb-2 p-1 waves-effect waves-light" onclick="onPageNext()" disabled><strong><i class="feather icon-arrow-right"></i></strong></button>
+
+                    </span>
+
+                   {% block actions %}
+                   {% endblock %}
+
+                </div>
+                <div class="card">
+
+                    <div class="card-header">
+                        <h4 class="card-title">{{tree_title}}</h4>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-body card-dashboard">
+
+                            <p class="card-text"></p>
+                            <div id="tree" class="table-responsive">
+
+                            </div>
+                            <div>
+                                               <span id="tree_data_summary">
+
+                                               </span>
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                </div>
+
+
+            </div>
+        </div>
+    </section>
+    <!--/ Complex headers table -->
+
+
+{% endblock %}
+
+{% block footer %}
+
+    <script>
+
+        const root_view = `<table class="table table-striped table-bordered complex-headers"><thead><tr></tr></thead><tbody></tbody></table>`;
+        const head_checkbox = `<th class="checkbox_column"><div class="vs-checkbox-con vs-checkbox-primary">
+<input id='select_all_checkbox' type='checkbox' onchange='selectAll()' />
+<span class="vs-checkbox">
+<span class="vs-checkbox--check">
+<i class="vs-icon feather icon-check"></i>
+</span>
+</span>
+</div></th>`;
+        const head_entry = `<th>%s</th>`;
+        const row_checkbox = `<tr id="%d"  style="cursor: pointer;"><td class="checkbox_column"><div class="vs-checkbox-con vs-checkbox-primary">
+<input type='checkbox' onchange='onSelectionChange()' />
+<span class="vs-checkbox">
+<span class="vs-checkbox--check">
+<i class="vs-icon feather icon-check"></i>
+</span>
+</span>
+</div></td></tr>`;
+        const row_entry = `<td onclick='onRowSelected("%d")'>%s</td>`;
+
+        let i, j;
+        const host = window.location.protocol+'//'+window.location.host;
+        const content = JSON.parse($("meta[name=tree_content]").attr("content"));
+
+        let tree = new TreeRequest(content);
+
+        $("#tree").html(root_view);
+        $("#tree").find( "thead" ).find("tr").append(head_checkbox);
+        for (i = 0; i < tree.heads.length; i++) {
+            $("#tree").find( "thead" ).find("tr").append(head_entry.format_string(tree.heads[i][1]));
+        }
+
+        tree.onPageFetched = function (data) {
+            removeAll();
+            for (i = 0; i < data.length; i++)
+                addItem(data[i]);
+            $("#toolbar_action_next").prop('disabled', !tree.hasNext());
+            $("#toolbar_action_prev").prop('disabled', !tree.hasPrevious());
+            $("#tree_data_summary").html(tree.getDataSummary());
+        };
+
+        tree.onAddRow = function (row) {
+            addItem(row);
+        };
+
+        tree.onRemoveRow = function (id) {
+            removeItem(id);
+        };
+
+        function addItem(row) {
+            let even = $("#tree").find( "tbody").find('tr').length%2 != 0 ? true : false;
+            let id =  row['id'];
+            $("#tree").find( "tbody" ).append(row_checkbox.format_string( id));
+            for (j = 0; j < tree.heads.length; j++) {
+                let head = tree.heads[j];
+                $("#tree").find( "tbody" ).find(`#${id}`).append(row_entry.format_string(id,tree.getDisplayValue(head, row)));
+            }
+        }
+        function removeItem(id) {
+            $("#tree").find( "tbody" ).find(`#${id}`).remove();
+        }
+        function getSelectedIds() {
+            let ids = [];
+            $("#tree").find( "tbody" ).find('tr').each(function() {
+                let checked = $(this).find("td input").prop("checked");
+                if(checked){
+                    let id = parseInt($(this).attr('id'));
+                    ids.push(id);
+                }
+            });
+            return ids;
+        }
+
+        function deleteSelected() {
+            let ids = getSelectedIds();
+            tree.delete(ids);
+        }
+        function getCheckState(id) {
+            let ids = [];
+            $("#tree").find( "tbody" ).find('tr').each(function() {
+                let checked = $(this).find("td input").prop("checked");
+                if(checked){
+                    let id = parseInt($(this).attr('id'));
+                    ids.push(id);
+                }
+            });
+            return ids;
+        }
+
+        function getRowCount() {
+            return $("#tree").find( "tbody" ).find('tr').length;
+        }
+
+        function removeAll() {
+            $("#tree").find( "tbody" ).find('tr').each(function() {
+                $(this).remove();
+            });
+            $('#select_all_checkbox').prop('checked',false);
+            $("#toolbar_action_delete").prop('disabled',true);
+        }
+
+        function onRowSelected(object) {
+            let id = parseInt(object);
+            window.location.href = '/console/project/'+tree.model+'/'+id;
+        }
+
+        function onSelectionChange() {
+            if(getSelectedIds().length != getRowCount())
+                $('#select_all_checkbox').prop('checked',false);
+            updateActions();
+        }
+
+        function updateActions() {
+            if(getSelectedIds().length == 0)
+                $("#toolbar_action_delete").prop('disabled',true);
+            else
+                $("#toolbar_action_delete").prop('disabled',false);
+        }
+
+        function selectAll() {
+            $("#tree").find( "tbody" ).find('tr').each(function() {
+                $(this).find("td input").prop("checked", $('#select_all_checkbox').prop('checked'));
+                updateActions();
+            });
+        }
+
+        function onPageNext() {
+            tree.next();
+        }
+        function onPagePrevious() {
+            tree.previous();
+        }
+
+        tree.fetch();
+
+    </script>
+    {% block tree_footer %}
+        {% endblock %}
+{% endblock %}

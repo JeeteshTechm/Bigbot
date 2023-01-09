@@ -1,0 +1,178 @@
+{   
+    "PhoneNumberUSA": [
+        [
+            {"ORTH": "("},
+            {"SHAPE": "ddd"},
+            {"ORTH": ")"},
+            {"SHAPE": "dddd"},
+            {"ORTH": "-", "OP": "?"},
+            {"SHAPE": "dddd"}
+        ]
+    ],
+
+    "EMAIL": [
+        [
+            {"TEXT": {"REGEX": "[a-zA-z0-9-_.]+@[a-zA-z0-9-_.]+"}}
+        ]
+    ],
+
+    "BookIntent": [
+        [
+            {"POS": "VERB", "TAG": {"IN": ["VB", "VBG", "VBP"]}, "LEMMA": "book"}
+        ]
+    ],
+
+    "CheckIntent": [
+        [
+            {"POS": "VERB", "TAG": {"IN": ["VB", "VBG", "VBP"]}, "LEMMA": "check"}
+        ]
+    ],
+
+    "ContactIntent": [
+        [
+            {"POS": "VERB", "TAG": {"IN": ["VB", "VBG", "VBP"]}, "LEMMA": {"IN": ["call", "contact"]}}
+        ]
+    ],
+
+    "CreateIntent": [
+        [
+            {"POS": "VERB", "TAG": {"IN": ["VB", "VBG", "VBP"]}, "LEMMA": {"IN": ["make", "create", "build"]}}
+        ]
+    ],
+
+    "DeleteIntent": [
+        [
+            {"POS": {"IN": ["VERB", "ADJ"]}, "TAG": {"IN": ["VB", "VBG", "VBP"]}, "LEMMA": {"IN": ["delete", "remove", "cancel", "terminate"]}}
+        ]
+    ],
+
+    "DeliveryIntent": [
+        [
+            {"POS": {"IN": ["VERB", "NOUN"]}, "TAG": {"IN": ["NN", "VB", "VBG", "VBP"]}, "LEMMA": {"IN": ["deliver", "delivery"]}}
+        ]
+    ],
+
+    "DesireIntent": [
+        [
+            {"POS": {"IN": ["VERB", "NOUN"]}, "TAG": {"IN": ["VB", "VBG", "VBP", "NNS", "NN"]}, "LEMMA": {"IN": ["desire", "want"]}}
+        ]
+    ],
+
+    "GreetIntent": [
+        [
+            {"LOWER": {"IN": ["hi", "hello", "hey", "howdy", "great"]}}
+        ],
+        [
+            {"LOWER": "good"}, {"LOWER": "after", "OP": "?"}, {"LOWER": {"IN": ["morning", "noon", "night", "evening"]}}
+        ],
+        [
+            {"LOWER": "dear"}, {"LOWER": {"IN": ["sir", "madam", "ma'am"]}}
+        ],
+        [
+            {"LOWER": "dear"}, {"ENT_TYPE": "PERSON", "OP": "+"}
+        ]
+    ],
+
+    "OrderIntent": [
+        [
+            {"POS": {"IN":["VERB", "NOUN"]}, "TAG": {"IN": ["VB", "VBG", "VBP", "NN"]}, "LEMMA": "order"}
+        ]
+    ],
+
+    "PurchaseIntent":[
+        [
+            {"POS": {"IN": ["VERB", "NOUN"]}, "TAG": {"IN": ["VB", "VBG", "VBP", "NN"]}, "LEMMA": {"IN": ["purchase", "buy"]}}
+        ]
+    ],
+
+    "NewsIntent": [
+        [
+            {"POS": "NOUN", "LOWER": "news", "DEP": {"IN": ["attr", "dobj"]}}
+        ]
+    ],
+
+    "RateIntent": [
+        [
+            {"POS": "VERB", "LEMMA": "rate", "TAG": {"IN": ["VB", "VBP", "VBG"]}}
+        ],
+        [
+            {"POS": "NOUN", "LEMMA": "rating"}
+        ]
+    ],
+
+    "RemindIntent": [
+        [
+            {"POS": "VERB", "LEMMA": "remind", "TAG": {"IN": ["VB", "VBG", "VBP"]}}
+        ],
+        [
+            {"POS": "NOUN", "LEMMA": "reminder"}
+        ]
+    ],
+
+    "RentIntent": [
+        [
+            {"POS": "VERB", "LEMMA": "rent", "TAG": {"IN": ["VB", "VBG", "VBP"]}}
+        ]
+    ],
+
+    "SearchIntent": [
+        [
+            {"POS": "VERB", "LEMMA": {"IN": ["search", "find"]}, "TAG": {"IN": ["VB", "VBG", "VBP"]}}
+        ],
+        [
+            {"POS": "VERB", "LEMMA": "look", "TAG": {"IN": ["VB", "VBP", "VBG"]}},
+            {"LEMMA": {"IN": ["for", "about"]}},
+            {"POS": "NOUN", "OP": "+"}
+        ],
+        [
+            {"LEMMA": {"IN": ["what", "where", "who", "when", "why", "which", "how"]}},
+            {"POS": {"IN": ["AUX", "PART"]}, "LEMMA": {"IN": ["be", "do", "to"]}, "TAG": {"IN": ["VB", "VBP", "VBG", "VBZ", "TO"]}}
+        ]
+    ],
+
+    "SetIntent": [
+        [
+            {"POS": "VERB", "LEMMA": {"IN": ["set", "add"]}, "TAG": {"IN": ["VB", "VBP", "VBG"]}}
+        ]
+    ],
+
+    "UpdateIntent": [
+        [
+            {"POS": "VERB", "TAG": {"IN": ["VB", "VBG", "VBP"]}, "LEMMA": {"IN": ["update", "change", "alter"]}}
+        ]
+    ],
+
+    "AddTaskIntent": [
+        [
+            {"POS": "VERB", "LEMMA": {"IN": ["add", "create", "build", "make"]}},
+            {"POS": "DET", "OP": "?"},
+            {"POS": "ADJ", "OP": "?"},
+            {"POS": "NOUN", "LOWER": "task"}
+        ]
+    ],
+
+    "LinkTaskIntent": [
+        [
+            {"POS": "VERB", "LEMMA": {"IN": ["add", "merge", "attach"]}},
+            {"POS": {"IN": ["DET", "PRON"]}, "OP": "?"},
+            {"POS": "NOUN", "DEP": "dobj", "OP": "?"},
+            {"POS": {"IN": ["ADP", "PART"]}, "DEP": {"IN": ["prep", "aux"]}},
+            {"POS": "PUNCT", "TEXT": {"IN": ["\"", "'", "`"]}, "OP": "?"},
+            {"POS": "NOUN", "DEP": {"IN": ["xcomp", "compound", "nmod"]}, "OP": "+"},
+            {"POS": "PUNCT", "TEXT": {"IN": ["\"", "'", "`"]}, "OP": "?"},
+            {"POS": "NOUN", "LOWER": "project"}
+        ]
+    ],
+
+    "SetDeadlineIntent": [
+        [
+            {"POS": {"IN": ["NOUN", "VERB"]}, "LEMMA": {"IN": ["complete", "completion", "finish", "end", "close", "finalize", "close"]}},
+            {"POS": {"IN": ["PRON", "DET"]}, "OP": "?"},
+            {"POS": "NOUN", "OP": "?"},
+            {"LOWER": {"IN": ["by", "before", "in"]}},
+            {"ENT_TYPE": {"IN": ["DATE", "TIME"]}, "OP": "+"},
+            {"ENT_TYPE": {"IN": ["DATE", "TIME"]}, "OP": "*"}
+        ]
+    ]
+
+}

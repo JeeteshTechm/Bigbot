@@ -1,0 +1,5 @@
+<properties>
+    <attr name="required" format="boolean"/>
+    <attr name="model" format="string"/>
+    <attr name="multiple" format="boolean"/>
+</properties>
