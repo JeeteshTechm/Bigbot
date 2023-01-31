@@ -1,0 +1,19 @@
+[
+    {
+   "component":"apps.myinfo.component.MyInfo",
+   "name": "MyInfo",
+   "package": "com.bits.myinfo",
+   "input_arch": [
+     {
+       "field": "location",
+       "type": "text",
+       "string": "Please enter a location for your event.",
+       "required": false
+     }
+   ],
+   "response_arch": [{
+    "node": "big.bot.core.text",
+    "content": "{% if result %}Here is your details:<br> {{result.name.value}} <br> {{result.sex.desc}}<br>{{result.nationality.desc}} {% else %}\n We got an error while fetching your data\n{% endif %}"
+   }]
+  }
+  ]

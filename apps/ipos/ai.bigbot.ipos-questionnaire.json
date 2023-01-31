@@ -1,0 +1,195 @@
+{
+  "name": "IPOS Questionnaire",
+  "package": "ai.bigbot.ipos-questionnaire",
+  "start": "knlu",
+  "blocks": [
+    {
+      "id": "knlu",
+      "parent_id": -1,
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Help us to better understand your needs"
+        }
+      ],
+      "connections": [[1, "prjz"]]
+    },
+    {
+      "id": "prjz",
+      "parent_id": "knlu",
+      "component": "main.Block.InputText",
+      "properties": [
+        { "name": "key", "value": "q1" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "What are the details op the IP issues you are dealing with?"
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "cfqb"]
+      ]
+    },
+    {
+      "id": "cfqb",
+      "parent_id": "prjz",
+      "component": "main.Block.InputText",
+      "properties": [
+        { "name": "key", "value": "q2" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "What are the current IP challanges that you are facing?"
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "p9li"]
+      ]
+    },
+    {
+      "id": "p9li",
+      "parent_id": "cfqb",
+      "component": "main.Block.InputText",
+      "properties": [
+        { "name": "key", "value": "q3" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "What are the business issues you are trying to address?"
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "vjv6"]
+      ]
+    },
+    {
+      "id": "vjv6",
+      "parent_id": "p9li",
+      "component": "main.Block.InputText",
+      "properties": [
+        { "name": "key", "value": "q4" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "How urgent are you looking to  have these issues solved?"
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "rqdy"]
+      ]
+    },
+    {
+      "id": "rqdy",
+      "parent_id": "vjv6",
+      "component": "main.Block.InputText",
+      "properties": [
+        { "name": "key", "value": "q5" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "What ir the budget for addressing these issues?"
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "lbbm"]
+      ]
+    },
+    {
+      "id": "lbbm",
+      "parent_id": "rqdy",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        { "name": "key", "value": "q6" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "Do you prefer a boutique firm who is specialized in a particular service or a full-service firm who can provide one-stop service for all your needs?"
+        },
+        {
+          "name": "selections",
+          "value": [
+            [1, "Boutique Firm"],
+            [2, "Full-Service Firm"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "zxg1"]
+      ]
+    },
+    {
+      "id": "zxg1",
+      "parent_id": "lbbm",
+      "component": "main.Block.InputText",
+      "properties": [
+        { "name": "key", "value": "q7" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "Are there any countries/markets that you are planning to expand to?"
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "iigf"]
+      ]
+    },
+    {
+      "id": "iigf",
+      "parent_id": "zxg1",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        { "name": "key", "value": "q8" },
+        { "name": "required", "value": true },
+        {
+          "name": "prompt",
+          "value": "How would you describe your current company size?"
+        },
+        {
+          "name": "selections",
+          "value": [
+            [1, "Start-up"],
+            [2, "SME with Singapore office only"],
+            [3, "SME with various office overseas"],
+            [4, "MNC"],
+            [5, "Research Institution"],
+            [6, "IHLS"],
+            [7, "Government"],
+            [8, "Freelancer"],
+            [9, "Other"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "Reject"],
+        [1, "sx07"]
+      ]
+    },
+    {
+      "id": "sx07",
+      "parent_id": "iigf",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Thanks you for sharing your needs. Please leave your name, email address, and contact number. Our community manager will get back to you shortly"
+        }
+      ],
+      "connections": [[1, "bv34"]]
+    },
+    {
+      "id": "bv34",
+      "parent_id": "iigf",
+      "component": "main.Block.TerminalBlock",
+      "properties": [],
+      "connections": []
+    }
+  ]
+}

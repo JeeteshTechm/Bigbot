@@ -1,0 +1,132 @@
+{
+    "name": " Myinfo Post",
+    "package": "com.bits.myinfo.post",
+    "start": "nv4k",
+    "blocks": [
+        {
+            "id": "nv4k",
+            "parent_id": -1,
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": [
+                        "Myinfo Post"
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "4x3i"
+                ]
+            ]
+        },
+        {
+            "id": "4x3i",
+            "parent_id": "nv4k",
+            "component": "main.Block.InputOAuth",
+            "properties": [
+                {
+                    "name": "component",
+                    "value": "apps.myinfo.component.MyinfoOAuthProvider"
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "4x3i"
+                ],
+                [
+                    1,
+                    "tgs5"
+                ]
+            ]
+        },
+        {
+            "id": "tgs5",
+            "parent_id": "4x3i",
+            "component": "main.Block.InterpreterSkill",
+            "properties": [
+                {
+                    "name": "component",
+                    "value": "apps.myinfo.component.MyInfoPost"
+                },
+                {
+                    "name": "nodes",
+                    "value": [
+                        {
+                            "node": "big.bot.core.text",
+                            "content": "Here are the details you have requested. {{result.summary}}"
+                        },
+                        {
+                            "node": "apps.myinfo.component.Expandable",
+                            "content": {}
+                        }
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "bhpy"
+                ],
+                [
+                    2,
+                    "nv4k"
+                ]
+            ]
+        },
+        {
+            "id": "bhpy",
+            "parent_id": "tgs5",
+            "component": "main.Block.TerminalBlock",
+            "properties": [
+                {
+                    "name": "action",
+                    "value": null
+                },
+                {
+                    "name": "post_skill",
+                    "value": null
+                }
+            ],
+            "connections": []
+        },
+        {
+            "id": "nv4k",
+            "parent_id": "tgs5",
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": [
+                        "We got an error while fetching your data"
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "k9su"
+                ]
+            ]
+        },
+        {
+            "id": "k9su",
+            "parent_id": "nv4k",
+            "component": "main.Block.TerminalBlock",
+            "properties": [
+                {
+                    "name": "action",
+                    "value": null
+                },
+                {
+                    "name": "post_skill",
+                    "value": null
+                }
+            ],
+            "connections": []
+        }
+    ]
+}

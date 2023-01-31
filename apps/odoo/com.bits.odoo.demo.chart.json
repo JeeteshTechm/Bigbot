@@ -1,0 +1,184 @@
+{
+  "name": "Odoo demo Chart ",
+  "package": "com.bits.odoo.demo.chart",
+  "start": "u16b",
+  "blocks": [
+    {
+      "id": "u16b",
+      "parent_id": -1,
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please enter name of Chart"]
+        }
+      ],
+      "connections": [[1, "vepf"]]
+    },
+    {
+      "id": "vepf",
+      "parent_id": "u16b",
+      "component": "main.Block.InputText",
+      "properties": [
+        {
+          "name": "key",
+          "value": "name"
+        },
+        {
+          "name": "required",
+          "value": true
+        }
+      ],
+      "connections": [
+        [-1, "u16b"],
+        [1, "rjgh"]
+      ]
+    },
+    {
+      "id": "rjgh",
+      "parent_id": "vepf",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please select a reporting interveral."]
+        }
+      ],
+      "connections": [[1, "wy8z"]]
+    },
+    {
+      "id": "wy8z",
+      "parent_id": "rjgh",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        {
+          "name": "key",
+          "value": "duration"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "selections",
+          "value": [
+            ["this week", "This week"],
+            ["this month", "Current month"],
+            ["this year", "Whole year"],
+            ["last week", "Last Week"],
+            ["last month", "Last Month"],
+            ["last 30 days", "Past 30 Days"],
+            ["last 7 days", "Past 7 Days"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "rjgh"],
+        [1, "mjas"]
+      ]
+    },
+    {
+      "id": "mjas",
+      "parent_id": "wy8z",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please select a chart type from the recommendations."]
+        }
+      ],
+      "connections": [[1, "zrcj"]]
+    },
+    {
+      "id": "zrcj",
+      "parent_id": "mjas",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        {
+          "name": "key",
+          "value": "graph_type"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "selections",
+          "value": [
+            ["1", "Hexbin"],
+            ["2", "Scatter"],
+            ["3", "Stacked Area"],
+            ["4", "Colormapped"],
+            ["5", "Stacked Split"],
+            ["6", "Pie"],
+            ["7", "Stacked"],
+            ["8", "Boxplot"],
+            ["9", "Burtin"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "mjas"],
+        [1, "ynat"]
+      ]
+    },
+    {
+      "id": "ynat",
+      "parent_id": "zrcj",
+      "component": "main.Block.InputOAuth",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooOAuthProvider"
+        }
+      ],
+      "connections": [
+        [-1, "ynat"],
+        [1, "tmd2"]
+      ]
+    },
+    {
+      "id": "tmd2",
+      "parent_id": "2d1y",
+      "component": "main.Block.InterpreterSkill",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "nodes",
+          "value": [
+            {
+              "node": "big.bot.core.text",
+              "content": "Here is summary for the [DATA MODEL] using a '{{input.name}}' chart {{input.graph_type}}."
+            },
+            {
+              "node": "big.bot.core.iframe",
+              "content": "{{result.obj__test_chart.url}}?w=270&h=200&fullscreen=True&id={{result.obj__test_chart.id}}",
+              "width": 270,
+              "height": 200
+            }
+          ]
+        }
+      ],
+      "connections": [[1, "ityv"]]
+    },
+    {
+      "id": "ityv",
+      "parent_id": "tmd2",
+      "component": "main.Block.TerminalBlock",
+      "properties": [
+        {
+          "name": "action",
+          "value": null
+        },
+        {
+          "name": "post_skill",
+          "value": null
+        }
+      ],
+      "connections": []
+    }
+  ]
+}

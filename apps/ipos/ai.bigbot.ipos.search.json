@@ -1,0 +1,41 @@
+{
+  "name": "(IPOS) Search Post",
+  "package": "ai.bigbot.ipos.search",
+  "start": "lpnv",
+  "blocks": [
+    {
+      "id": "lpnv",
+      "parent_id": -1,
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please enter your query"]
+        }
+      ],
+      "connections": [[1, "fki2"]]
+    },
+    {
+      "id": "fki2",
+      "parent_id": -1,
+      "component": "main.Block.InputSkill",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.ipos.component.IPOSProvider"
+        }
+      ],
+      "connections": [
+        [1, "fki2"],
+        [2, "fki2"]
+      ]
+    },
+    {
+      "id": "aoic",
+      "parent_id": "fki2",
+      "component": "main.Block.TerminalBlock",
+      "properties": [],
+      "connections": []
+    }
+  ]
+}

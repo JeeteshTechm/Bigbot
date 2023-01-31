@@ -1,0 +1,13 @@
+{
+  "name": "Odoo Bigbot",
+  "version": "1.1.0",
+  "maintainer": "Jonathan Lee <jonathan@bigbot.ai>",
+  "summary": "Bigbot Odoo direct skill support.",
+  "description": "Google Calendar is a time-management and scheduling calendar service.",
+  "category": "productivity",
+  "cover": "https://erpsolutions.oodles.io/wp-content/uploads/2019/12/Technical-Architecture-of-Odoo-and-Deployment-Structure-at-Server.jpg",
+  "author": "BIG BOTS (PRIVATE LIMITED)",
+  "website": "https://bigbot.ai",
+  "auto_install": true,
+  "signed_packages": ["com.bits.google.create.event"]
+}

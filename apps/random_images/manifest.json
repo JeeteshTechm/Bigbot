@@ -1,0 +1,12 @@
+{
+  "name": "Random Images",
+  "version": "0.1.0",
+  "maintainer" : "Jonathan Lee <jonathan@bigbot.ai>",
+  "summary": "Get a rangom image",
+  "description": "Get a random image",
+  "category": "misc",
+  "cover": "",
+  "author": "BIG BOTS (PRIVATE LIMITED)",
+  "website": "https://bigbot.ai",
+  "auto_install": true
+}

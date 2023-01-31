@@ -1,0 +1,12 @@
+{
+    "name": "My Info",
+    "version": "1.0.0",
+    "maintainer" : "Jonathan Lee <tsleeuk@gmail.com>",
+    "summary": "Bigbot Algolia",
+    "description": "Integrate Algolia Search",
+    "category": "productivity",
+    "author": "Jonathan",
+    "website": "",
+    "auto_install": false,
+    "signed_packages": ["com.bits.algolia"]
+}

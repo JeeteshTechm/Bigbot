@@ -1,0 +1,55 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "sfzs"]],
+      "id": "kh3m",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "You can connect directly with the service providers via the Connect Button."
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "hg4f"]],
+      "id": "sfzs",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "You can also chat with the service provider via the bot through their profile page."
+        }
+      ],
+      "parent_id": "kh3m"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "nu61"]],
+      "id": "hg4f",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO (refer to listing page)"
+        }
+      ],
+      "parent_id": "sfzs"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "nu61",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "hg4f"
+    }
+  ],
+  "name": "ipos-q12",
+  "package": "ai.bigbot.ipos-q12",
+  "start": "kh3m"
+}

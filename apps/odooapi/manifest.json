@@ -1,0 +1,11 @@
+{
+    "name": "Odoo API",
+    "version": 1.0,
+    "maintainer" : "Jonathan Lee <jonathan@bigbot.ai>",
+    "summary": "Big Bot Odoo External API",
+    "description": "Api for connecting to Odoo Database",
+    "category": "productivity",
+    "author": "BIG BOTS (PRIVATE LIMITED)",
+    "website": "https://bigbot.ai",
+    "auto_install": true
+  }

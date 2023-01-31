@@ -1,0 +1,106 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "yuom"]],
+      "id": "2w26",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Are you a service provider or an enterprise?"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "yuom",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "nh27",
+              "text": "Service Provider",
+              "value": "ibnt"
+            },
+            {
+              "id": "dgor",
+              "text": "Enterprises",
+              "value": "y1v4"
+            }
+          ]
+        }
+      ],
+      "parent_id": "2w26"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "jmm4"]],
+      "id": "ibnt",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Signing up for a profile is complimentary. We welcome you to be part of our IP Grow community of experts dedicated to serving the needs of individuals and enterprises in Singapore’s innovation ecosystem. Join us today via this link"
+        }
+      ],
+      "parent_id": "yuom"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "3jua"]],
+      "id": "y1v4",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "This connection service is complimentary. IP Grow is an initiative of IPOS International, the enterprise engagement arm of the Intellectual Property Office of Singapore, in collaboration with various partners across Singapore’s innovation ecosystem. IP Grow addresses the need to provide a quick and easy platform to connect innovative enterprises with IP and IA practitioners to help businesses grow and scale with their intellectual property and intangible assets."
+        }
+      ],
+      "parent_id": "yuom"
+    },
+    {
+      "component": "main.Block.PromptPreview",
+      "connections": [[1, "tqcx"]],
+      "id": "jmm4",
+      "properties": [
+        {
+          "name": "url",
+          "value": "https://example.com"
+        }
+      ],
+      "parent_id": "ibnt"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "3jua",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q1"
+        }
+      ],
+      "parent_id": "y1v4"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "tqcx",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "jmm4"
+    }
+  ],
+  "name": "ipos-q8",
+  "package": "ai.bigbot.ipos-q8",
+  "start": "2w26"
+}

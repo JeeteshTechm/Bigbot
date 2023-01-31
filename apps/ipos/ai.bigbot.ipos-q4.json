@@ -1,0 +1,59 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "e2p2"]],
+      "id": "x6k1",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Yes, you may refer to the Resource page - Complimentary support to find out more (provide link to resources page and sub-link to available programmes such as EDG or MRA or SEEDS capital or IPOS program)"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "1bz7"]],
+      "id": "e2p2",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "You can also connect with any of the listed service provider to undertand more about the available support."
+        }
+      ],
+      "parent_id": "x6k1"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "0jhv"]],
+      "id": "1bz7",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Are there a particular IP services that you are looking for?"
+        }
+      ],
+      "parent_id": "e2p2"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "0jhv",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q1"
+        }
+      ],
+      "parent_id": "1bz7"
+    }
+  ],
+  "name": "ipos-q4",
+  "package": "ai.bigbot.ipos-q4",
+  "start": "x6k1"
+}

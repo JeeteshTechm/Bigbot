@@ -1,0 +1,90 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "2zxy"]],
+      "id": "25ub",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "We thank you for your interest. You may sign up via this link"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "8atp",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "cgfx",
+              "text": "Finish",
+              "value": "m3fr"
+            },
+            {
+              "id": "9f0p",
+              "text": "I have some questions to clarify before deciding if I want to join.",
+              "value": "0ivd"
+            }
+          ]
+        }
+      ],
+      "parent_id": "2zxy"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "m3fr",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "8atp"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "yup8"]],
+      "id": "0ivd",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO (link bot)"
+        }
+      ],
+      "parent_id": "8atp"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "yup8",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "0ivd"
+    },
+    {
+      "component": "main.Block.PromptPreview",
+      "connections": [[1, "8atp"]],
+      "id": "2zxy",
+      "properties": [
+        {
+          "name": "url",
+          "value": "https://example.com"
+        }
+      ],
+      "parent_id": "25ub"
+    }
+  ],
+  "name": "ipos-q7",
+  "package": "ai.bigbot.ipos-q7",
+  "start": "25ub"
+}

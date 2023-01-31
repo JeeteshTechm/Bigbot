@@ -1,0 +1,107 @@
+{
+    "name": "Adobe Send Agreement",
+    "package": "com.bits.adobe",
+    "start": "069l",
+    "blocks": [
+        {
+            "id": "069l",
+            "parent_id": -1,
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": [
+                        "Please Signin First."
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "jgid"
+                ]
+            ]
+        },
+        {
+            "id": "jgid",
+            "parent_id": "069l",
+            "component": "main.Block.InputOAuth",
+            "properties": [
+                {
+                    "name": "component",
+                    "value": "apps.adobe_sign.component.AdobeSignAuthProvider"
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "jgid"
+                ],
+                [
+                    1,
+                    "b3yn"
+                ]
+            ]
+        },
+        {
+            "id": "b3yn",
+            "parent_id": "jgid",
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": [
+                        "Enter Email Address"
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "iq35"
+                ]
+            ]
+        },
+        {
+            "id": "iq35",
+            "parent_id": "b3yn",
+            "component": "main.Block.InputEmail",
+            "properties": [
+                {
+                    "name": "key",
+                    "value": "email"
+                },
+                {
+                    "name": "required",
+                    "value": true
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "b3yn"
+                ],
+                [
+                    1,
+                    "xpf6"
+                ]
+            ]
+        },
+        {
+            "id": "xpf6",
+            "parent_id": "iq35",
+            "component": "main.Block.TerminalBlock",
+            "properties": [
+                {
+                    "name": "action",
+                    "value": null
+                },
+                {
+                    "name": "post_skill",
+                    "value": null
+                }
+            ],
+            "connections": []
+        }
+    ]
+}

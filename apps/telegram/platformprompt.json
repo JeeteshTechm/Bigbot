@@ -1,0 +1,46 @@
+{
+    "name": "Chat Platforms",
+    "package": "platform",
+    "start": "ucar",
+    "blocks": [
+        {
+            "id": "ucar",
+            "parent_id": -1,
+            "component": "main.Block.PromptChatPlatform",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": [
+                        "Choose your favorite platform."
+                    ]
+                },
+                {
+                    "name": "telegram_bot_username",
+                    "value": "randomNameTestBot"
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "kl2u"
+                ]
+            ]
+        },
+        {
+            "id": "kl2u",
+            "parent_id": "ucar",
+            "component": "main.Block.TerminalBlock",
+            "properties": [
+                {
+                    "name": "action",
+                    "value": 0
+                },
+                {
+                    "name": "post_skill",
+                    "value": null
+                }
+            ],
+            "connections": []
+        }
+    ]
+}

@@ -1,0 +1,74 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "9uki"]],
+      "id": "elz2",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "What services are you referring to?"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "9uki",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "2wqb",
+              "text": "I'm looking at the connection services.",
+              "value": "h35z"
+            },
+            {
+              "id": "thca",
+              "text": "I want to engage IP services from IP service provider.",
+              "value": "lphc"
+            }
+          ]
+        }
+      ],
+      "parent_id": "elz2"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "h35z",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q8"
+        }
+      ],
+      "parent_id": "9uki"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "lphc",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q3"
+        }
+      ],
+      "parent_id": "9uki"
+    }
+  ],
+  "name": "ipos-q9",
+  "package": "ai.bigbot.ipos-q9",
+  "start": "elz2"
+}

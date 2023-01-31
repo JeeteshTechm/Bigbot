@@ -1,0 +1,12 @@
+{
+  "name": "IPOS",
+  "version": "1.0.5",
+  "maintainer": "Jonathan Lee <jonathan@bigbot.ai>",
+  "summary": "Custom Big Bot Integration for IPOS",
+  "description": "Custom Big Bot Integration for IPOS",
+  "category": "productivity",
+  "cover": "",
+  "author": "BIG BOTS (PRIVATE LIMITED)",
+  "website": "https://bigbot.ai",
+  "auto_install": true
+}

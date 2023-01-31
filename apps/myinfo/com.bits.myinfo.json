@@ -1,0 +1,175 @@
+{
+    "name": "MyInfo",
+    "package": "com.bits.myinfo",
+    "start": "e4a1",
+    "blocks": [
+        {
+            "id": "e4a1",
+            "parent_id": -1,
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": ["Which info you want to access?"]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "7uwi"
+                ]
+            ]
+        },
+        {
+            "id": "7uwi",
+            "parent_id": "e4a1",
+            "component": "main.Block.InputSelection",
+            "properties": [
+                {
+                    "name": "key",
+                    "value": "is_all"
+                },
+                {
+                    "name": "required",
+                    "value": true
+                },
+                {
+                    "name": "selections",
+                    "value": [
+                        [
+                            "0",
+                            "All"
+                           ],
+                           [
+                            "1",
+                            "Custom"
+                           ]
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "e4a1"
+                ],
+                [
+                    1,
+                    "4x3i"
+                ]
+            ]
+        },
+        {
+            "id": "4x3i",
+            "parent_id": "7uwi",
+            "component": "main.Block.InputOAuth",
+            "properties": [
+                {
+                    "name": "component",
+                    "value": "apps.myinfo.component.MyinfoOAuthProvider"
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "4x3i"
+                ],
+                [
+                    1,
+                    "9qba"
+                ]
+            ]
+        },
+        {
+            "id": "9qba",
+            "parent_id": "4x3i",
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": ["Select fields you like to include."]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "qald"
+                ]
+            ]
+        },
+        {
+            "id": "qald",
+            "parent_id": "9qba",
+            "component": "main.Block.InputSearchable",
+            "properties": [
+                {
+                    "name": "key",
+                    "value": "fields"
+                },
+                {
+                    "name": "required",
+                    "value": true
+                },
+                {
+                    "name": "component",
+                    "value": "apps.myinfo.component.MyInfo"
+                },
+                {
+                    "name": "model",
+                    "value": "myinfo.scope"
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "9qba"
+                ],
+                [
+                    1,
+                    "487h"
+                ]
+            ]
+        },
+        {
+            "id": "487h",
+            "parent_id": "qald",
+            "component": "main.Block.InterpreterSkill",
+            "properties": [
+                {
+                    "name": "component",
+                    "value": "apps.myinfo.component.MyInfo"
+                },
+                {
+                    "name": "nodes",
+                    "value": [
+                        {
+                            "node": "big.bot.core.text",
+                            "content": "Continue authenticate your account."
+                           }    
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "k2x1"
+                ]
+            ]
+        },
+        {
+            "id": "k2x1",
+            "parent_id": "487h",
+            "component": "main.Block.TerminalBlock",
+            "properties": [
+                {
+                    "name": "action",
+                    "value": null
+                },
+                {
+                    "name": "post_skill",
+                    "value": null
+                }
+            ],
+            "connections": []
+        }
+    ]
+}

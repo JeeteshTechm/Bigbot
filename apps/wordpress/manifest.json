@@ -1,0 +1,13 @@
+{
+  "name": "Wordpress",
+  "version": "0.0.2",
+  "maintainer": "Jonathan Lee <jonathan@bigbot.ai>",
+  "summary": "Bigbot Wordpress Integration",
+  "description": "Bigbot Wordpress Integration",
+  "category": "productivity",
+  "cover": "https://upload.wikimedia.org/wikipedia/commons/thumb/a/ae/WordPress.svg/1200px-WordPress.svg.png",
+  "author": "BIG BOTS (PRIVATE LIMITED)",
+  "website": "https://bigbot.ai",
+  "auto_install": true,
+  "signed_packages": []
+}
