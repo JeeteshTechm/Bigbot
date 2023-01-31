@@ -4,7 +4,6 @@ import json
 
 from jinja2 import Template
 
-
 def all():
     data = [
         # Nodes that can be set by the user (?)
