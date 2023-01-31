@@ -14,12 +14,10 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     'websocket': AllowedHostsOriginValidator(
         AuthMiddlewareStack(
-            URLRouter(
-                [
-                    path('', WebSocketConsumer.as_asgi()),
-                    path('debug/', WebSocketDebug.as_asgi()),
-                ]
-            )
+            URLRouter([
+                path('ws/', WebSocketConsumer.as_asgi()),
+                path('ws/debug/', WebSocketDebug.as_asgi()),
+            ])
         )
     ),
 })
