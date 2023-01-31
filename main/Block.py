@@ -1,4 +1,4 @@
-"""This module must be a perfect copy of the equivalent module in the the customer repo."""
+"""This module must be a perfect copy of the equivalent module in the the customer template repository in multi-tenant deployments."""
 
 from abc import ABC, abstractmethod
 import datetime
@@ -8,7 +8,7 @@ import re
 from durations import Duration
 from jinja2 import Template
 
-from . import Log
+from .Log import Log
 from .Node import (
     BinaryNode,
     DateNode,
@@ -23,7 +23,7 @@ from .Node import (
     SearchNode,
 )
 from .Statement import OutputStatement
-from . import Utils
+from .Utils import Utils
 
 
 BLOCK_REJECT = -1
@@ -35,25 +35,25 @@ BLOCK_MOVE_Z = 4
 
 
 def get_block_by_id(binder, skill, block_id):
-    for item in skill["blocks"]:
-        if item["id"] == block_id:
-            for block in binder.get_registry().blocks:
-                if item["component"] == block.__module__ + "." + block.__name__:
-                    connections = item.get("connections")
-                    return block(binder.on_context(), item["id"], item["properties"], connections)
-    raise Exception("block_id or component not matched: " + block_id)
+    block_data = next((item for item in skill["blocks"] if item["id"] == block_id), None)
+    if block_data is None:
+        raise ValueError(f"Block not found for id: {block_id}")
+    component = block_data["component"]
+    block = next((b for b in binder.get_registry().blocks if component == f"{b.__module__}.{b.__name__}"), None)
+    if block is None:
+        raise ValueError(f"Component not found for id: {block_id}")
+    connections = block_data.get("connections")
+    return block(binder.on_context(), block_data["id"], block_data["properties"], connections)
 
 
 def get_block_by_property(binder, skill, key_name, key_value):
-    for item in skill["blocks"]:
-        for block in binder.get_registry().blocks:
-            if item["component"] == block.__module__ + "." + block.__name__:
-                connections = item.get("connections")
-                block_obj = block(binder.on_context(), item["id"], item["properties"], connections)
-                value = block_obj.property_value(key_name)
-                if key_value == value:
-                    return block_obj
-    raise Exception("block_id or key not matched: " + key_value)
+    match = next((item for item in skill["blocks"] 
+                  if item["component"] in (f"{b.__module__}.{b.__name__}" for b in binder.get_registry().blocks)
+                  and block_obj:=block(binder.on_context(), item["id"], item["properties"], item.get("connections"))
+                  and block_obj.property_value(key_name) == key_value), None)
+    if match is None:
+        raise ValueError(f"Block not found for property {key_name} with value {key_value}")
+    return block_obj
 
 
 class BlockResult:
@@ -62,12 +62,12 @@ class BlockResult:
         self.code = code
         self.connection = connection
 
-    # def is_rejected(self):
-    #     return self.code == BLOCK_REJECT
+    @classmethod
+    def status(cls, block, code, connection):
+        return cls(block, code, connection)
 
-    @staticmethod
-    def status(block, code, connection):
-        return BlockResult(block, code, connection)
+    def is_rejected(self):
+        return self.code == BLOCK_REJECT
 
     def post_skill(self):
         if isinstance(self.block, TerminalBlock):
@@ -88,9 +88,11 @@ class BaseBlock(ABC):
 
     # use this method as constructor
     def on_init(self):
+        """Initialize the block with default values"""
         pass
 
-    def get_meta(self):
+    def get_meta(self) -> dict:
+        """Return the meta data"""
         return self.meta
 
     def serialize(self):
@@ -101,7 +103,8 @@ class BaseBlock(ABC):
             "connections": self.get_connections(self.properties),
         }
 
-    def property_value(self, key):
+    def property_value(self, key: str) -> Union[str, int, float, dict]:
+        """Return the value of the property with the given key"""
         for item in self.properties:
             name = item["name"]
             value = item["value"]
@@ -144,9 +147,8 @@ class BaseBlock(ABC):
         self.template_properties.extend(properties)
 
     def remove_template_properties(self, name):
-        for item in self.template_properties:
-            if item["name"] == name:
-                self.template_properties.remove(item)
+        self.template_properties[:] = [item for item in self.template_properties if item["name"] != name]
+
 
     def get_connections(self, properties):
         return []
@@ -336,15 +338,19 @@ class InputDuration(InputBlock):
 
 class InputEmail(InputBlock):
     def on_descriptor(self):
-        return {"name": "Email Input", "summary": "No description available", "category": "input"}
+        return {
+            "name": "Email Input",
+            "summary": "Validates and saves input as email",
+            "category": "input"
+        }
 
     def on_process(self, binder, user_id, statement):
-        if statement.input:
-            regex = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
-            if re.search(regex, statement.input.lower()):
-                self.save(binder, statement.input)
-                return self.move()
-        return super(InputEmail, self).on_process(binder, user_id, statement)
+        email_regex = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
+        if statement.input and re.search(email_regex, statement.input.lower()):
+            self.save(binder, statement.input)
+            return self.move()
+        return super().on_process(binder, user_id, statement)
+
 
 
 class InputFile(InputBlock):
