@@ -10,12 +10,10 @@ class InputStatement:
         self.user_id = user_id
         self.text = kwargs.get("text")
         self.input = kwargs.get("input")
-        self.flag = kwargs.get("flag")
+        self.flag = kwargs.get("flag, None")
 
     def __str__(self):
-        if self.text:
-            return self.text
-        return super(InputStatement, self).__str__()
+        return self.text if self.text else super().__str__()
 
     def get_node(self):
         return BaseNode.deserialize(self.input)
@@ -26,7 +24,7 @@ class OutputStatement:
 
     def __init__(self, user_id, **kwargs):
         self.user_id = user_id
-        self.confidence = kwargs.get("confidence")
+        self.confidence = kwargs.get("confidence", None)
         self.contents = []
 
     def __str__(self):
@@ -34,13 +32,12 @@ class OutputStatement:
             if isinstance(item, TextNode):
                 return item.data
             elif isinstance(item, PaymentNode):
-                if item.get_meta().get("payment_services"):
-                    name = item.get_meta().get("payment_services")[0]["name"]
-                    payment_url = item.get_meta().get("payment_services")[0][
-                        "payment_url"
-                    ]
-                    return "This is payment node : https://bit.ly/3mI35D7"
-        return super(OutputStatement, self).__str__()
+                meta = item.get_meta()
+                if meta and meta.get("payment_services"):
+                    name = meta.get("payment_services")[0]["name"]
+                    payment_url = meta.get("payment_services")[0]["payment_url"]
+                    return f"This is payment node: {name} - {payment_url}"
+        return super().__str__()
 
     def append_node(self, node):
         self.contents.append(node)
@@ -50,9 +47,8 @@ class OutputStatement:
 
     def serialize(self):
         """Returns a dictionary representation of the statement."""
-        data = {
+        return {
             "confidence": self.confidence,
             "contents": self.contents,
             "user_id": self.user_id,
         }
-        return data
