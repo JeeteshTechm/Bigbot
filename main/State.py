@@ -6,15 +6,15 @@ class ChannelState:
         self.user_id = user_id
         self.operator_id = operator_id
         self.channel_id = channel_id
-        # the two parameter used to determine whether skill is active or not and what is current block state
+        # the two parameters used to determine whether a skill is active or not and return the current block state
         self.skill = skill
         self.block_id = block_id
         self.data = data
         self.extra = extra
 
     # this method used if some skill is active against user and channel
-    def is_active(self):
-        return True if self.skill else False
+def is_active(self) -> bool:
+    return bool(self.skill)
 
     def serialize(self):
         return {
@@ -28,7 +28,7 @@ class ChannelState:
         }
 
     @staticmethod
-    def deserialize(state):
+    def deserialize(state: dict) -> 'ChannelState':
         return ChannelState( state['user_id'],
                             state['operator_id'],
                             state['channel_id'],
