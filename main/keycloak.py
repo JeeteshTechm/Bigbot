@@ -1,8 +1,7 @@
-from keycloak import KeycloakOpenID
-from keycloak import KeycloakAdmin
 import json
 import base64
 import time
+from keycloak import KeycloakOpenID, KeycloakAdmin
 
 
 def base64_encode(string):
@@ -15,7 +14,7 @@ def base64_decode(string):
     string_bytes = base64.b64decode(base64_bytes)
     return string_bytes.decode("ascii")
 
-class KeyclaokController:
+class KeycloakController:
 
     def __init__(self):
         server_url = 'https://login.igotbot.com/auth/'
@@ -33,13 +32,13 @@ class KeyclaokController:
     @staticmethod
     def openid_token(username, password):
         try:
-            kc = KeyclaokController()
+            kc = KeycloakController()
             token = kc.keycloak_openid.token(username, password)
             token['created_at'] = time.time()
             token_string = json.dumps(token)
             return base64_encode(token_string)
         except Exception as e:
-            KeyclaokController.log_error(e)
+            KeycloakController.log_error(e)
 
     @staticmethod
     def load_token(kc, token_encoded):
@@ -53,8 +52,8 @@ class KeyclaokController:
     @staticmethod
     def authenticate(token_encoded):
         try:
-            kc = KeyclaokController()
-            token  = KeyclaokController.load_token(kc, token_encoded)
+            kc = KeycloakController()
+            token  = KeycloakController.load_token(kc, token_encoded)
             userinfo = kc.keycloak_openid.userinfo(token['access_token'])
             km = KeycloakUserModel()
             km.email = userinfo.get('email')
@@ -67,21 +66,21 @@ class KeyclaokController:
                 km.groups.append(item.get('name'))
             return km
         except Exception as e:
-            KeyclaokController.log_error(e)
+            KeycloakController.log_error(e)
 
     @staticmethod
     def logout(token_encoded):
         try:
-            kc = KeyclaokController()
-            token  = KeyclaokController.load_token(kc, token_encoded)
+            kc = KeycloakController()
+            token  = KeycloakController.load_token(kc, token_encoded)
             res = kc.keycloak_openid.logout(token['refresh_token'])
             return True
         except Exception as e:
-            KeyclaokController.log_error(e)
+            KeycloakController.log_error(e)
 
     @staticmethod
     def log_error(obj):
-        print('KeyclaokController: ',obj)
+        print('KeycloakController: ',obj)
 
 
 class KeycloakUserManager:
