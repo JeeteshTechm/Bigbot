@@ -245,7 +245,7 @@ class DecisionBlock(InputBlock):
 
     def on_descriptor(self):
         return {
-            "name": "Decission Block",
+            "name": "Decision Block",
             "summary": "Maps a list of options to other blocks",
             "category": "input",
         }
@@ -274,12 +274,56 @@ class DecisionBlock(InputBlock):
                     "required": True,
                     "unique": False,
                     "auto": True,
-                    "decription": "Maps a list of options to blocks",
+                    "description": "Maps a list of options to blocks",
                     "value": [],
                 },
             ]
         )
 
+        
+class GoToBlock(InputBlock):
+    def before_process(self, binder, operator_id):
+        pass
+
+    def get_connections(self, *args, **kwargs):
+        return [[BLOCK_NEXT, "Next"]]
+
+    def on_descriptor(self):
+        return {
+            "name": "GoTo Block",
+            "summary": "Redirects to another block",
+            "category": "input",
+        }
+
+    def on_process(self):
+        pass
+
+    def load_template(self):
+        self.append_template_properties(
+            [
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": False,
+                    "auto": True,
+                    "description": "Display text before processing block",
+                    "value": None,
+                },
+                {
+                    "text": "Destination Block ID",
+                    "name": "destination_block_id",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": True,
+                    "auto": False,
+                    "description": "The ID of the block to redirect to",
+                    "value": None,
+                },
+            ]
+        )
+        
 
 class InputDate(InputBlock):
     def on_descriptor(self):
