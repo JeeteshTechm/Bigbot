@@ -610,7 +610,7 @@ class Project(mixin.Model, models.Model):
         return False
 
 
-class Preference(mixin.Model, models.Model):
+class Preference(models.Model):
 
     TYPE_INT = 1
     TYPE_STR = 2
@@ -632,62 +632,22 @@ class Preference(mixin.Model, models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:
-            pass
-        super(Preference, self).save(*args, **kwargs)
+            super().save(*args, **kwargs)
 
     @staticmethod
     def put_value(key, value):
-        if value:
-            db_pref = Preference.objects.filter(key=key).first()
-            if isinstance(value, int):
-                if not db_pref:
-                    Preference.objects.create(type=Preference.TYPE_INT, key=key, value=str(value))
-                else:
-                    db_pref.value = str(value)
-                    db_pref.save()
-            elif isinstance(value, float):
-                if not db_pref:
-                    Preference.objects.create(type=Preference.TYPE_FLOAT, key=key, value=str(value))
-                else:
-                    db_pref.value = str(value)
-                    db_pref.save()
-            elif isinstance(value, str):
-                if not db_pref:
-                    Preference.objects.create(type=Preference.TYPE_STR, key=key, value=str(value))
-                else:
-                    db_pref.value = str(value)
-                    db_pref.save()
-            elif isinstance(value, bool):
-                if not db_pref:
-                    Preference.objects.create(type=Preference.TYPE_BOOL, key=key, value=str(value))
-                else:
-                    db_pref.value = str(value)
-                    db_pref.save()
-            elif isinstance(value, dict) or isinstance(value, list):
-                if not db_pref:
-                    Preference.objects.create(
-                        type=Preference.TYPE_OBJECT, key=key, value=json.dumps(value)
-                    )
-                else:
-                    db_pref.value = json.dumps(value)
-                    db_pref.save()
-        pass
+        if value is not None:
+            db_pref, _ = Preference.objects.get_or_create(key=key)
+            pref_type = Preference._get_preference_type(value)
+            db_pref.type = pref_type
+            db_pref.value = Preference._serialize_value(value, pref_type)
+            db_pref.save()
 
     @staticmethod
     def get_value(key, default=False):
         obj = Preference.objects.filter(key=key).first()
         if obj and obj.value:
-            if obj.type == Preference.TYPE_INT:
-                return int(obj.value)
-            elif obj.type == Preference.TYPE_FLOAT:
-                return float(obj.value)
-            elif obj.type == Preference.TYPE_STR:
-                return str(obj.value)
-            elif obj.type == Preference.TYPE_BOOL:
-                return bool(obj.value)
-            elif obj.type == Preference.TYPE_OBJECT:
-                return json.loads(obj.value)
-
+            return Preference._deserialize_value(obj.value, obj.type)
         return default
 
     @staticmethod
@@ -695,6 +655,41 @@ class Preference(mixin.Model, models.Model):
         obj = Preference.objects.filter(key=key).first()
         if obj:
             obj.delete()
+
+    @staticmethod
+    def _get_preference_type(value):
+        if isinstance(value, int):
+            return Preference.TYPE_INT
+        elif isinstance(value, float):
+            return Preference.TYPE_FLOAT
+        elif isinstance(value, str):
+            return Preference.TYPE_STR
+        elif isinstance(value, bool):
+            return Preference.TYPE_BOOL
+        elif isinstance(value, (dict, list)):
+            return Preference.TYPE_OBJECT
+        else:
+            raise ValueError(f"Unsupported preference value type: {type(value)}")
+
+    @staticmethod
+    def _serialize_value(value, pref_type):
+        if pref_type == Preference.TYPE_OBJECT:
+            return json.dumps(value)
+        else:
+            return str(value)
+
+    @staticmethod
+    def _deserialize_value(value, pref_type):
+        if pref_type == Preference.TYPE_INT:
+            return int(value)
+        elif pref_type == Preference.TYPE_FLOAT:
+            return float(value)
+        elif pref_type == Preference.TYPE_STR:
+            return str(value)
+        elif pref_type == Preference.TYPE_BOOL:
+            return bool(value)
+        elif pref_type == Preference.TYPE_OBJECT:
+            return json.loads(value)
 
 
 class SkillStore(models.Model):
