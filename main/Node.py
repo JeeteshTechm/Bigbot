@@ -1,37 +1,39 @@
 """This module must be a perfect copy of the equivalent module in the the customer repo."""
-
 import json
-
 from jinja2 import Template
 
+# Define a list of node types that can be set by the user
+NODE_TYPES = [
+    AudioNode,
+    BinaryNode,
+    DateNode,
+    DateTimeNode,
+    DurationNode,
+    IFrameNode,
+    ImageNode,
+    InputFileNode,
+    NotificationNode,
+    OAuthNode,
+    PaymentNode,
+    PreviewNode,
+    TextNode,
+]
+
+# Define a function to return serialized data for all node types
 def all():
-    data = [
-        # Nodes that can be set by the user (?)
-        AudioNode,
-        BinaryNode,
-        DateNode,
-        DateTimeNode,
-        DurationNode,
-        IFrameNode,
-        ImageNode,
-        InputFileNode,
-        NotificationNode,
-        OAuthNode,
-        PaymentNode,
-        PreviewNode,
-        TextNode,
-    ]
-    for index, item in enumerate(data):
-        data[index] = item(None, None).serialize()
-    return data
+    serialized_data = []
+    for node_type in NODE_TYPES:
+        node = node_type(None, None)
+        serialized_data.append(node.serialize())
+    return serialized_data
 
 
+# Define the base class for all nodes
 class BaseNode:
     def __init__(self, node, data, meta):
         self.node = node
         self.data = data
         self.meta = meta
-        pass
 
     def get_data(self):
         return self.data
@@ -49,73 +51,76 @@ class BaseNode:
     @staticmethod
     def deserialize(object):
         if isinstance(object, dict):
-            if "node" in object and "data" in object:
-                data = object.get("data")
-                meta = object.get("meta")
-                node = object.get("node")
-                if node == "big.bot.core.audio":
-                    return AudioNode(data, meta)
-                if node == "big.bot.core.binary":
-                    return BinaryNode(data, meta)
-                if node == "big.bot.core.cancel":
-                    return CancelNode(data, meta)
-                if node == "big.bot.core.delegates":
-                    return DelegatesNode(data, meta)
-                if node == "big.bot.core.iframe":
-                    return IFrameNode(data, meta)
-                if node == "big.bot.core.image":
-                    return ImageNode(data, meta)
-                if node == "big.bot.core.notification":
-                    return NotificationNode(data, meta)
-                if node == "big.bot.core.oauth":
-                    return OAuthNode(data, node)
-                if node == "big.bot.core.payment":
-                    return PaymentNode(data, meta)
-                if node == "big.bot.core.picker.date":
-                    return DateNode(data, meta)
-                if node == "big.bot.core.picker.datetime":
-                    return DateTimeNode(date, meta)
-                if node == "big.bot.core.picker.duration":
-                    return DurationNode(data, meta)
-                if node == "big.bot.core.picker.file":
-                    return InputBinaryNode(data, meta)
-                if node == "big.bot.core.preview":
-                    return PreviewNode(data, meta)
-                if node == "big.bot.core.search":
-                    return SearchNode(data, meta)
-                if node == "big.bot.core.skip":
-                    return SkipNode(data, meta)
-                if node == "big.bot.core.text":
-                    return TextNode(data, meta)
+            node = object.get("node")
+            data = object.get("data")
+            meta = object.get("meta")
+            if node == "big.bot.core.audio":
+                return AudioNode(data, meta)
+            elif node == "big.bot.core.binary":
+                return BinaryNode(data, meta)
+            elif node == "big.bot.core.cancel":
+                return CancelNode(data, meta)
+            elif node == "big.bot.core.delegates":
+                return DelegatesNode(data, meta)
+            elif node == "big.bot.core.iframe":
+                return IFrameNode(data, meta)
+            elif node == "big.bot.core.image":
+                return ImageNode(data, meta)
+            elif node == "big.bot.core.notification":
+                return NotificationNode(data, meta)
+            elif node == "big.bot.core.oauth":
+                return OAuthNode(data, node)
+            elif node == "big.bot.core.payment":
+                return PaymentNode(data, meta)
+            elif node == "big.bot.core.picker.date":
+                return DateNode(data, meta)
+            elif node == "big.bot.core.picker.datetime":
+                return DateTimeNode(date, meta)
+            elif node == "big.bot.core.picker.duration":
+                return DurationNode(data, meta)
+            elif node == "big.bot.core.picker.file":
+                return InputBinaryNode(data, meta)
+            elif node == "big.bot.core.preview":
+                return PreviewNode(data, meta)
+            elif node == "big.bot.core.search":
+                return SearchNode(data, meta)
+            elif node == "big.bot.core.skip":
+                return SkipNode(data, meta)
+            elif node == "big.bot.core.text":
+                return TextNode(data, meta)
+            else:
+                raise ValueError(f"Invalid node type: {node}")
 
 
+# Define a subclass of BaseNode for the "Audio" node type
 class AudioNode(BaseNode):
     def __init__(self, data, meta=None):
-        super(AudioNode, self).__init__("big.bot.core.audio", data, meta)
+        super().__init__("big.bot.core.audio", data, meta)
 
 
+# Define a subclass of BaseNode for the "Binary" node type
 class BinaryNode(BaseNode):
     def __init__(self, data, meta=None):
-        super(BinaryNode, self).__init__("big.bot.core.binary", data, meta)
+        super().__init__("big.bot.core.binary", data, meta)
+
 
 
 class CancelNode(BaseNode):
     def __init__(self, data=None, meta=None):
-        super(CancelNode, self).__init__("big.bot.core.cancel", data, meta)
+        super().__init__("big.bot.core.cancel", data, meta)
 
 
 class DateNode(BaseNode):
     def __init__(self, data=None, meta=None):
-        super(DateNode, self).__init__("big.bot.core.picker.date", data, meta)
+        super().__init__("big.bot.core.picker.date", data, meta)
 
 
 class DateTimeNode(BaseNode):
     def __init__(self, data=None, meta=None):
-        super(DateTimeNode, self).__init__("big.bot.core.picker.datetime", data, meta)
+        super().__init__("big.bot.core.picker.datetime", data, meta)
 
 
-class DelegatesNode(BaseNode):
-    """Creates a delegates node, the node has the following structure:
+    """The DelegatesNode has the following structure:
 
     {
         "node": "big.bot.core.delegates",
@@ -143,29 +148,27 @@ class DelegatesNode(BaseNode):
     + [5, 27] - An array with two integers in the case of BotDelegates, the first integer is the
       delegate's id, the second integers is the skill's id.
     """
-
+class DelegatesNode(BaseNode):
     def __init__(self, data=None, meta=None):
         super().__init__("big.bot.core.delegates", data, meta)
 
 
 class DurationNode(BaseNode):
     def __init__(self, data=None, meta=None):
-        super(DurationNode, self).__init__("big.bot.core.picker.duration", data, meta)
+        super().__init__("big.bot.core.picker.duration", data, meta)
 
 
 class IFrameNode(BaseNode):
     def __init__(self, data, meta=None):
-        super(IFrameNode, self).__init__("big.bot.core.iframe", data, meta)
+        super().__init__("big.bot.core.iframe", data, meta)
 
 
 class ImageNode(BaseNode):
     def __init__(self, data, meta=None):
-        super(ImageNode, self).__init__("big.bot.core.image", data, meta)
+        super().__init__("big.bot.core.image", data, meta)
 
 
-class InputFileNode(BaseNode):
-    """The node should have the following structure:
-
+    """The InputFileNode should have the following structure:
     {
         "node": "big.bot.core.picker.file",
         "data": None,
@@ -174,30 +177,27 @@ class InputFileNode(BaseNode):
             "size": 1000000,
         },
     }
-
     Where:
         + accept: Accepted file extensions, can be any value accepted by the accept property of an
             HTML input tag.
         + size: Maximun size of the file in bytes.
     """
-
-    def __init__(self, meta={}, *args, **kwargs):
+class InputFileNode(BaseNode):
+    def __init__(self, meta=None):
         super().__init__("big.bot.core.picker.file", None, meta)
 
 
 class NotificationNode(BaseNode):
     def __init__(self, data, meta=None):
-        super(NotificationNode, self).__init__("big.bot.core.notification", data, meta)
+        super().__init__("big.bot.core.notification", data, meta)
 
 
 class OAuthNode(BaseNode):
     def __init__(self, data, meta=None):
-        super(OAuthNode, self).__init__("big.bot.core.oauth", data, meta)
+        super().__init__("big.bot.core.oauth", data, meta)
 
 
-class PreviewNode(BaseNode):
-    """Node to preview a URL. The node hass the following structure
-
+    """Node to PreviewNode provides webpage previews for a given a URL, it has the following structure
     {
         "data": "<url>",
         "meta": {
@@ -207,8 +207,8 @@ class PreviewNode(BaseNode):
         },
     }
     """
-
-    def __init__(self, data, meta={}):
+class PreviewNode(BaseNode):
+    def __init__(self, data, meta=None):
         try:
             from contrib.utils import web_preview
 
@@ -216,54 +216,52 @@ class PreviewNode(BaseNode):
         except:
             title, summary, thumbnail = "", "", ""
 
-        if isinstance(meta, dict):
-            meta = {
-                "summary": meta.get("summary", summary),
-                "thumbnail": meta.get("thumbnail", thumbnail),
-                "title": meta.get("title", title),
-            }
-        else:
-            meta = {"summary": summary, "thumbnail": thumbnail, "title": title}
+        meta = meta or {}
+        meta.update({
+            "summary": meta.get("summary", summary),
+            "thumbnail": meta.get("thumbnail", thumbnail),
+            "title": meta.get("title", title),
+        })
+
         super().__init__("big.bot.core.preview", data, meta)
 
 
 class PaymentNode(BaseNode):
     def __init__(self, data, meta=None):
-        super(PaymentNode, self).__init__("big.bot.core.payment", data, meta)
+        meta = meta or {}
+        meta.update({
+            "charge_summary": meta.get("charge_summary", "You have to pay"),
+            "currency_code": meta.get("currency_code", "USD"),
+            "currency_symbol": meta.get("currency_symbol", "$"),
+            "button_text": meta.get("button_text", "Make Payment"),
+            "payment_services": meta.get("payment_services", [
+                {
+                    "name": "Bank Card",
+                    "icon": "https://cdn.worldvectorlogo.com/logos/apple-pay.svg",
+                    "payment_url": "https://razorpay.com/?version=t1",
+                },
+                {
+                    "name": "Google Pay",
+                    "icon": "https://cdn.worldvectorlogo.com/logos/apple-pay.svg",
+                    "payment_url": "https://razorpay.com/?version=t1",
+                },
+                {
+                    "name": "Apple Pay",
+                    "icon": "https://cdn.worldvectorlogo.com/logos/apple-pay.svg",
+                    "payment_url": "https://razorpay.com/?version=t1",
+                },
+            ]),
+        })
 
-    def sample(self):
-        data = {
-            "node": "big.bot.core.payment",
-            "data": 549.99,
-            "meta": {
-                "charge_summary": "You have to pay",
-                "currency_code": "USD",
-                "currency_symbol": "$",
-                "button_text": "Make Payment",
-                "payment_services": [
-                    {
-                        "name": "Bank Card",
-                        "icon": "https://cdn.worldvectorlogo.com/logos/apple-pay.svg",
-                        "payment_url": "https://razorpay.com/?version=t1",
-                    },
-                    {
-                        "name": "Google Pay",
-                        "icon": "https://cdn.worldvectorlogo.com/logos/apple-pay.svg",
-                        "payment_url": "https://razorpay.com/?version=t1",
-                    },
-                    {
-                        "name": "Apple Pay",
-                        "icon": "https://cdn.worldvectorlogo.com/logos/apple-pay.svg",
-                        "payment_url": "https://razorpay.com/?version=t1",
-                    },
-                ],
-            },
-        }
+        super().__init__("big.bot.core.payment", data, meta)
+
 
 
 class SearchNode(BaseNode):
+    NODE_TYPE = "big.bot.core.search"
+
     def __init__(self, data, meta=None):
-        super(SearchNode, self).__init__("big.bot.core.search", data, meta)
+        super().__init__(SearchNode.NODE_TYPE, data, meta)
 
     def __str__(self):
         node = self.get_node()
@@ -273,7 +271,7 @@ class SearchNode(BaseNode):
             return "Skip"
         elif isinstance(node, TextNode):
             return node.data
-        return super(SearchNode, self).__str__()
+        return super().__str__()
 
     @staticmethod
     def wrap_text(display_text, input):
@@ -292,15 +290,21 @@ class SearchNode(BaseNode):
 
 
 class SkipNode(BaseNode):
+    NODE_TYPE = "big.bot.core.skip"
+
     def __init__(self, data=None, meta=None):
-        super(SkipNode, self).__init__("big.bot.core.skip", data, meta)
+        super().__init__(SkipNode.NODE_TYPE, data, meta)
 
 
 class TextNode(BaseNode):
+    NODE_TYPE = "big.bot.core.text"
+
     def __init__(self, data, meta=None):
-        super(TextNode, self).__init__("big.bot.core.text", data, meta)
+        super().__init__(TextNode.NODE_TYPE, data, meta)
 
 
 class TTSNode(BaseNode):
+    NODE_TYPE = "big.bot.core.tts"
+
     def __init__(self, data, meta=None):
-        super(TTSNode, self).__init__("big.bot.core.tts", data, meta)
+        super().__init__(TTSNode.NODE_TYPE, data, meta)
