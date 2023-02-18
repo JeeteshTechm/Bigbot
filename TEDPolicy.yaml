@@ -1,0 +1,77 @@
+policies:
+  - name: TEDPolicy
+    max_history: 5
+    epochs: 100
+    model_confidence: linear_norm
+    featurizer:
+    - name: MaxHistoryTrackerFeaturizer
+      max_history: 5
+      state_featurizer:
+        - name: BinarySingleStateFeaturizer
+    - name: LanguageModelFeaturizer
+      model_name: "bert"
+      model_weights: "bert-base-uncased"
+      batch_size: 32
+    - name: CountVectorsFeaturizer
+      analyzer: "char_wb"
+      min_ngram: 1
+      max_ngram: 4
+    - name: SpacyNLP
+    - name: SpacyEntityExtractor
+      dimensions:
+      - "PERSON"
+      - "ORG"
+      - "GPE"
+    - name: DIETClassifier
+      epochs: 100
+      constrain_similarities: true
+      batch_strategy: "balanced"
+      batch_size: 64
+      featurizer:
+        - name: CountVectorsFeaturizer
+          analyzer: "char_wb"
+          min_ngram: 1
+          max_ngram: 4
+        - name: SpacyFeaturizer
+        - name: LexicalSyntacticFeaturizer
+        - name: EntitySynonyms
+      model:
+        - name: EmbeddingIntentClassifier
+          epochs: 100
+          hidden_layers_sizes: [256, 128]
+          batch_size: 64
+          shuffle: true
+    - name: ResponseSelector
+      epochs: 100
+      retrieval_intent: faq
+      constrain_similarities: true
+      margin: 0.5
+      scale: 0.5
+      epochs_to_ft: 10
+      retrieval_action: action_default_fallback
+      model:
+        - name: EmbeddingIntentClassifier
+          epochs: 100
+          hidden_layers_sizes: [256, 128]
+          batch_size: 64
+          shuffle: true
+    - name: FallbackClassifier
+      threshold: 0.3
+      ambiguity_threshold: 0.1
+      nlu_threshold: 0.3
+      core_threshold: 0.3
+      fallback_responses:
+        - "I'm sorry, I didn't understand what you said. Can you please rephrase?"
+        - "I'm sorry, could you please repeat that?"
+        - "I'm sorry, I didn't catch that. Can you please say it again?"
+      deny_suggestion_intent_name: "out_of_scope"
+    policies:
+      - name: MemoizationPolicy
+        max_history: 5
+      - name: KerasPolicy
+        epochs: 100
+      - name: MappingPolicy
+      - name: FallbackPolicy
+        nlu_threshold: 0.3
+        core_threshold: 0.3
+        fallback_action_name: "action_default_fallback"
