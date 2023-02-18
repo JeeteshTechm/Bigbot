@@ -74,3 +74,39 @@ class UtteranceDistance:
     # Method to get the index
     def get_index(self):
         return self.index
+
+
+    def show_confidence_graph(self):
+        intents = [result['name'] for result in self.results]
+        confidences = [result['confidence'] for result in self.results]
+
+        # Create a subplot with a single trace
+        fig = make_subplots(rows=1, cols=1)
+        fig.add_trace(go.Bar(x=intents, y=confidences), row=1, col=1)
+
+        fig.update_layout(title='Confidence graph for query: ' + self.query,
+                          xaxis_title='Intents',
+                          yaxis_title='Confidence')
+
+        fig.show()
+
+    def show_confidence_heatmap(self):
+        intents = [result['name'] for result in self.results]
+        confidences = [result['confidence'] for result in self.results]
+
+        # Define the trace for the heatmap
+        trace = go.Heatmap(z=[confidences],
+                           x=intents,
+                           y=[self.query],
+                           colorscale='YlGnBu')
+
+        # Set the layout for the heatmap
+        layout = go.Layout(title='Confidence heatmap for query: ' + self.query,
+                           xaxis=dict(title='Intents'),
+                           yaxis=dict(title='Query'))
+
+        # Create the figure and add the trace
+        fig = go.Figure(data=[trace], layout=layout)
+
+        # Show the figure
+        fig.show()
