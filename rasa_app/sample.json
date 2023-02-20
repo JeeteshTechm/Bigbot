@@ -1,0 +1,86 @@
+{
+    "bot_id": "my_bot",
+    "message": "Hello, how can I help you?",
+    "intents": [
+      {
+        "name": "greet",
+        "utterances": [
+          "Hi",
+          "Hello",
+          "Hey",
+          "Hi there"
+        ],
+        "responses": [
+          "Hello! How can I assist you?",
+          "Hi there! How may I help you?",
+          "Hey! How can I assist you today?"
+        ]
+      },
+      {
+        "name": "goodbye",
+        "utterances": [
+          "Bye",
+          "Goodbye",
+          "See you later",
+          "See ya"
+        ],
+        "responses": [
+          "Goodbye! Have a nice day.",
+          "See you later. It was nice talking to you.",
+          "Bye! Talk to you soon."
+        ]
+      },
+      {
+        "name": "inform",
+        "utterances": [
+          "I want to buy a {product}",
+          "I am interested in purchasing a {product}",
+          "Can you help me buy a {product}?"
+        ],
+        "responses": [
+          "Sure, I can help you buy a {product}. May I know your name?",
+          "Of course! I'd be happy to help you purchase a {product}. Can you tell me your name?",
+          "Absolutely! Before we begin, can you tell me your name?"
+        ],
+        "slots": [
+          {
+            "name": "product",
+            "type": "text"
+          },
+          {
+            "name": "name",
+            "type": "text"
+          }
+        ]
+      },
+      {
+        "name": "weather",
+        "utterances": [
+          "what's the weather like today?",
+          "what's the forecast?",
+          "will it rain today?"
+        ],
+        "responses": [
+          "Here's the current weather in New York:",
+          "{api_response}"
+        ],
+        "api_call": {
+          "url": "https://api.weatherapi.com/v1/current.json?key=<your_api_key>&q=New%20York&aqi=no",
+          "method": "GET"
+        },
+        "response_field": "current.condition.text"
+      }
+    ],
+    "entities": [
+      {
+        "name": "product",
+        "values": [
+          "laptop",
+          "smartphone",
+          "tablet",
+          "camera"
+        ]
+      }
+    ]
+  }
+  
