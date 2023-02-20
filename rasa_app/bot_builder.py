@@ -1,89 +1,128 @@
-import json
 import os
-import uuid
-
-from rasa.cli.scaffold import create_initial_project
-from rasa.model import get_model
-from rasa.core.agent import Agent
-from rasa.utils.endpoints import EndpointConfig
-from rasa.core.interpreter import RasaNLUInterpreter
+import yaml
+from rasa.agent import Agent
+from rasa.core.interpreter import RegexInterpreter
+from rasa.core.policies import MemoizationPolicy, FormPolicy
 from rasa.core.policies.fallback import FallbackPolicy
-from rasa.core.policies.keras_policy import KerasPolicy
-from rasa.core.policies.memoization import MemoizationPolicy
+from rasa.core.policies.rule_based import RuleBasedPolicy
+from rasa.nlu import config as nlu_config
+from rasa.nlu.model import Trainer
+from rasa.nlu.components import ComponentBuilder
+from rasa.nlu.tokenizers.whitespace_tokenizer import WhitespaceTokenizer
+from rasa.nlu.featurizers.sparse_featurizer.regex_featurizer import RegexFeaturizer
+from rasa.nlu.featurizers.sparse_featurizer.count_vectors_featurizer import CountVectorsFeaturizer
+from rasa.nlu.featurizers.sparse_featurizer.tfidf_featurizer import TfidfFeaturizer
+from rasa.nlu.classifiers.diet_classifier import DIETClassifier
+from rasa.utils.endpoints import EndpointConfig
 
 from django.http import JsonResponse, HttpResponseBadRequest
 
-def create_bot(request):
-    # Load the request payload
-    payload = json.loads(request.body)
 
-    # Extract the required parameters from the payload
-    bot_id = payload.get("bot_id")
-    message = payload.get("message")
-    intents = payload.get("intents")
-    entities = payload.get("entities")
+def create_bot(bot_id, payload):
+    # Define the file paths
+    models_dir = "rasa_models"
+    if not os.path.exists(models_dir):
+        os.makedirs(models_dir)
+    bot_models_dir = os.path.join(models_dir, bot_id)
+    if not os.path.exists(bot_models_dir):
+        os.makedirs(bot_models_dir)
+    domain_path = os.path.join(bot_models_dir, "domain.yml")
+    nlu_path = os.path.join(bot_models_dir, "nlu")
+    stories_path = os.path.join(bot_models_dir, "stories.md")
+    config_path = os.path.join(bot_models_dir, "config.yml")
 
-    # Generate a unique ID for the bot's project directory
-    project_id = uuid.uuid4().hex
+    # Define the domain file
+    domain = {"intents": {}, "entities": {}}
 
-    # Create a new Rasa project in the rasa_models directory
-    project_path = os.path.join("rasa_models", project_id)
-    create_initial_project(project_path)
+    # Define the intent and entity lists from the payload
+    intents = payload.get("intents", [])
+    entities = payload.get("entities", [])
 
-    # Create a new domain.yml file for the bot
-    domain_file = os.path.join(project_path, "domain.yml")
-    with open(domain_file, "w") as f:
-        f.write("intents:\n")
-        for intent in intents:
-            f.write("  - {}\n".format(intent["name"]))
+    # Add the intents to the domain file
+    for intent in intents:
+        intent_name = intent.get("name")
+        intent_examples = intent.get("examples", [])
 
-        f.write("\nentities:\n")
-        for entity in entities:
-            f.write("  {}:\n".format(entity["name"]))
-            f.write("  - {}\n".format(entity["value"]))
+        domain["intents"][intent_name] = {"use_entities": True, "responses": {}}
 
-    # Train the Rasa model for the bot
-    model_directory = get_model(project_path)
-    agent = Agent.load(model_directory, interpreter=RasaNLUInterpreter(model_directory))
-    training_data = agent.load_data_from_domain(domain_file)
+        if intent_examples:
+            domain["intents"][intent_name]["examples"] = []
+            for example in intent_examples:
+                domain["intents"][intent_name]["examples"].append({"text": example})
 
+    # Add the entities to the domain file
+    for entity in entities:
+        entity_name = entity.get("name")
+        domain["entities"][entity_name] = {}
+
+    # Save the domain file
+    with open(domain_path, "w") as f:
+        yaml.dump(domain, f)
+
+    # Train the NLU model
+    builder = ComponentBuilder(use_cache=True)
+    builder.add_component(RegexFeaturizer())
+    builder.add_component(TfidfFeaturizer())
+    builder.add_component(CountVectorsFeaturizer())
+    builder.add_component(WhitespaceTokenizer())
+    builder.add_component(DIETClassifier.create(nlu_config.load("config.yml")))
+    trainer = Trainer(builder)
+
+    training_data_dir = "training_data"
+    nlu_file = os.path.join(training_data_dir, "nlu.md")
+    stories_file = os.path.join(training_data_dir, "stories.md")
+    rules_file = os.path.join(training_data_dir, "rules.yml")
+
+    training_data = trainer.load_data(nlu_file)
+    interpreter = trainer.train(training_data)
+    interpreter.persist(bot_models_dir)
+
+    # Define the agent
+    endpoint_config = EndpointConfig(url="http://18.136.204.25:5056/webhook")
+    agent = Agent(
+        domain=domain_path,
+        policies=[
+            RuleBasedPolicy(),
+            FallbackPolicy(),
+            MemoizationPolicy(),
+            FormPolicy(),
+        ],
+        interpreter=interpreter,
+        action_endpoint=endpoint_config,
+    )
+
+    # Train the Core model
+    training_data = agent.load_data(
+        stories_file=stories_file,
+        nlu_data=nlu_file,
+        rules=rules_file,
+    )
     agent.train(training_data)
-    agent.persist(model_directory)
 
-    # Configure the bot's endpoint
-    endpoint_config = EndpointConfig(url="http://localhost:5005/webhooks/rest/webhook")
+    # Save the agent
+    agent.persist(bot_models_dir)
 
-    fallback = FallbackPolicy(fallback_action_name="utter_unclear",
-                              core_threshold=0.2,
-                              nlu_threshold=0.1)
-    keras_policy = KerasPolicy(max_history=5)
-    memo_policy = MemoizationPolicy(max_history=5)
-
-    # Create a new Rasa agent for the bot
-    rasa_agent = Agent.load(model_directory, policies=[memo_policy, fallback, keras_policy], interpreter=RasaNLUInterpreter(model_directory), action_endpoint=endpoint_config)
-
-    # Store the bot's agent in a dictionary for later retrieval
-    bots[bot_id] = rasa_agent
-
-    return JsonResponse({"message": "Bot created successfully"})
-
+    return agent
 
 def chatbot(bot_id, message):
-    # Find the latest trained model for the bot
+    # Check if a trained model already exists for the bot
     models_dir = "rasa_models"
     model_names = [f for f in os.listdir(models_dir) if bot_id in f]
-    if not model_names:
-        raise ValueError(f"No trained models found for bot '{bot_id}'")
+    if model_names:
+        latest_model_name = sorted(model_names)[-1]
+        model_path = os.path.join(models_dir, latest_model_name)
 
-    latest_model_name = sorted(model_names)[-1]
-    model_path = os.path.join(models_dir, latest_model_name)
-
-    # Create the Rasa agent with the latest trained model
-    endpoint_config = EndpointConfig(url="http://localhost:5055/webhook")
-    interpreter = RasaNLUInterpreter(model_path)
-    agent = Agent.load(model_path, interpreter=interpreter, action_endpoint=endpoint_config)
+        # Load the Rasa agent with the latest trained model
+        endpoint_config = EndpointConfig(url="http://18.136.204.25:5056/webhook")
+        interpreter = RasaNLUInterpreter(model_path)
+        agent = Agent.load(model_path, interpreter=interpreter, action_endpoint=endpoint_config)
+    else:
+        # Create a new bot model with the given bot_id
+        payload = get_bot_payload_from_db(bot_id)  # retrieve bot data from database
+        agent = create_bot(bot_id, payload)
 
     # Parse the user message and get the bot's response
     response = agent.handle_text(message)
 
     return response
+
