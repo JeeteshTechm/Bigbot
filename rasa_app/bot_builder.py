@@ -123,9 +123,9 @@ def create_bot(bot_id, payload):
     
 
    # Train your Rasa model
-    model_directory = rasa.train(domain=domain_file,
-                             config=config,
-                             training_data=data_yaml_data,
+    model_directory = rasa.train(domain=domain_file_path,
+                             config=config_file_path,
+                             training_data=data_file_path,
                              output=os.path.join( f"{bot_id}/models"),
                              fixed_model_name=bot_id)
 
