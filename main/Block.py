@@ -1,13 +1,11 @@
-"""This module must be a perfect copy of the equivalent module in the the customer template repository in multi-tenant deployments."""
-
 from abc import ABC, abstractmethod
 import datetime
 import random
 import re
-
+import spacy
+from typing import List, Tuple, Union
 from durations import Duration
 from jinja2 import Template
-
 from .Log import Log
 from .Node import (
     BinaryNode,
@@ -34,26 +32,35 @@ BLOCK_MOVE_Y = 3
 BLOCK_MOVE_Z = 4
 
 
+class BlockNotFoundException(Exception):
+    pass
+
+
+class ComponentNotFoundException(Exception):
+    pass
+
+
 def get_block_by_id(binder, skill, block_id):
     block_data = next((item for item in skill["blocks"] if item["id"] == block_id), None)
     if block_data is None:
-        raise ValueError(f"Block not found for id: {block_id}")
+        raise BlockNotFoundException(f"Block not found for id: {block_id}")
     component = block_data["component"]
-    block = next((b for b in binder.get_registry().blocks if component == f"{b.__module__}.{b.__name__}"), None)
-    if block is None:
-        raise ValueError(f"Component not found for id: {block_id}")
+    blocks = [b for b in binder.get_registry().blocks if f"{b.__module__}.{b.__name__}" == component]
+    if not blocks:
+        raise ComponentNotFoundException(f"Component not found for id: {block_id}")
+    block = blocks[0]
     connections = block_data.get("connections")
     return block(binder.on_context(), block_data["id"], block_data["properties"], connections)
 
 
 def get_block_by_property(binder, skill, key_name, key_value):
-    match = next((item for item in skill["blocks"] 
-                  if item["component"] in (f"{b.__module__}.{b.__name__}" for b in binder.get_registry().blocks)
-                  and block_obj:=block(binder.on_context(), item["id"], item["properties"], item.get("connections"))
-                  and block_obj.property_value(key_name) == key_value), None)
-    if match is None:
-        raise ValueError(f"Block not found for property {key_name} with value {key_value}")
-    return block_obj
+    matches = [item for item in skill["blocks"]
+               if item["component"] in (f"{b.__module__}.{b.__name__}" for b in binder.get_registry().blocks)
+               and block_obj := block(binder.on_context(), item["id"], item["properties"], item.get("connections"))
+               and block_obj.property_value(key_name) == key_value]
+    if not matches:
+        raise BlockNotFoundException(f"Block not found for property {key_name} with value {key_value}")
+    return matches[0]
 
 
 class BlockResult:
@@ -76,7 +83,7 @@ class BlockResult:
 
 class BaseBlock(ABC):
     def __init__(self, context, id, properties, connections):
-        self.component = self.__class__.__module__ + "." + self.__class__.__name__
+        self.component = f"{self.__class__.__module__}.{self.__class__.__name__}"
         self.context = context
         self.id = id
         self.properties = properties
@@ -105,11 +112,7 @@ class BaseBlock(ABC):
 
     def property_value(self, key: str) -> Union[str, int, float, dict]:
         """Return the value of the property with the given key"""
-        for item in self.properties:
-            name = item["name"]
-            value = item["value"]
-            if name == key:
-                return value
+        return next((prop["value"] for prop in self.properties if prop["name"] == key), None)
 
     def find_connection(self, code):
         if self.connections:
@@ -149,7 +152,6 @@ class BaseBlock(ABC):
     def remove_template_properties(self, name):
         self.template_properties[:] = [item for item in self.template_properties if item["name"] != name]
 
-
     def get_connections(self, properties):
         return []
 
@@ -168,7 +170,7 @@ class InputBlock(BaseBlock):
         return self.reject()
 
     def process(self, binder, user_id, statement):
-        # by pass input validation while skip node given
+        # bypass input validation while skip node given
         required = self.property_value("required")
         if not required and statement.input is None:
             self.save(binder, None)
@@ -178,71 +180,55 @@ class InputBlock(BaseBlock):
     def get_connections(self, properties):
         return [[BLOCK_MOVE, "Next"], [BLOCK_REJECT, "Reject"]]
 
-    # this methods return saves value in state
+    # this method saves a value in the state
     def save(self, binder, value):
-        state = binder.on_load_state()
+        state = binder.load_state()
         key = self.property_value("key")
         state.data[key] = value
-        binder.on_save_state(state.serialize())
+        binder.save_state(state)
 
-    # this method return value from state
+    # this method returns a value from the state
     def load(self, binder):
-        state = binder.on_load_state()
+        state = binder.load_state()
         key = self.property_value("key")
         return state.data.get(key)
 
     def load_template(self):
-        self.append_template_properties(
-            [
-                {
-                    "text": "Key",
-                    "name": "key",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": True,
-                    "unique": True,
-                    "auto": True,
-                    "description": "Key used to store the data",
-                    "value": None,
-                },
-                {
-                    "text": "Prompt",
-                    "name": "prompt",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": False,
-                    "auto": True,
-                    "description": "Display text before processing block",
-                    "value": None,
-                },
-                {
-                    "text": "Required",
-                    "name": "required",
-                    "format": "boolean",
-                    "input_type": "checkbox",
-                    "required": True,
-                    "description": "If set to false this property become optional.",
-                    "value": False,
-                },
-            ]
+        self.add_template_property(
+            "key",
+            "string",
+            "text",
+            required=True,
+            unique=True,
+            auto=True,
+            description="Key used to store the data",
+        )
+        self.add_template_property(
+            "prompt",
+            "string",
+            "text",
+            required=False,
+            auto=True,
+            description="Display text before processing block",
+        )
+        self.add_template_property(
+            "required",
+            "boolean",
+            "checkbox",
+            required=True,
+            description="If set to false this property becomes optional.",
+            value=False,
         )
 
     def on_search(self, binder, user_id, query, **kwargs):
         required = self.property_value("required")
         if required is not None and not required:
-            resources = super(InputBlock, self).on_search(binder, user_id, query, **kwargs)
-            resources.extend([SearchNode.wrap_skip()])
+            resources = super().on_search(binder, user_id, query, **kwargs)
+            resources.append(SearchNode.wrap_skip())
             return resources
-        return super(InputBlock, self).on_search(binder, user_id, query, **kwargs)
-
+        return super().on_search(binder, user_id, query, **kwargs)
 
 class DecisionBlock(InputBlock):
-    def before_process(self, binder, operator_id):
-        pass
-
-    def get_connections(self, *args, **kwargs):
-        return [[BLOCK_REJECT, "Reject"]]
-
     def on_descriptor(self):
         return {
             "name": "Decision Block",
@@ -250,42 +236,61 @@ class DecisionBlock(InputBlock):
             "category": "input",
         }
 
-    def on_process(self):
-        pass
-
     def load_template(self):
-        self.append_template_properties(
-            [
-                {
-                    "text": "Prompt",
-                    "name": "prompt",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": False,
-                    "auto": True,
-                    "description": "Display text before processing block",
-                    "value": None,
-                },
-                {
-                    "text": "Connections",
-                    "name": "connections",
-                    "format": "connections",
-                    "input_type": "connections",
-                    "required": True,
-                    "unique": False,
-                    "auto": True,
-                    "description": "Maps a list of options to blocks",
-                    "value": [],
-                },
-            ]
-        )
+        super().load_template()
+        self.append_template_properties([
+            {
+                "text": "Connections",
+                "name": "connections",
+                "format": "connections",
+                "input_type": "connections",
+                "required": True,
+                "unique": False,
+                "auto": True,
+                "description": "Maps a list of options to blocks",
+                "value": [],
+            },
+        ])
 
-        
+    def on_process(self, binder, user_id, statement):
+        options = self.property_value("connections")
+
+        for option in options:
+            value = option["value"]
+            condition = option["condition"]
+
+            if condition is None or self.evaluate_condition(condition, statement):
+                block_id = value["block_id"]
+                block = binder.get_block_by_id(block_id)
+
+                if block is not None:
+                    binder.set_current_block_id(block_id)
+                    return self.move()
+
+        return self.reject()
+
+    def evaluate_condition(self, condition, statement):
+        if not condition:
+            return True
+
+        if "input" in condition:
+            input_value = statement.input
+            expected_value = condition["input"]
+            return input_value == expected_value
+
+        if "intent" in condition:
+            intent_value = statement.intent
+            expected_value = condition["intent"]
+            return intent_value == expected_value
+
+        return False
+
+
 class GoToBlock(InputBlock):
     def before_process(self, binder, operator_id):
         pass
 
-    def get_connections(self, *args, **kwargs):
+    def get_connections(self, properties):
         return [[BLOCK_NEXT, "Next"]]
 
     def on_descriptor(self):
@@ -295,8 +300,10 @@ class GoToBlock(InputBlock):
             "category": "input",
         }
 
-    def on_process(self):
-        pass
+    def on_process(self, binder, user_id, statement):
+        destination_block_id = self.property_value("destination_block_id")
+        binder.on_save_data("next_block_id", destination_block_id)
+        return self.move()
 
     def load_template(self):
         self.append_template_properties(
@@ -323,7 +330,6 @@ class GoToBlock(InputBlock):
                 },
             ]
         )
-        
 
 class InputDate(InputBlock):
     def on_descriptor(self):
@@ -335,9 +341,9 @@ class InputDate(InputBlock):
                 datetime.datetime.strptime(statement.input, "%Y-%m-%d")
                 self.save(binder, statement.input)
                 return self.move()
-            except:
+            except ValueError:
                 pass
-        return super(InputDate, self).on_process(binder, user_id, statement)
+        return super().on_process(binder, user_id, statement)
 
 
 class InputDateTime(InputBlock):
@@ -354,9 +360,9 @@ class InputDateTime(InputBlock):
                 datetime.datetime.strptime(statement.input, "%Y-%m-%d %H:%M:%S")
                 self.save(binder, statement.input)
                 return self.move()
-            except:
+            except ValueError:
                 pass
-        return super(InputDateTime, self).on_process(binder, user_id, statement)
+        return super().on_process(binder, user_id, statement)
 
 
 class InputDuration(InputBlock):
@@ -375,9 +381,9 @@ class InputDuration(InputBlock):
                     value = [int(dur.to_hours()), int(dur.to_minutes() % 60)]
                     self.save(binder, value)
                     return self.move()
-            except:
+            except (ValueError, TypeError):
                 pass
-        return super(InputDuration, self).on_process(binder, user_id, statement)
+        return super().on_process(binder, user_id, statement)
 
 
 class InputEmail(InputBlock):
@@ -395,60 +401,11 @@ class InputEmail(InputBlock):
             return self.move()
         return super().on_process(binder, user_id, statement)
 
-
-
 class InputFile(InputBlock):
-    """Sends an InputFileNode to the user, the user must return (or statement.input )a JSON object
-    with the following structure:
-
-    {
-        "file": "file contents...",
-        "file_name": "file_name.txt",
-        "file_size": 156244,
-    }
-
-    Where:
-        + file: File contents encoded as a base64 string:
-            "data:<mime_type>;base64,<base64 string ...>"
-        + file_name: File name.
-        + file_size: Size of the file in bytes.
-    """
-
-    def load_template(self):
-        super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "File type",
-                    "name": "accept",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": True,
-                    "unique": True,
-                    "auto": True,
-                    "description": "Valid file extensions",
-                    "value": "",
-                },
-                {
-                    "text": "Size",
-                    "name": "size",
-                    "format": "integer",
-                    "input_type": "number",
-                    "required": True,
-                    "unique": True,
-                    "auto": True,
-                    "description": "Maximum file size in bytes",
-                    "value": 1000000,
-                },
-            ]
-        )
-
-    def before_process(self, binder, operator_id):
-        accept = self.property_value("accept")
-        size = self.property_value("size")
-        output = OutputStatement(operator_id)
-        output.append_node(InputFileNode({"accept": accept, "size": size}))
-        binder.post_message(output)
+    def __init__(self):
+        super().__init__()
+        self.accept = InputProperty("accept", "string", required=True, description="Valid file extensions")
+        self.size = InputProperty("size", "integer", required=True, default=1000000, description="Maximum file size in bytes")
 
     def on_descriptor(self):
         return {"name": "File Input", "summary": "Shows a file input field", "category": "input"}
@@ -459,7 +416,7 @@ class InputFile(InputBlock):
                 file = statement.input["file"]
                 file_name = statement.input["file_name"]
                 file_size = statement.input["file_size"]
-                max_size = self.property_value("size") or 1000000
+                max_size = self.size.value or 1000000
             except Exception as e:
                 Log.error("InputFile.on_process", e)
                 return self.reject()
@@ -477,6 +434,16 @@ class InputFile(InputBlock):
                 return self.move()
         return self.reject()
 
+    def on_template_load(self):
+        self.accept.load_from_template(self.template)
+        self.size.load_from_template(self.template)
+        super().on_template_load()
+
+    def before_process(self, binder, operator_id):
+        output = OutputStatement(operator_id)
+        output.append_node(InputFileNode({"accept": self.accept.value, "size": self.size.value}))
+        binder.post_message(output)
+
 
 class InputNumber(InputBlock):
     def on_descriptor(self):
@@ -487,15 +454,18 @@ class InputNumber(InputBlock):
             if isinstance(statement.input, int) or isinstance(statement.input, float):
                 self.save(binder, statement.input)
                 return self.move()
-        return super(InputNumber, self).on_process(binder, user_id, statement)
-
+        return super().on_process(binder, user_id, statement)
 
 class InputOAuth(InputBlock):
     def on_descriptor(self):
-        return {"name": "OAuth Input", "summary": "No description available", "category": "input"}
+        return {
+            "name": "OAuth Input",
+            "summary": "No description available",
+            "category": "input",
+        }
 
-    def on_process(self, binder, user_id, input):
-        authorization_response = input.input
+    def on_process(self, binder, user_id, statement):
+        authorization_response = statement.input
         component_name = self.property_value("component")
         component_object = binder.get_registry().get_component(binder, component_name)
         on_redirect = component_object.on_redirect(binder, authorization_response)
@@ -504,6 +474,7 @@ class InputOAuth(InputBlock):
         return self.reject()
 
     def load_template(self):
+        super().load_template()
         self.append_template_properties(
             [
                 {
@@ -520,12 +491,15 @@ class InputOAuth(InputBlock):
         )
 
     def get_connections(self, properties):
-        return [[BLOCK_MOVE, "Next"], [BLOCK_REJECT, "Reject"]]
+        return [
+            [BLOCK_MOVE, "Next"],
+            [BLOCK_REJECT, "Reject"]
+        ]
 
 
 class InputPayment(InputBlock):
     def on_init(self):
-        super(InputPayment, self).on_init()
+        super().on_init()
         self.remove_template_properties("required")
 
     def on_descriptor(self):
@@ -540,7 +514,7 @@ class InputPayment(InputBlock):
             on_redirect = component_object.on_redirect(binder, authorization_response)
             if on_redirect:
                 return self.move()
-        except:
+        except Exception:
             pass
         return self.reject()
 
@@ -578,73 +552,74 @@ class InputSearchable(InputBlock):
         state = binder.on_load_state()
         package = state.skill["package"]
 
-        real_user_id = binder.on_load_state().user_id
+        real_user_id = state.user_id
 
-        if isinstance(input.input, str):
-            query = input.input
+        item = input.input
+        if isinstance(item, str):
+            query = item
             item = component_object.on_query_search(
                 binder, real_user_id, package, self, query, skill=state.skill
             )
-            if item:
-                valid = component_object.on_verify_input(
-                    binder, real_user_id, package, self, item, skill=state.skill
-                )
-                if valid:
-                    self.save(binder, item)
-                    return self.move()
-        else:
-            item = input.input
-            if item:
-                valid = component_object.on_verify_input(
-                    binder, real_user_id, package, self, item, skill=state.skill
-                )
-                if valid:
-                    self.save(binder, item)
-                    return self.move()
+        if not item:
+            return super().on_process(binder, user_id, input)
 
-        return super().on_process(binder, user_id, input)
+        valid = component_object.on_verify_input(
+            binder, real_user_id, package, self, item, skill=state.skill
+        )
+        if not valid:
+            return super().on_process(binder, user_id, input)
+
+        self.save(binder, item)
+        return self.move()
 
     def load_template(self):
-        super(InputSearchable, self).load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Component",
-                    "name": "component",
-                    "format": "string",
-                    "input_type": "search",
-                    "search_filter": "SkillProvider",
-                    "required": True,
-                    "description": "Skill provider userd to handle the search",
-                    "value": None,
-                },
-                {
-                    "text": "Model",
-                    "name": "model",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": True,
-                    "description": "<Description of property.>",
-                    "value": None,
-                },
-            ]
-        )
+        super().load_template()
+        self.append_template_properties([
+            {
+                "text": "Component",
+                "name": "component",
+                "format": "string",
+                "input_type": "search",
+                "search_filter": "SkillProvider",
+                "required": True,
+                "description": "Skill provider used to handle the search",
+                "value": None,
+            },
+            {
+                "text": "Model",
+                "name": "model",
+                "format": "string",
+                "input_type": "text",
+                "required": True,
+                "description": "<Description of property>",
+                "value": None,
+            },
+        ])
 
     def on_search(self, binder, user_id, query, **kwargs):
-        real_user_id = binder.on_load_state().user_id
         component_name = self.property_value("component")
         component_object = binder.get_registry().get_component(binder, component_name)
         state = binder.on_load_state()
         package = state.skill["package"]
+
         result = component_object.on_search(
-            binder, real_user_id, package, self, query, skill=state.skill
+            binder, state.user_id, package, self, query, skill=state.skill
         )
-        resources = super(InputSearchable, self).on_search(binder, user_id, query, **kwargs)
+
+        resources = super().on_search(binder, user_id, query, **kwargs)
         resources.extend(result)
         return resources
 
 
+import spacy
+
 class InputSelection(InputBlock):
+    def __init__(self, nlp=None):
+        super().__init__()
+        if nlp is None:
+            nlp = spacy.load("en_core_web_sm")
+        self.nlp = nlp
+
     def on_descriptor(self):
         return {
             "name": "Selection Input",
@@ -654,50 +629,63 @@ class InputSelection(InputBlock):
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
-            if self._in_selection(statement):
-                value = statement.input
+            value = self._get_value(statement)
+            if value is not None:
                 self.save(binder, value)
                 return self.move()
-            fuzzy_item = self._fuzzy_item(statement)
-            if fuzzy_item:
-                value = fuzzy_item
-                self.save(binder, value)
-                return self.move()
-        return super(InputSelection, self).on_process(binder, user_id, statement)
+        return super().on_process(binder, user_id, statement)
 
     def load_template(self):
-        super(InputSelection, self).load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Selections",
-                    "name": "selections",
-                    "format": "json",
-                    "input_type": "textarea",
-                    "required": True,
-                    "description": "List of options",
-                    "value": [["draft", "Draft"]],
-                }
-            ]
-        )
+        super().load_template()
+        self.append_template_properties([
+            {
+                "text": "Selections",
+                "name": "selections",
+                "format": "json",
+                "input_type": "textarea",
+                "required": True,
+                "description": "List of options",
+                "value": [["draft", "Draft"]],
+            }
+        ])
 
-    # def get_connections(self, properties):
-    #     connections = super(InputBlock, self).get_connections(properties)
-    #     for idx, val in enumerate(self.property_value('selections')):
-    #         pass
-    #     return connections
+    def _get_value(self, statement):
+        value = statement.input
+        if self._in_selection(value):
+            return value
+        fuzzy_item = self._fuzzy_item(value)
+        if fuzzy_item is not None:
+            return fuzzy_item
+        augmented_results = self._augment_results(value)
+        if augmented_results:
+            return augmented_results[0]
+        return None
 
-    def _in_selection(self, statement):
+    def _in_selection(self, value):
+        return any(item[0] == value for item in self.property_value("selections"))
+
+    def _fuzzy_item(self, value):
         for item in self.property_value("selections"):
-            if item[0] == statement.input:
-                return True
-        return False
-
-    def _fuzzy_item(self, statement):
-        for item in self.property_value("selections"):
-            if item[1].lower() == statement.input.lower():
+            if item[1].lower() == value.lower():
                 return item[0]
         return None
+
+    def _augment_results(self, value):
+        doc = self.nlp(value)
+        tokens = [token for token in doc if not token.is_stop]
+        results = []
+        for index, item in enumerate(self.property_value("selections")):
+            txt, val = item[1], item[0]
+            item_doc = self.nlp(txt)
+            item_tokens = [token for token in item_doc if not token.is_stop]
+            score = doc.similarity(item_doc)
+            for token in tokens:
+                token_score = max(token.similarity(item_token) for item_token in item_tokens)
+                score += token_score
+            score /= len(tokens) + len(item_tokens)
+            results.append((score, val))
+        results.sort(reverse=True)
+        return [result[1] for result in results]
 
     def on_search(self, binder, user_id, query, **kwargs):
         result = []
@@ -705,18 +693,40 @@ class InputSelection(InputBlock):
             txt, val = item[1], item[0]
             if query.lower() in txt.lower():
                 result.append(SearchNode.wrap_text(txt, val))
-        resources = super(InputSelection, self).on_search(binder, user_id, query, **kwargs)
-        resources.extend(result)
+        fuzzy_results = self._fuzzy_search(query)
+        resources = super().on_search(binder, user_id, query, **kwargs)
+        resources.extend(result + fuzzy_results)
         return resources
+
+    def _similarity(self, text1, text2):
+        doc1 = self.nlp(text1)
+        doc2 = self.nlp(text2)
+        return doc1.similarity(doc2)
+
+    def _fuzzy_search(self, query):
+        results = []
+        for index, item in enumerate(self.property_value("selections")):
+            txt, val = item[1], item[0]
+            if query.lower() in txt.lower():
+                results.append((0, val))
+        results.extend([(self._similarity(query, item[1]), item[0]) for item in self.property_value("selections")])
+        results.sort(reverse=True)
+        return [SearchNode.wrap_text(item[1], item[0]) for item in results]
 
 
 class InputSkill(InputBlock):
-    """ """
+    """An input block that passes user input to a skill"""
 
     def on_descriptor(self):
-        return {"name": "Skill Input", "summary": "Passes user input to skill", "category": "input"}
+        """Returns a dictionary containing metadata about this input block"""
+        return {
+            "name": "Skill Input",
+            "summary": "Passes user input to skill",
+            "category": "input"
+        }
 
     def on_process(self, binder, user_id, statement):
+        """Processes the user's input statement"""
         component_name = self.property_value("component")
         component_object = binder.get_registry().get_component(binder, component_name)
         state = binder.on_load_state()
@@ -731,27 +741,32 @@ class InputSkill(InputBlock):
             properties=self.properties,
             skill=state.skill,
         )
+
         if result:
             self.context["result"] = result
             self.context["input"] = state.data
             nodes = self.property_value("nodes")
+
             if nodes:
                 output = OutputStatement(user_id)
+
                 for item in nodes:
+                    template = Template(item["content"])
+                    html = template.render(self.context)
+
                     if item["node"] == "big.bot.core.iframe":
-                        template = Template(item["content"])
-                        html = template.render(self.context)
                         output.append_node(IFrameNode(html))
-                        binder.post_message(output)
                     elif item["node"] == "big.bot.core.text":
-                        template = Template(item["content"])
-                        html = template.render(self.context)
                         output.append_text(html)
-                        binder.post_message(output)
+
+                binder.post_message(output)
+
             return self.move()
+
         return super().on_process(binder, user_id, statement)
 
     def on_search(self, binder, user_id, query):
+        """Searches for the user's query"""
         component_name = self.property_value("component")
         component_object = binder.get_registry().get_component(binder, component_name)
         state = binder.on_load_state()
@@ -774,47 +789,46 @@ class InputSkill(InputBlock):
         return result
 
     def load_template(self):
-        super(InputSkill, self).load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Output Nodes",
-                    "name": "nodes",
-                    "format": "json",
-                    "input_type": "nodes",
-                    "required": True,
-                    "description": "Skill provider",
-                    "value": [],
-                }
-            ]
-        )
+        """Loads the template for this input block"""
+        super().load_template()
+        self.append_template_properties([
+            {
+                "text": "Output Nodes",
+                "name": "nodes",
+                "format": "json",
+                "input_type": "nodes",
+                "required": True,
+                "description": "Nodes to output to the user",
+                "value": [],
+            }
+        ])
 
 
 class InputText(InputBlock):
     def on_descriptor(self):
-        return {"name": "Text Input", "summary": "No description available", "category": "input"}
+        return {
+            "name": "Text Input",
+            "summary": "No description available",
+            "category": "input"
+        }
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
             self.save(binder, statement.input)
             return self.move()
-        return super(InputText, self).on_process(binder, user_id, statement)
+
+        return super().on_process(binder, user_id, statement)
+
 
 
 # ----------------------------------------------------------------------
 # Interpreter Blocks
 # ----------------------------------------------------------------------
 
-
 class InterpreterBlock(BaseBlock):
     def __init__(self, context, id, properties, connections):
-        super(InterpreterBlock, self).__init__(context, id, properties, connections)
-        self.context = context
-        self.id = id
-        self.properties = properties
-        self.connections = connections
+        super().__init__(context, id, properties, connections)
 
-    @abstractmethod
     def on_process(self, binder, user_id):
         return self.move_x()
 
@@ -825,20 +839,18 @@ class InterpreterBlock(BaseBlock):
         return [[BLOCK_MOVE, "Next"], [BLOCK_MOVE_X, "Reject"]]
 
     def load_template(self):
-        self.append_template_properties(
-            [
-                {
-                    "text": "Component",
-                    "name": "component",
-                    "format": "string",
-                    "input_type": "component",
-                    "required": True,
-                    "description": "Skill provider",
-                    "search_filter": "SkillProvider",
-                    "value": None,
-                }
-            ]
-        )
+        self.append_template_properties([
+            {
+                "text": "Component",
+                "name": "component",
+                "format": "string",
+                "input_type": "component",
+                "required": True,
+                "description": "Skill provider",
+                "search_filter": "SkillProvider",
+                "value": None,
+            }
+        ])
 
 
 class DataExchange(InterpreterBlock):
@@ -882,28 +894,26 @@ class DataExchange(InterpreterBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Input Data",
-                    "name": "input",
-                    "format": "json",
-                    "input_type": "nodes",
-                    "required": False,
-                    "description": "Input data for the exchange function",
-                    "value": [],
-                },
-                {
-                    "text": "Output Data",
-                    "name": "output",
-                    "format": "json",
-                    "input_type": "nodes",
-                    "required": False,
-                    "description": "Output data for the exchange function",
-                    "value": [],
-                },
-            ]
-        )
+        self.append_template_properties([
+            {
+                "text": "Input Data",
+                "name": "input",
+                "format": "json",
+                "input_type": "nodes",
+                "required": False,
+                "description": "Input data for the exchange function",
+                "value": [],
+            },
+            {
+                "text": "Output Data",
+                "name": "output",
+                "format": "json",
+                "input_type": "nodes",
+                "required": False,
+                "description": "Output data for the exchange function",
+                "value": [],
+            }
+        ])
 
 
 class InterpreterSkill(InterpreterBlock):
@@ -926,40 +936,11 @@ class InterpreterSkill(InterpreterBlock):
         if result:
             self.context["result"] = result
             self.context["input"] = state.data
-            # self.save(binder, result)
+
             nodes = self.property_value("nodes")
             if nodes:
                 output = OutputStatement(user_id)
-                for item in nodes:
-                    if item["node"] == "big.bot.core.text":
-                        template = Template(item["content"])
-                        html = template.render(self.context)
-                        output.append_text(html)
-                        binder.post_message(output)
-                    elif item["node"] == "big.bot.core.iframe":
-                        template = Template(item["content"])
-                        html = template.render(self.context)
-                        output.append_node(IFrameNode(html))
-                        binder.post_message(output)
-                    pass
-            return self.move()
-        return super().on_process(binder, user_id)
-
-    def load_template(self):
-        super(InterpreterSkill, self).load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Output Nodes",
-                    "name": "nodes",
-                    "format": "json",
-                    "input_type": "nodes",
-                    "required": True,
-                    "description": "Nodes used to render the result",
-                    "value": [],
-                }
-            ]
-        )
+                for item in
 
 
 # ----------------------------------------------------------------------
@@ -972,20 +953,19 @@ class PromptBlock(BaseBlock):
         return [[BLOCK_MOVE, "Next"]]
 
     def load_template(self):
-        self.append_template_properties(
-            [
-                {
-                    "text": "Read",
-                    "name": "read",
-                    "format": "string",
-                    "required": False,
-                    "unique": True,
-                    "auto": True,
-                    "description": "Reads data from the data instead of using the set value",
-                    "value": None,
-                }
-            ]
-        )
+        super().load_template()
+        self.append_template_properties([
+            {
+                "text": "Read",
+                "name": "read",
+                "format": "string",
+                "required": False,
+                "unique": True,
+                "auto": True,
+                "description": "Reads data from the data instead of using the set value",
+                "value": None,
+            }
+        ])
 
     @abstractmethod
     def on_process(self, binder, user_id):
@@ -997,32 +977,34 @@ class PromptBlock(BaseBlock):
 
 class PromptBinary(PromptBlock):
     def on_descriptor(self):
-        return {"name": "Binary", "summary": "No description available", "category": "prompt"}
+        return {
+            "name": "Binary",
+            "summary": "No description available",
+            "category": "prompt"
+        }
+
+    def load_template(self):
+        super().load_template()
+        self.append_template_properties([
+            {
+                "text": "Binary",
+                "name": "binary",
+                "format": "binary",
+                "input_type": "file",
+                "file_limit": 1000000,
+                "mime_types": ["*/*"],
+                "required": True,
+                "description": "Binary File",
+                "value": None,
+            },
+        ])
 
     def on_process(self, binder, user_id):
         binary = self.property_value("binary")
         output = OutputStatement(user_id)
         output.append_node(BinaryNode(binary))
         binder.post_message(output)
-        return super(PromptBinary, self).on_process(binder, user_id)
-
-    def load_template(self):
-        super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Binary",
-                    "name": "binary",
-                    "format": "binary",
-                    "input_type": "file",
-                    "file_limit": 1000000,
-                    "mime_types": ["*/*"],
-                    "required": True,
-                    "description": "Binary File",
-                    "value": None,
-                },
-            ]
-        )
+        return super().on_process(binder, user_id)
 
 
 class PromptChatPlatform(PromptBlock):
@@ -1030,21 +1012,18 @@ class PromptChatPlatform(PromptBlock):
         return {
             "name": "Chat Platforms",
             "summary": "No description available",
-            "category": "prompt",
+            "category": "prompt"
         }
 
     def on_process(self, binder, user_id):
-        # load value from template for further integrations
         real_user_id = binder.on_load_state().user_id
-        # base64 encode user id as payload
         b64_bytes = base64.b64encode(str(real_user_id).encode("utf-8"))
         payload = b64_bytes.decode("utf-8")
         data = {
             "platforms": [
                 {
                     "name": "Telegram",
-                    "icon": "data:image/png;base64,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",
-                    "url": "https://t.me/randomNameTestBot?start=" + payload,
+                    "url": f"https://t.me/randomNameTestBot?start={payload}",
                 }
             ]
         }
@@ -1054,100 +1033,74 @@ class PromptChatPlatform(PromptBlock):
         output = OutputStatement(user_id)
         output.append_node(chat_platform)
         binder.post_message(output)
-        return super(PromptChatPlatform, self).on_process(binder, user_id)
+        return super().on_process(binder, user_id)
 
 
-class PromptDate(PromptBlock):
-    def on_descriptor(self):
-        return {"name": "Date", "summary": "No description available", "category": "prompt"}
+class PromptTimeBlock(PromptBlock):
+    def get_output_node(self):
+        return None
+
+    @abstractmethod
+    def get_time_node(self, value):
+        pass
 
     def on_process(self, binder, user_id):
         output = OutputStatement(user_id)
-        output.append_node(DateNode(None))
+        value = self.property_value("time")
+        output_node = self.get_time_node(value)
+        if output_node:
+            output.append_node(output_node)
         binder.post_message(output)
-        return super(PromptDate, self).on_process(binder, user_id)
+        return super(PromptTimeBlock, self).on_process(binder, user_id)
 
     def load_template(self):
         super().load_template()
         self.append_template_properties(
             [
                 {
-                    "text": "Date",
-                    "name": "date",
-                    "format": "time",
-                    "input_type": "date",
-                    "unique": False,
-                    "auto": False,
-                    "description": "Date",
-                }
-            ]
-        )
-
-
-class PromptDateTime(PromptBlock):
-    def on_descriptor(self):
-        return {"name": "Date Time", "summary": "No description available", "category": "prompt"}
-
-    def on_process(self, binder, user_id):
-        output = OutputStatement(user_id)
-        output.append_node(DateTimeNode(None))
-        binder.post_message(output)
-        return super(PromptDateTime, self).on_process(binder, user_id)
-
-    def load_template(self):
-        super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Datetime",
-                    "name": "datetime",
-                    "format": "time",
-                    "input_type": "datetime",
-                    "unique": False,
-                    "auto": False,
-                    "description": "Hour and Date",
-                }
-            ]
-        )
-
-
-class PromptDuration(PromptBlock):
-    def on_descriptor(self):
-        return {"name": "Duration", "summary": "No description available", "category": "prompt"}
-
-    def on_process(self, binder, user_id):
-        output = OutputStatement(user_id)
-        output.append_node(DurationNode(None))
-        binder.post_message(output)
-        return super(PromptDuration, self).on_process(binder, user_id)
-
-    def load_template(self):
-        super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Duration",
+                    "text": self.__class__.__name__,
                     "name": "time",
                     "format": "time",
-                    "input_type": "time",
                     "unique": False,
                     "auto": False,
-                    "description": "Hour",
+                    "description": self.__class__.__name__,
                 }
             ]
         )
+
+class PromptDate(PromptTimeBlock):
+    def get_output_node(self):
+        return DateNode(None)
+
+    def get_time_node(self, value):
+        return self.get_output_node()
+
+class PromptDateTime(PromptTimeBlock):
+    def get_output_node(self):
+        return DateTimeNode(None)
+
+    def get_time_node(self, value):
+        return self.get_output_node()
+
+class PromptDuration(PromptTimeBlock):
+    def get_output_node(self):
+        return DurationNode(None)
+
+    def get_time_node(self, value):
+        return self.get_output_node()
 
 
 class PromptImage(PromptBlock):
-    def on_descriptor(self):
-        return {"name": "Image", "summary": "No description available", "category": "prompt"}
+    def __init__(self):
+        super().__init__()
+        self.descriptor = {"name": "Image", "summary": "No description available", "category": "prompt"}
 
     def on_process(self, binder, user_id):
         image = self.property_value("image")
         output = OutputStatement(user_id)
         output.append_node(ImageNode(image))
         binder.post_message(output)
-        return super(PromptImage, self).on_process(binder, user_id)
+        return super().on_process(binder, user_id)
 
     def load_template(self):
         super().load_template()
@@ -1176,71 +1129,82 @@ class PromptPayment(PromptBlock):
         real_user_id = binder.on_load_state().user_id
         amount = self.property_value("amount")
         currency_code = "USD"
-        # this is hardcoded add props for same
-        meta = {
-            "charge_summary": "You have to pay",
-            "currency_code": currency_code,
-            "currency_symbol": "$",
-            "button_text": "Pay " + str(amount) + " " + currency_code,
-            "payment_services": [],
-        }
-        objects = binder.get_registry().payment_providers(binder)
-        for component_object in objects:
-            payment_url = component_object.get_payment_url(
-                binder, real_user_id, amount, currency_code
-            )
-            payment_method = component_object.get_meta()
-            # need improvement for including such meta
-            if "name" not in payment_method:
-                payment_method["name"] = "None"
-            elif "icon" not in payment_method:
-                payment_method["icon"] = "https://commons.wikimedia.org/wiki/File:PayPal.svg"
-            payment_method["payment_url"] = payment_url
-            meta["payment_services"].append(payment_method)
-            pass
-        payment_node = PaymentNode(amount, meta)
+
+        payment_services = self._get_payment_services(binder, real_user_id, amount, currency_code)
+        payment_node = PaymentNode(amount, self._get_payment_meta(amount, currency_code, payment_services))
+
         output = OutputStatement(user_id)
         output.append_node(payment_node)
         binder.post_message(output)
         Log.info("PaymentNode", payment_node.serialize())
+
         return super().on_process(binder, user_id)
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Amount",
-                    "name": "amount",
-                    "format": "float",
-                    "input_type": "number",
-                    "required": True,
-                    "description": "Amount to pay",
-                    "value": 0.00,
-                },
-            ]
-        )
+        self.append_template_properties([
+            {
+                "text": "Amount",
+                "name": "amount",
+                "format": "float",
+                "input_type": "number",
+                "required": True,
+                "description": "Amount to pay",
+                "value": 0.00,
+            },
+        ])
+
+    def _get_payment_services(self, binder, user_id, amount, currency_code):
+        payment_services = []
+
+        objects = binder.get_registry().payment_providers(binder)
+        for component_object in objects:
+            payment_url = component_object.get_payment_url(
+                binder, user_id, amount, currency_code
+            )
+            payment_method = component_object.get_meta()
+
+            if "name" not in payment_method:
+                payment_method["name"] = "None"
+            if "icon" not in payment_method:
+                payment_method["icon"] = "https://commons.wikimedia.org/wiki/File:PayPal.svg"
+
+            payment_method["payment_url"] = payment_url
+            payment_services.append(payment_method)
+
+        return payment_services
+
+    def _get_payment_meta(self, amount, currency_code, payment_services):
+        return {
+            "charge_summary": "You have to pay",
+            "currency_code": currency_code,
+            "currency_symbol": "$",
+            "button_text": f"Pay {amount} {currency_code}",
+            "payment_services": payment_services,
+        }
 
 
 class PromptPreview(PromptBlock):
     def on_descriptor(self):
-        return {"category": "prompt", "name": "Preview", "summary": "Previews a URL"}
+        return {
+            "category": "prompt",
+            "name": "Preview",
+            "summary": "Previews a URL"
+        }
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "URL",
-                    "name": "url",
-                    "format": "string",
-                    "input_type": "url",
-                    "required": True,
-                    "description": "URL to display",
-                    "value": "https://example.com",
-                }
-            ]
-        )
+        self.append_template_properties([
+            {
+                "text": "URL",
+                "name": "url",
+                "format": "string",
+                "input_type": "url",
+                "required": True,
+                "description": "URL to display",
+                "value": "https://example.com"
+            }
+        ])
 
     def on_process(self, binder, user_id):
         url = self.property_value("url")
@@ -1252,33 +1216,36 @@ class PromptPreview(PromptBlock):
 
 class PromptText(PromptBlock):
     def on_descriptor(self):
-        return {"name": "Text", "summary": "No description available", "category": "prompt"}
-
-    def on_process(self, binder, user_id):
-        output = OutputStatement(user_id)
-        output.append_text(text=self._get_display_text())
-        binder.post_message(output)
-        return super(PromptText, self).on_process(binder, user_id)
+        return {
+            "name": "Text",
+            "summary": "No description available",
+            "category": "prompt"
+        }
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Text Primary",
-                    "name": "primary_text",
-                    "format": "array",
-                    "input_type": "text",
-                    "required": True,
-                    "description": "List of strings to display",
-                    "value": [],
-                },
-            ]
-        )
+        self.append_template_properties([
+            {
+                "text": "Text Primary",
+                "name": "primary_text",
+                "format": "array",
+                "input_type": "text",
+                "required": True,
+                "description": "List of strings to display",
+                "value": []
+            }
+        ])
+
+    def on_process(self, binder, user_id):
+        output = OutputStatement(user_id)
+        display_text = self._get_display_text()
+        output.append_text(text=display_text)
+        binder.post_message(output)
+        return super().on_process(binder, user_id)
 
     def _get_display_text(self):
-        value = self.property_value("primary_text")
-        pattern = random.choice(value)
+        primary_text = self.property_value("primary_text")
+        pattern = random.choice(primary_text)
         template = Template(pattern)
         html = template.render(self.context)
         return html
@@ -1293,15 +1260,12 @@ class TerminalBlock(BaseBlock):
     def on_descriptor(self):
         return {
             "name": "Terminate",
-            "summary": "This block terminate the workflow.",
+            "summary": "This block terminates the workflow.",
             "category": "terminal",
         }
 
-    def process(self, binder, user_id):
+    def on_process(self, binder, user_id):
         return self.move()
-
-    def get_connections(self, properties):
-        return []
 
     def load_template(self):
         self.append_template_properties(
@@ -1312,7 +1276,7 @@ class TerminalBlock(BaseBlock):
                     "format": "enum",
                     "input_type": "select",
                     "required": True,
-                    "description": "Actio to execute after",
+                    "description": "Action to execute after",
                     "enum": [
                         {"name": "Do Nothing", "value": 0},
                         {"name": "Start Skill", "value": 1},
@@ -1342,5 +1306,6 @@ class TerminalBlock(BaseBlock):
             ]
         )
 
+    @property
     def post_skill(self):
         return self.property_value("post_skill")
