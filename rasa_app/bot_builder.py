@@ -183,6 +183,7 @@ def generate_rules_file(payload, bot_id):
 
 
 def create_rasa_model(payload_data,config_data,bot_id):
+    os.makedirs(bot_id)
     generate_domain_file(payload_data,bot_id)
     generate_config_file(config_data,bot_id)
     generate_nlu_file(payload_data,bot_id)
