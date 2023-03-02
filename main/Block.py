@@ -39,6 +39,19 @@ class BlockNotFoundException(Exception):
 class ComponentNotFoundException(Exception):
     pass
 
+def load_blocks_from_json(block_json):
+    """
+    Load blocks from a JSON file and return a list of Block objects.
+    """
+    blocks = []
+    for block_data in block_json:
+        component = block_data.get("component")
+        block_module, block_name = component.rsplit(".", 1)
+        block_class = getattr(__import__(block_module, fromlist=[block_name]), block_name)
+        connections = block_data.get("connections")
+        block = block_class(connections=connections, **block_data["properties"])
+        blocks.append(block)
+    return blocks
 
 def get_block_by_id(binder, skill, block_id):
     block_data = next((item for item in skill["blocks"] if item["id"] == block_id), None)
