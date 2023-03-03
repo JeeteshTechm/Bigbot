@@ -13,7 +13,7 @@ class UtteranceDistance:
         self.algorithm = algorithm
         self.utterances = utterances
         self.query = query
-        self.distance = 0.0
+        self.similarity = []
         self.index = None
         self.text = None
 
