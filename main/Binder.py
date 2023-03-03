@@ -48,35 +48,43 @@ from .Block import (
 )
 
 
-DATA_EXCHANGE = [DataExchange]
-INPUT_BLOCKS = [
-    DecisionBlock,
-    InputDate,
-    InputDateTime,
-    InputDuration,
-    InputEmail,
-    InputFile,
-    InputNumber,
-    InputOAuth,
-    InputPayment,
-    InputSearchable,
-    InputSelection,
-    InputSkill,
-    InputText,
-]
-INTERPRETER_BLOCKS = [InterpreterSkill]
-OTHER_BLOCKS = [TerminalBlock]
-PROMPT_BLOCKS = [
-    PromptBinary,
-    PromptChatPlatform,
-    PromptDate,
-    PromptDateTime,
-    PromptDuration,
-    PromptImage,
-    PromptPayment,
-    PromptPreview,
-    PromptText,
-]
+class BlockType:
+    PROMPT_BLOCKS = [
+        PromptBinary,
+        PromptChatPlatform,
+        PromptDate,
+        PromptDateTime,
+        PromptDuration,
+        PromptImage,
+        PromptPayment,
+        PromptPreview,
+        PromptText,
+    ]
+
+    INPUT_BLOCKS = [
+        DecisionBlock,
+        InputDate,
+        InputDateTime,
+        InputDuration,
+        InputEmail,
+        InputFile,
+        InputNumber,
+        InputOAuth,
+        InputPayment,
+        InputSearchable,
+        InputSelection,
+        InputSkill,
+        InputText,
+    ]
+
+    INTERPRETER_BLOCKS = [InterpreterSkill]
+
+    DATA_EXCHANGE = [DataExchange]
+
+    OTHER_BLOCKS = [TerminalBlock]
+
+    ALL_BLOCKS = PROMPT_BLOCKS + INPUT_BLOCKS + INTERPRETER_BLOCKS + DATA_EXCHANGE + OTHER_BLOCKS
+
 
 
 def _get_block_names(block_classes):
