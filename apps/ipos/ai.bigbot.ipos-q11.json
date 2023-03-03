@@ -1,0 +1,90 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "vn4m"]],
+      "id": "vf65",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Choose an option"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "vn4m",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "z1u8",
+              "text": "For Individuals/Enterprises",
+              "value": "05k5"
+            },
+            {
+              "id": "xjy8",
+              "text": "For Service Providers",
+              "value": "qtao"
+            }
+          ]
+        }
+      ],
+      "parent_id": "vf65"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "h74f"]],
+      "id": "05k5",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "We can help you to identify IP/IA needs and guide you to make informed hiring decisions for IP/IA-related services, find credible professional IP/IA services and connect with them directly through our safe and secure platform, and gain knowledge and awareness on IP/IA-related capabilities, services, and topics."
+        }
+      ],
+      "parent_id": "vn4m"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "8trh"]],
+      "id": "qtao",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "We can help you to access potential clients seeking professional IP/IA help when you join our platform, showcase your IP/IA capabilities, solutions and expert insights, and connect and collaborate with other IP/IA professionals."
+        }
+      ],
+      "parent_id": "vn4m"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "h74f",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "05k5"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "8trh",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "qtao"
+    }
+  ],
+  "name": "ipos-q11",
+  "package": "ai.bigbot.ipos-q11",
+  "start": "vf65"
+}

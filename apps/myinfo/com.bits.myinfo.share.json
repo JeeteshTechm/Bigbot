@@ -1,0 +1,164 @@
+{
+    "name": "MyInfo Share",
+    "package": "com.bits.myinfo.share",
+    "start": "amv2",
+    "blocks": [
+        {
+            "id": "amv2",
+            "parent_id": -1,
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": ["Would you like to share on google forms?"]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "blgs"
+                ]
+            ]
+        },
+        {
+            "id": "blgs",
+            "parent_id": "amv2",
+            "component": "main.Block.InputSelection",
+            "properties": [
+                {
+                    "name": "key",
+                    "value": "is_share"
+                },
+                {
+                    "name": "required",
+                    "value": true
+                },
+                {
+                    "name": "selections",
+                    "value": [
+                        [
+                            [
+                                "0",
+                                "No"
+                            ],
+                            [
+                                "1",
+                                "Yes"
+                            ]
+                        ]
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "amv2"
+                ],
+                [
+                    1,
+                    "4x3i"
+                ]
+            ]
+        },
+        {
+            "id": "4x3i",
+            "parent_id": "blgs",
+            "component": "main.Block.InputOAuth",
+            "properties": [
+                {
+                    "name": "component",
+                    "value": "apps.myinfo.component.MyinfoOAuthProvider"
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "4x3i"
+                ],
+                [
+                    1,
+                    "k6q8"
+                ]
+            ]
+        },
+        {
+            "id": "k6q8",
+            "parent_id": "4x3i",
+            "component": "main.Block.InterpreterSkill",
+            "properties": [
+                {
+                    "name": "component",
+                    "value": "apps.myinfo.component.MyInfoShare"
+                },
+                {
+                    "name": "nodes",
+                    "value": [
+                        {
+                            "node": "big.bot.core.text",
+                            "content": "Your information has been shared."
+                           }
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "zqk9"
+                ],
+                [
+                    2,
+                    "fe6j"
+                ]
+            ]
+        },
+        {
+            "id": "zqk9",
+            "parent_id": "k6q8",
+            "component": "main.Block.TerminalBlock",
+            "properties": [
+                {
+                    "name": "action",
+                    "value": null
+                },
+                {
+                    "name": "post_skill",
+                    "value": null
+                }
+            ],
+            "connections": []
+        },
+        {
+            "id": "fe6j",
+            "parent_id": "k6q8",
+            "component": "main.Block.PromptText",
+            "properties": [
+                {
+                    "name": "primary_text",
+                    "value": ["Sharing cancelled."]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "12f8"
+                ]
+            ]
+        },
+        {
+            "id": "12f8",
+            "parent_id": "fe6j",
+            "component": "main.Block.TerminalBlock",
+            "properties": [
+                {
+                    "name": "action",
+                    "value": null
+                },
+                {
+                    "name": "post_skill",
+                    "value": null
+                }
+            ],
+            "connections": []
+        }
+    ]
+}

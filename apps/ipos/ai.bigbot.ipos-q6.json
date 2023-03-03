@@ -1,0 +1,90 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "h14o"]],
+      "id": "3tt9",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Which service provider do you want to connect with?"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "h14o",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "5rf9",
+              "text": "Keyword Search",
+              "value": "bwru"
+            },
+            {
+              "id": "3lem",
+              "text": "Link to the service provider's bot",
+              "value": "vk6k"
+            }
+          ]
+        }
+      ],
+      "parent_id": "3tt9"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "k9mn"]],
+      "id": "bwru",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO"
+        }
+      ],
+      "parent_id": "h14o"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "uha1"]],
+      "id": "vk6k",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO"
+        }
+      ],
+      "parent_id": "h14o"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "k9mn",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "bwru"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "uha1",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "vk6k"
+    }
+  ],
+  "name": "ipos-q6",
+  "package": "ai.bigbot.ipos-q6",
+  "start": "3tt9"
+}

@@ -1,0 +1,55 @@
+{
+  "name": "(IPOS) Filter Post",
+  "package": "ai.bigbot.ipos.filter",
+  "start": "shov",
+  "blocks": [
+    {
+      "id": "shov",
+      "parent_id": -1,
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Hello there, what are you looking for?"]
+        }
+      ],
+      "connections": [[1, "hkmu"]]
+    },
+    {
+      "id": "hkmu",
+      "parent_id": "shov",
+      "component": "main.Block.InputSkill",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.ipos.component.IPOSProvider"
+        }
+      ],
+      "connections": [
+        [1, "hkmu"],
+        [2, "hkmu"]
+      ]
+    },
+    {
+      "id": "oboo",
+      "parent_id": "hkmu",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": [
+            "Sorry, I did not understood, could you repeat your query again"
+          ]
+        }
+      ],
+      "connections": [[1, "hkmu"]]
+    },
+    {
+      "id": "cety",
+      "parent_id": "hkmu",
+      "component": "main.Block.TerminalBlock",
+      "properties": [],
+      "connections": []
+    }
+  ]
+}

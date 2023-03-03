@@ -1,0 +1,246 @@
+{
+  "name": "Create Timesheet (Odoo)",
+  "package": "com.bits.odoo.create.timesheet",
+  "start": "ms8p",
+  "blocks": [
+    {
+      "id": "ms8p",
+      "parent_id": -1,
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please Enter a Description for your timesheet."]
+        }
+      ],
+      "connections": [[1, "np65"]]
+    },
+    {
+      "id": "np65",
+      "parent_id": "ms8p",
+      "component": "main.Block.InputText",
+      "properties": [
+        {
+          "name": "key",
+          "value": "name"
+        },
+        {
+          "name": "required",
+          "value": true
+        }
+      ],
+      "connections": [
+        [-1, "ms8p"],
+        [1, "29x6"]
+      ]
+    },
+    {
+      "id": "29x6",
+      "parent_id": "np65",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please enter a duration."]
+        }
+      ],
+      "connections": [[1, "f2ir"]]
+    },
+    {
+      "id": "f2ir",
+      "parent_id": "29x6",
+      "component": "main.Block.InputDuration",
+      "properties": [
+        {
+          "name": "key",
+          "value": "unit_amount"
+        },
+        {
+          "name": "required",
+          "value": true
+        }
+      ],
+      "connections": [
+        [-1, "29x6"],
+        [1, "czzz"]
+      ]
+    },
+    {
+      "id": "czzz",
+      "parent_id": "f2ir",
+      "component": "main.Block.InputOAuth",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooOAuthProvider"
+        }
+      ],
+      "connections": [
+        [-1, "czzz"],
+        [1, "m99k"]
+      ]
+    },
+    {
+      "id": "m99k",
+      "parent_id": "czzz",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Plesae Select the Project."]
+        }
+      ],
+      "connections": [[1, "76bp"]]
+    },
+    {
+      "id": "76bp",
+      "parent_id": "m99k",
+      "component": "main.Block.InputSearchable",
+      "properties": [
+        {
+          "name": "key",
+          "value": "project_id"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "model",
+          "value": "project.project"
+        }
+      ],
+      "connections": [
+        [-1, "m99k"],
+        [1, "8qux"]
+      ]
+    },
+    {
+      "id": "8qux",
+      "parent_id": "76bp",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please select the task."]
+        }
+      ],
+      "connections": [[1, "e2er"]]
+    },
+    {
+      "id": "e2er",
+      "parent_id": "8qux",
+      "component": "main.Block.InputSearchable",
+      "properties": [
+        {
+          "name": "key",
+          "value": "task_id"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "model",
+          "value": "project.task"
+        },
+        {
+          "name": "domain",
+          "value": [["project_id", "=", "project_id"]]
+        }
+      ],
+      "connections": [
+        [-1, "8qux"],
+        [1, "pbn5"]
+      ]
+    },
+    {
+      "id": "pbn5",
+      "parent_id": "e2er",
+      "component": "main.Block.InterpreterSkill",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "nodes",
+          "value": [
+            {
+              "node": "big.bot.core.text",
+              "content": "Timesheet name '{{result.object__account_analytic_line.name}}' with a duration of {{result.object__account_analytic_line.unit_amount}}, has been created under the project '{{result.object__account_analytic_line.project_id.1}}' for the user '{{result.object__account_analytic_line.user_id.1}}'."
+            }
+          ]
+        }
+      ],
+      "connections": [
+        [1, "58w9"],
+        [2, "70w1"]
+      ]
+    },
+    {
+      "id": "58w9",
+      "parent_id": "pbn5",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Timesheet created !!"]
+        }
+      ],
+      "connections": [[1, "xate"]]
+    },
+    {
+      "id": "70w1",
+      "parent_id": "pbn5",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["opration failed !!"]
+        }
+      ],
+      "connections": [[1, "sc3l"]]
+    },
+    {
+      "id": "xate",
+      "parent_id": "58w9",
+      "component": "main.Block.TerminalBlock",
+      "properties": [
+        {
+          "name": "action",
+          "value": null
+        },
+        {
+          "name": "post_skill",
+          "value": null
+        }
+      ],
+      "connections": []
+    },
+    {
+      "id": "sc3l",
+      "parent_id": "70w1",
+      "component": "main.Block.TerminalBlock",
+      "properties": [
+        {
+          "name": "action",
+          "value": null
+        },
+        {
+          "name": "post_skill",
+          "value": null
+        }
+      ],
+      "connections": []
+    }
+  ]
+}

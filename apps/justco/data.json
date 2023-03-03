@@ -1,0 +1,522 @@
+{
+    "name": "Justco Plan",
+    "package": "demo.justco.coworking.plan",
+    "start": "vfaj",
+    "blocks": [
+     {
+      "id": "vfaj",
+      "parent_id": -1,
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "Hello there, let's help you to get onboard.",
+         "Hello, thank you for your interest with JustCo."
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "cw3f"
+       ]
+      ]
+     },
+     {
+      "id": "cw3f",
+      "parent_id": "vfaj",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "What kind of space are you looking for?"
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "smak"
+       ]
+      ]
+     },
+     {
+      "id": "smak",
+      "parent_id": "cw3f",
+      "component": "main.Block.InputSelection",
+      "properties": [
+       {
+        "name": "key",
+        "value": "space_type"
+       },
+       {
+        "name": "required",
+        "value": true
+       },
+       {
+        "name": "selections",
+        "value": [
+         [
+          "space_1",
+          "Conventional/Open"
+         ],
+         [
+          "space_2",
+          "Private Workspaces"
+         ],
+         [
+          "space_3",
+          "Corporate/Professional"
+         ],
+         [
+          "space_4",
+          "Meeting Space"
+         ]
+        ]
+       }
+      ],
+      "connections": [
+       [
+        -1,
+        "cw3f"
+       ],
+       [
+        1,
+        "0t4u"
+       ]
+      ]
+     },
+     {
+      "id": "0t4u",
+      "parent_id": "smak",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "You can find JustCo coworking office spaces across the Asia-Pacific\u2019s major cities."
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "o5fv"
+       ]
+      ]
+     },
+     {
+      "id": "o5fv",
+      "parent_id": "0t4u",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "Which location suits you?"
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "tw7b"
+       ]
+      ]
+     },
+     {
+      "id": "tw7b",
+      "parent_id": "o5fv",
+      "component": "main.Block.InputSelection",
+      "properties": [
+       {
+        "name": "key",
+        "value": "location"
+       },
+       {
+        "name": "required",
+        "value": true
+       },
+       {
+        "name": "selections",
+        "value": [
+         [
+          "singapore",
+          "Singapore"
+         ],
+         [
+          "jakarta",
+          "Jakarta"
+         ],
+         [
+          "bangkok",
+          "Bangkok"
+         ],
+         [
+          "sydney",
+          "Sydney"
+         ],
+         [
+          "tokyo",
+          "tokyo"
+         ],
+         [
+          "melbourne",
+          "Melbourne"
+         ],
+         [
+          "seoul",
+          "Seoul"
+         ],
+         [
+          "taipei",
+          "Taipei"
+         ],
+         [
+          "shanghai",
+          "Shanghai"
+         ]
+        ]
+       }
+      ],
+      "connections": [
+       [
+        -1,
+        "o5fv"
+       ],
+       [
+        1,
+        "fipl"
+       ]
+      ]
+     },
+     {
+      "id": "fipl",
+      "parent_id": "tw7b",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "We got several plans, which one suits you?"
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "1shd"
+       ]
+      ]
+     },
+     {
+      "id": "1shd",
+      "parent_id": "fipl",
+      "component": "main.Block.InputSelection",
+      "properties": [
+       {
+        "name": "key",
+        "value": "plan_type"
+       },
+       {
+        "name": "required",
+        "value": true
+       },
+       {
+        "name": "selections",
+        "value": [
+         [
+          "plan_1",
+          "JustDesk Basic"
+         ],
+         [
+          "plan_2",
+          "JustDesk Unlimited"
+         ],
+         [
+          "plan_3",
+          "JustDesk Dedicate"
+         ],
+         [
+          "plan_4",
+          "Just Studio"
+         ]
+        ]
+       }
+      ],
+      "connections": [
+       [
+        -1,
+        "fipl"
+       ],
+       [
+        1,
+        "xzp5"
+       ]
+      ]
+     },
+     {
+      "id": "xzp5",
+      "parent_id": "1shd",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "Perfect for the free-spirited who do not require a workspace daily. With this membership, you get to enjoy the benefits of having a business address and being part of the JustCo community."
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "wxki"
+       ]
+      ]
+     },
+     {
+      "id": "wxki",
+      "parent_id": "xzp5",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "Your selected plan will cost you $98/month."
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "fdx4"
+       ]
+      ]
+     },
+     {
+      "id": "fdx4",
+      "parent_id": "wxki",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "Choose your preferred payment method to continue."
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "esdl"
+       ]
+      ]
+     },
+     {
+      "id": "esdl",
+      "parent_id": "fdx4",
+      "component": "main.Block.PromptPayment",
+      "properties": [
+       {
+        "name": "amount",
+        "value": 98
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "90gc"
+       ]
+      ]
+     },
+     {
+      "id": "90gc",
+      "parent_id": "esdl",
+      "component": "main.Block.InputPayment",
+      "properties": [],
+      "connections": [
+       [
+        -1,
+        "fdx4"
+       ],
+       [
+        1,
+        "o3sv"
+       ]
+      ]
+     },
+     {
+      "id": "o3sv",
+      "parent_id": "90gc",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "Thank you for your payment."
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "k5dl"
+       ]
+      ]
+     },
+     {
+      "id": "suq9",
+      "parent_id": "gpmb",
+      "component": "main.Block.TerminalBlock",
+      "properties": [
+       {
+        "name": "action",
+        "value": 1
+       },
+       {
+        "name": "post_skill",
+        "value": "demo.justco.coworking.onboarding"
+       }
+      ],
+      "connections": []
+     },
+     {
+      "id": "k5dl",
+      "parent_id": "o3sv",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "What is your email address ?"
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "s4h5"
+       ]
+      ]
+     },
+     {
+      "id": "s4h5",
+      "parent_id": "k5dl",
+      "component": "main.Block.InputEmail",
+      "properties": [
+       {
+        "name": "key",
+        "value": "email"
+       },
+       {
+        "name": "required",
+        "value": false
+       }
+      ],
+      "connections": [
+       [
+        -1,
+        "k5dl"
+       ],
+       [
+        1,
+        "l2es"
+       ]
+      ]
+     },
+     {
+      "id": "l2es",
+      "parent_id": "s4h5",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "Let's Make Work Better. "
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "33zp"
+       ]
+      ]
+     },
+     {
+      "id": "33zp",
+      "parent_id": "l2es",
+      "component": "main.Block.PromptImage",
+      "properties": [
+       {
+        "name": "image",
+        "value": "https://media-exp1.licdn.com/dms/image/C4E1BAQFWM5BX6kFZTw/company-background_10000/0/1519799939052?e=2159024400&v=beta&t=pBNK_kUg9zFeeyJPAPtdrf1iFX1x6E7kDKXTsw02BIM"
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "n9yh"
+       ]
+      ]
+     },
+     {
+      "id": "n9yh",
+      "parent_id": "33zp",
+      "component": "main.Block.PromptText",
+      "properties": [
+       {
+        "name": "primary_text",
+        "value": [
+         "JustCo is more than just an instagrammable space."
+        ]
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "g0gv"
+       ]
+      ]
+     },
+     {
+      "id": "g0gv",
+      "parent_id": "n9yh",
+      "component": "main.Block.InterpreterSkill",
+      "properties": [
+       {
+        "name": "component",
+        "value": "apps.demo.component.JustCOAdapter"
+       },
+       {
+        "name": "nodes",
+        "value": []
+       }
+      ],
+      "connections": [
+       [
+        1,
+        "lnmt"
+       ]
+      ]
+     },
+     {
+      "id": "lnmt",
+      "parent_id": "g0gv",
+      "component": "main.Block.TerminalBlock",
+      "properties": [
+       {
+        "name": "action",
+        "value": 1
+       },
+       {
+        "name": "post_skill",
+        "value": "demo.justco.coworking.onboarding"
+       }
+      ],
+      "connections": []
+     }
+    ]
+   }

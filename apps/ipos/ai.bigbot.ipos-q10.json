@@ -1,0 +1,31 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "akie"]],
+      "id": "7d48",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "We understand the importance of intellectual property (IP) and intangible assets (IA) and their impact to your business at every stage of growth. Which is why we have created this digital solution that grants you access to a wide network of IP and IA practitioners and solutions in a smart and seamless way. Whatever your IP needs may be, IP Grow helps you make the right connections to safeguard your competitive edge for success as you take your ideas to market. Navigate our site, connect with service providers and access resources focusing on IP and IA issues in the innovation cycle."
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "akie",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "7d48"
+    }
+  ],
+  "name": "ipos-q10",
+  "package": "ai.bigbot.ipos-q10",
+  "start": "7d48"
+}

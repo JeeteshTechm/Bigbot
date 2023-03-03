@@ -1,0 +1,35 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "dobc"]],
+      "id": "lya1",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "A rough cost indication can be found on most of the service providers' profile"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "dobc",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q1"
+        }
+      ],
+      "parent_id": "lya1"
+    }
+  ],
+  "name": "ipos-q3",
+  "package": "ai.bigbot.ipos-q3",
+  "start": "lya1"
+}

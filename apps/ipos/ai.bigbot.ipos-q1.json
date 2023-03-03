@@ -1,0 +1,131 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "4vap"]],
+      "id": "ttsp",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Which services are you looking for?"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "4vap",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "qinn",
+              "text": "I need guidance",
+              "value": "bels"
+            },
+            {
+              "id": "l3la",
+              "text": "List of common IP services",
+              "value": "zl9q"
+            },
+            {
+              "id": "iqjm",
+              "text": "Link to IP Expertise",
+              "value": "0box"
+            }
+          ]
+        }
+      ],
+      "parent_id": "ttsp"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "cwcm"]],
+      "id": "bels",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "You may identify your IP/IA needs and make informed hiring decisions for IP/IA-related services, through this questionnaire."
+        }
+      ],
+      "parent_id": "4vap"
+    },
+    {
+      "component": "main.Block.PromptPreview",
+      "connections": [[1, "anf4"]],
+      "id": "cwcm",
+      "properties": [
+        {
+          "name": "url",
+          "value": "https://example.com"
+        }
+      ],
+      "parent_id": "bels"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "448p"]],
+      "id": "zl9q",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO"
+        }
+      ],
+      "parent_id": "4vap"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "tj01"]],
+      "id": "0box",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO"
+        }
+      ],
+      "parent_id": "4vap"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "anf4",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "cwcm"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "448p",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "zl9q"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "tj01",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "0box"
+    }
+  ],
+  "name": "ipos-q1",
+  "package": "ai.bigbot.ipos-q1",
+  "start": "ttsp"
+}

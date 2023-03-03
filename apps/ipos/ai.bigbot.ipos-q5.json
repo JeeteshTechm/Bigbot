@@ -1,0 +1,82 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "7ryk"]],
+      "id": "wa5a",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Choose an option"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "7ryk",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "392r",
+              "text": "What type of expertise are you looking for?",
+              "value": "9z1t"
+            },
+            {
+              "id": "kvr7",
+              "text": "Are you looking for advice on IP related matters?",
+              "value": "d1zu"
+            }
+          ]
+        }
+      ],
+      "parent_id": "wa5a"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "9z1t",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q1"
+        }
+      ],
+      "parent_id": "7ryk"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "yw52"]],
+      "id": "d1zu",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO (Link IP Grow)"
+        }
+      ],
+      "parent_id": "7ryk"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "yw52",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "d1zu"
+    }
+  ],
+  "name": "ipos-q5",
+  "package": "ai.bigbot.ipos-q5",
+  "start": "wa5a"
+}

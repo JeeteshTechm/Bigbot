@@ -1,0 +1,12 @@
+{
+  "name": "Telegram Bigbot",
+  "version": "2.0.0",
+  "maintainer": "Jonathan Lee <jonathan@bigbot.ai>",
+  "summary": "Bigbot Telegram direct skill support.",
+  "description": "Telgram Integration for Big Bot.",
+  "category": "productivity",
+  "cover": "",
+  "author": "BIG BOTS (PRIVATE LIMITED)",
+  "website": "https://bigbot.ai",
+  "auto_install": true
+}

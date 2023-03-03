@@ -1,0 +1,78 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "vehd"]],
+      "id": "zj8h",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "Feel free to reach out to us via the form or send us an email at email@ipgrow.com"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "vehd",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "qz6k",
+              "text": "Finish",
+              "value": "uqcx"
+            },
+            {
+              "id": "4zio",
+              "text": "I want to talk to a person instead of filling a form",
+              "value": "o6r2"
+            }
+          ]
+        }
+      ],
+      "parent_id": "zj8h"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "uqcx",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "vehd"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "q375",
+      "properties": [
+        {
+          "name": "action",
+          "value": 0
+        }
+      ],
+      "parent_id": "o6r2"
+    },
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "q375"]],
+      "id": "o6r2",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "TODO (Link IP Grow chat)"
+        }
+      ],
+      "parent_id": "vehd"
+    }
+  ],
+  "name": "ipos-q2",
+  "package": "ai.bigbot.ipos-q2",
+  "start": "zj8h"
+}

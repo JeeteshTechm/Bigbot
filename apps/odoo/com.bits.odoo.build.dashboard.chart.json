@@ -1,0 +1,575 @@
+{
+  "name": "Build a Chart Dashboard (Odoo)",
+  "package": "com.bits.odoo.build.dashboard.chart",
+  "start": "qnct",
+  "blocks": [
+    {
+      "id": "qnct",
+      "parent_id": -1,
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please enter a title for your chart."]
+        }
+      ],
+      "connections": [[1, "0op1"]]
+    },
+    {
+      "id": "0op1",
+      "parent_id": "qnct",
+      "component": "main.Block.InputText",
+      "properties": [
+        {
+          "name": "key",
+          "value": "name"
+        },
+        {
+          "name": "required",
+          "value": true
+        }
+      ],
+      "connections": [
+        [-1, "qnct"],
+        [1, "ir38"]
+      ]
+    },
+    {
+      "id": "ir38",
+      "parent_id": "0op1",
+      "component": "main.Block.InputOAuth",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooOAuthProvider"
+        }
+      ],
+      "connections": [
+        [-1, "ir38"],
+        [1, "zsk9"]
+      ]
+    },
+    {
+      "id": "zsk9",
+      "parent_id": "ir38",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please Select a Chart type."]
+        }
+      ],
+      "connections": [[1, "lc4e"]]
+    },
+    {
+      "id": "lc4e",
+      "parent_id": "zsk9",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        {
+          "name": "key",
+          "value": "graph_type"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "selections",
+          "value": [
+            ["circle", "Circle"],
+            ["line", "Line"],
+            ["area", "Area"],
+            ["bar", "Bar"],
+            ["vbar_stack", "Stacked Bar"],
+            ["hbar", "Horizontal Bar"],
+            ["scatter", "Scatter"],
+            ["heat", "Heat Map"],
+            ["hexbin", "Hexbin"],
+            ["interval", "Interval"],
+            ["pie", "Pie"],
+            ["donut", "Donut"],
+            ["candle", "Candle Stick"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "zsk9"],
+        [1, "oppj"]
+      ]
+    },
+    {
+      "id": "oppj",
+      "parent_id": "lc4e",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Which data model would you like to visualize?"]
+        }
+      ],
+      "connections": [[1, "uf3x"]]
+    },
+    {
+      "id": "uf3x",
+      "parent_id": "oppj",
+      "component": "main.Block.InputSearchable",
+      "properties": [
+        {
+          "name": "key",
+          "value": "model_id"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "model",
+          "value": "ir.model"
+        }
+      ],
+      "connections": [
+        [-1, "oppj"],
+        [1, "5izp"]
+      ]
+    },
+    {
+      "id": "5izp",
+      "parent_id": "uf3x",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please select a charting operation."]
+        }
+      ],
+      "connections": [[1, "qq9c"]]
+    },
+    {
+      "id": "qq9c",
+      "parent_id": "5izp",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        {
+          "name": "key",
+          "value": "operation"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "selections",
+          "value": [
+            ["count", "Count"],
+            ["sum", "Sum"],
+            ["average", "Average"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "5izp"],
+        [1, "05vg"]
+      ]
+    },
+    {
+      "id": "05vg",
+      "parent_id": "qq9c",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please pick a transparency level."]
+        }
+      ],
+      "connections": [[1, "gxth"]]
+    },
+    {
+      "id": "gxth",
+      "parent_id": "05vg",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        {
+          "name": "key",
+          "value": "transparency_rate"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "selections",
+          "value": [
+            ["0.5", "Default"],
+            ["0.1", "10%"],
+            ["0.2", "20%"],
+            ["0.3", "30%"],
+            ["0.4", "40%"],
+            ["0.5", "50%"],
+            ["0.6", "60%"],
+            ["0.7", "70%"],
+            ["0.8", "80%"],
+            ["0.9", "90%"],
+            ["1", "100%"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "05vg"],
+        [1, "s371"]
+      ]
+    },
+    {
+      "id": "s371",
+      "parent_id": "gxth",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please choose a primary measure field."]
+        }
+      ],
+      "connections": [[1, "vop7"]]
+    },
+    {
+      "id": "vop7",
+      "parent_id": "s371",
+      "component": "main.Block.InputSearchable",
+      "properties": [
+        {
+          "name": "key",
+          "value": "field_id"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "model",
+          "value": "ir.model.fields"
+        },
+        {
+          "name": "domain",
+          "value": [
+            ["model_id", "=", "model_id"],
+            ["store", "=", true]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "s371"],
+        [1, "vnnq"]
+      ]
+    },
+    {
+      "id": "vnnq",
+      "parent_id": "vop7",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please select secondary measure field for your chart."]
+        }
+      ],
+      "connections": [[1, "7zhs"]]
+    },
+    {
+      "id": "7zhs",
+      "parent_id": "vnnq",
+      "component": "main.Block.InputSearchable",
+      "properties": [
+        {
+          "name": "key",
+          "value": "sub_field_id"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "model",
+          "value": "ir.model.fields"
+        },
+        {
+          "name": "domain",
+          "value": [
+            ["model_id", "=", "model_id"],
+            ["store", "=", true]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "vnnq"],
+        [1, "5nrl"]
+      ]
+    },
+    {
+      "id": "5nrl",
+      "parent_id": "7zhs",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please select a group for your chart."]
+        }
+      ],
+      "connections": [[1, "ck9j"]]
+    },
+    {
+      "id": "ck9j",
+      "parent_id": "5nrl",
+      "component": "main.Block.InputSearchable",
+      "properties": [
+        {
+          "name": "key",
+          "value": "group_field_id"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "model",
+          "value": "ir.model.fields"
+        },
+        {
+          "name": "domain",
+          "value": [
+            ["model_id", "=", "model_id"],
+            ["store", "=", true]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "5nrl"],
+        [1, "k9vx"]
+      ]
+    },
+    {
+      "id": "k9vx",
+      "parent_id": "ck9j",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Please select chart interval."]
+        }
+      ],
+      "connections": [[1, "ab46"]]
+    },
+    {
+      "id": "ab46",
+      "parent_id": "k9vx",
+      "component": "main.Block.InputSearchable",
+      "properties": [
+        {
+          "name": "key",
+          "value": "subgroup_field_id"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "model",
+          "value": "ir.model.fields"
+        },
+        {
+          "name": "domain",
+          "value": [
+            ["model_id", "=", "model_id"],
+            ["store", "=", true]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "k9vx"],
+        [1, "jq05"]
+      ]
+    },
+    {
+      "id": "jq05",
+      "parent_id": "ab46",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["How would you like to sort your chart?"]
+        }
+      ],
+      "connections": [[1, "szpo"]]
+    },
+    {
+      "id": "szpo",
+      "parent_id": "jq05",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        {
+          "name": "key",
+          "value": "sort"
+        },
+        {
+          "name": "required",
+          "value": false
+        },
+        {
+          "name": "selections",
+          "value": [
+            ["asc", "Ascending"],
+            ["desc", "Descending"]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "jq05"],
+        [1, "pqyn"]
+      ]
+    },
+    {
+      "id": "pqyn",
+      "parent_id": "szpo",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": [
+            "I am preparing your chart, would you like to pin it to your dashboard?"
+          ]
+        }
+      ],
+      "connections": [[1, "3798"]]
+    },
+    {
+      "id": "3798",
+      "parent_id": "pqyn",
+      "component": "main.Block.InputSelection",
+      "properties": [
+        {
+          "name": "key",
+          "value": "pin"
+        },
+        {
+          "name": "required",
+          "value": true
+        },
+        {
+          "name": "selections",
+          "value": [
+            ["pin", "Pin it!"],
+            ["no_pin", "Not this time."]
+          ]
+        }
+      ],
+      "connections": [
+        [-1, "pqyn"],
+        [1, "x3s3"]
+      ]
+    },
+    {
+      "id": "x3s3",
+      "parent_id": "3798",
+      "component": "main.Block.InterpreterSkill",
+      "properties": [
+        {
+          "name": "component",
+          "value": "apps.odoo.component.OdooSkillProvider"
+        },
+        {
+          "name": "nodes",
+          "value": [
+            {
+              "node": "big.bot.core.text",
+              "content": "Here is your '{{input.name}}' chart."
+            },
+            {
+              "node": "big.bot.core.iframe",
+              "content": "{{result.obj__bits_dashboard.url}}?w=280&h=320&fullscreen=True&id={{result.obj__bits_dashboard.id}}",
+              "width": 280,
+              "height": 320
+            }
+          ]
+        }
+      ],
+      "connections": [
+        [1, "wy4b"],
+        [2, "z6w9"]
+      ]
+    },
+    {
+      "id": "wy4b",
+      "parent_id": "x3s3",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Operation Succeed."]
+        }
+      ],
+      "connections": [[1, "7hva"]]
+    },
+    {
+      "id": "z6w9",
+      "parent_id": "x3s3",
+      "component": "main.Block.PromptText",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": ["Operation Failed."]
+        }
+      ],
+      "connections": [[1, "zouu"]]
+    },
+    {
+      "id": "7hva",
+      "parent_id": "wy4b",
+      "component": "main.Block.TerminalBlock",
+      "properties": [
+        {
+          "name": "action",
+          "value": null
+        },
+        {
+          "name": "post_skill",
+          "value": null
+        }
+      ],
+      "connections": []
+    },
+    {
+      "id": "zouu",
+      "parent_id": "z6w9",
+      "component": "main.Block.TerminalBlock",
+      "properties": [
+        {
+          "name": "action",
+          "value": null
+        },
+        {
+          "name": "post_skill",
+          "value": null
+        }
+      ],
+      "connections": []
+    }
+  ]
+}

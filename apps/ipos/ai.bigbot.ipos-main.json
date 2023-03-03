@@ -1,0 +1,326 @@
+{
+  "blocks": [
+    {
+      "component": "main.Block.PromptText",
+      "connections": [[1, "d66l"]],
+      "id": "mzav",
+      "properties": [
+        {
+          "name": "primary_text",
+          "value": "How can I help you?"
+        }
+      ],
+      "parent_id": -1
+    },
+    {
+      "component": "main.Block.DecisionBlock",
+      "connections": [[-1, "Reject"]],
+      "id": "d66l",
+      "properties": [
+        {
+          "name": "connections",
+          "value": [
+            {
+              "id": "698y",
+              "text": "I am looking for IP services",
+              "value": "5oj3"
+            },
+            {
+              "id": "ffa4",
+              "text": "I want to give feedback or complaint",
+              "value": "oc85"
+            },
+            {
+              "id": "v72r",
+              "text": "How much does it cost to engage the services for <...>?",
+              "value": "a69j"
+            },
+            {
+              "id": "wr59",
+              "text": "Is there any grants or government support to engage the services?",
+              "value": "3wvy"
+            },
+            {
+              "id": "wmdm",
+              "text": "I want a list of top IP service providers",
+              "value": "79ct"
+            },
+            {
+              "id": "lwfy",
+              "text": "I have connected to a service provider but did not get a response",
+              "value": "myu1"
+            },
+            {
+              "id": "kfu9",
+              "text": "How to sign up to be be a service provider?",
+              "value": "f42q"
+            },
+            {
+              "id": "8l5q",
+              "text": "Do you charge to connect?",
+              "value": "k9p0"
+            },
+            {
+              "id": "0j4h",
+              "text": "Do you charge for your services?",
+              "value": "fcvu"
+            },
+            {
+              "id": "q1ri",
+              "text": "What is your business model?",
+              "value": "n1ku"
+            },
+            {
+              "id": "1p0y",
+              "text": "How does IP Grow work?",
+              "value": "to25"
+            },
+            {
+              "id": "b004",
+              "text": "I want to speak to a service provider who can help can help me with ...",
+              "value": "md66"
+            },
+            {
+              "id": "rdgi",
+              "text": "I am going overseas, what do I need to do?",
+              "value": "3yjy"
+            },
+            {
+              "id": "8k32",
+              "text": "I have just started a business, what do I need to do?",
+              "value": "4unx"
+            }
+          ]
+        }
+      ],
+      "parent_id": "mzav"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "5oj3",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q1"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "oc85",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q2"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "a69j",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q3"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "3wvy",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q4"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "79ct",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q5"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "myu1",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q6"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "f42q",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q7"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "k9p0",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q8"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "fcvu",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q9"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "n1ku",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q10"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "to25",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q11"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "md66",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q12"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "3yjy",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q5"
+        }
+      ],
+      "parent_id": "d66l"
+    },
+    {
+      "component": "main.Block.TerminalBlock",
+      "connections": [],
+      "id": "4unx",
+      "properties": [
+        {
+          "name": "action",
+          "value": 1
+        },
+        {
+          "name": "post_skill",
+          "value": "ai.bigbot.ipos-q5"
+        }
+      ],
+      "parent_id": "d66l"
+    }
+  ],
+  "name": "ipos-main",
+  "package": "ai.bigbot.ipos-main",
+  "start": "mzav"
+}

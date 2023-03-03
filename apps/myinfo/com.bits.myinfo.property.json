@@ -1,0 +1,118 @@
+{
+	"name": "Myinfo Property",
+	"package": "com.bits.myinfo.property",
+	"start": "8y4e",
+	"blocks": [
+                {
+			"id": "8y4e",
+			"parent_id": -1,
+			"component": "main.Block.PromptText",
+			"properties": [
+				{
+					"name": "primary_text",
+					"value": [
+						"How may I help you today?"
+					]
+				}
+			],
+			"connections": [
+				[
+					1,
+					"d4gs"
+				]
+			]
+		},
+                {
+			"id": "d4gs",
+			"parent_id": "8y4e",
+			"component": "main.Block.InputText",
+			"properties": [
+				{
+					"name": "key",
+					"value": "input"
+				}
+			],
+			"connections": [
+				[
+					1,
+					"7dsf"
+				]
+			]
+		},
+		{
+			"id": "7dsf",
+			"parent_id": "d4gs",
+			"component": "main.Block.PromptText",
+			"properties": [
+				{
+					"name": "primary_text",
+					"value": [
+						"You'd like to finance with your CPF, I can help you with some calculations."
+					]
+				}
+			],
+			"connections": [
+				[
+					1,
+					"i3h2"
+				]
+			]
+		},
+		{
+			"id": "i3h2",
+			"parent_id": "7dsf",
+			"component": "main.Block.InputOAuth",
+			"properties": [
+				{
+					"name": "component",
+					"value": "apps.myinfo.component.MyInfoPropertyOAuthProvider"
+				}
+			],
+			"connections": [
+				[
+					1,
+					"i87n"
+				]
+			]
+		},
+		{
+			"id": "i87n",
+			"parent_id": "i3h2",
+			"component": "main.Block.InterpreterSkill",
+			"properties": [
+				{
+					"name": "component",
+					"value": "apps.myinfo.component.MyInfoProperty"
+				},
+				{
+					"name": "nodes",
+					"value": [
+					]
+				}
+			],
+			"connections": [
+				[
+					1,
+					"ah5l"
+				]
+			]
+		},
+		{
+			"id": "ah5l",
+			"parent_id": "i87n",
+			"component": "main.Block.TerminalBlock",
+			"properties": [
+				{
+					"name": "action",
+					"value": 0
+				},
+				{
+					"name": "post_skill",
+					"value": null
+				}
+			],
+			"connections": [
+			]
+		}
+	]
+}
