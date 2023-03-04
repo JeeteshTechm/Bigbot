@@ -1,0 +1,11 @@
+{
+  "class": "InputFile",
+  "properties": {
+    "accept": {"type": "string", "required": true, "description": "Valid file extensions"},
+    "size": {"type": "integer", "required": true, "default": 1000000, "description": "Maximum file size in bytes"}
+  },
+  "methods": {
+    "on_descriptor": {"name": "File Input", "summary": "Shows a file input field", "category": "input"},
+    "on_process": {"python_function": "process_file"}
+  }
+}

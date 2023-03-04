@@ -7,19 +7,7 @@ from typing import List, Tuple, Union
 from durations import Duration
 from jinja2 import Template
 from .Log import Log
-from .Node import (
-    BinaryNode,
-    DateNode,
-    DateTimeNode,
-    DurationNode,
-    IFrameNode,
-    ImageNode,
-    InputFileNode,
-    OAuthNode,
-    PaymentNode,
-    PreviewNode,
-    SearchNode,
-)
+from .Node import *Node
 from .Statement import OutputStatement
 from .Utils import Utils
 
@@ -173,8 +161,34 @@ class BaseBlock(ABC):
 
 
 # ----------------------------------------------------------------------
-# Input Blocks
+# Input Block Functions
 # ----------------------------------------------------------------------
+
+def process_file(binder, user_id, statement, accept, size):
+    if statement.input:
+        try:
+            file = statement.input["file"]
+            file_name = statement.input["file_name"]
+            file_size = statement.input["file_size"]
+            max_size = size or 1000000
+        except Exception as e:
+            Log.error("process_file", e)
+            return InputBlock.REJECT
+
+        if max_size < file_size:
+            output = OutputStatement(user_id)
+            output.append_text(f"File should be smaller than {max_size} bytes")
+            binder.post_message(output)
+            return InputBlock.REJECT
+
+        base64_re = re.compile(r"^data:(?P<mimetype>[^;]+);base64,(?P<data>.+)$")
+        match = base64_re.match(file)
+        if match:
+            input_data = {"file": file, "file_name": file_name, "file_size": file_size}
+            InputFile.save(binder, input_data)
+            return InputBlock.MOVE
+
+    return InputBlock.REJECT
 
 
 class InputBlock(BaseBlock):
@@ -423,29 +437,33 @@ class InputFile(InputBlock):
     def on_descriptor(self):
         return {"name": "File Input", "summary": "Shows a file input field", "category": "input"}
 
-    def on_process(self, binder, user_id, statement):
-        if statement.input:
-            try:
-                file = statement.input["file"]
-                file_name = statement.input["file_name"]
-                file_size = statement.input["file_size"]
-                max_size = self.size.value or 1000000
-            except Exception as e:
-                Log.error("InputFile.on_process", e)
-                return self.reject()
+"""
+    def process_file(binder, user_id, statement, accept, size):
+    if statement.input:
+        try:
+            file = statement.input["file"]
+            file_name = statement.input["file_name"]
+            file_size = statement.input["file_size"]
+            max_size = size or 1000000
+        except Exception as e:
+            Log.error("process_file", e)
+            return InputBlock.REJECT
 
-            if max_size < file_size:
-                output = OutputStatement(user_id)
-                output.append_text(f"File should be smaller than {max_size} bytes")
-                binder.post_message(output)
-                return self.reject()
+        if max_size < file_size:
+            output = OutputStatement(user_id)
+            output.append_text(f"File should be smaller than {max_size} bytes")
+            binder.post_message(output)
+            return InputBlock.REJECT
 
-            base64_re = re.compile(r"^data:(?P<mimetype>[^;]+);base64,(?P<data>.+)$")
-            match = base64_re.match(file)
-            if match:
-                self.save(binder, statement.input)
-                return self.move()
-        return self.reject()
+        base64_re = re.compile(r"^data:(?P<mimetype>[^;]+);base64,(?P<data>.+)$")
+        match = base64_re.match(file)
+        if match:
+            input_data = {"file": file, "file_name": file_name, "file_size": file_size}
+            InputFile.save(binder, input_data)
+            return InputBlock.MOVE
+
+    return InputBlock.REJECT
+"""
 
     def on_template_load(self):
         self.accept.load_from_template(self.template)
