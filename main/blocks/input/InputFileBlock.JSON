@@ -6,6 +6,8 @@
   },
   "methods": {
     "on_descriptor": {"name": "File Input", "summary": "Shows a file input field", "category": "input"},
+    "before_process": {"python_function": "before_process"},
+    "on_template_load": {"python_function": "on_template_load"},
     "on_process": {"python_function": "process_file"}
   }
 }

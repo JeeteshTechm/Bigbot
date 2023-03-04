@@ -164,31 +164,30 @@ class BaseBlock(ABC):
 # Input Block Functions
 # ----------------------------------------------------------------------
 
-def process_file(binder, user_id, statement, accept, size):
+def process_file(binder, user_id, statement):
     if statement.input:
         try:
             file = statement.input["file"]
             file_name = statement.input["file_name"]
             file_size = statement.input["file_size"]
-            max_size = size or 1000000
+            max_size = self.size.value or 1000000
         except Exception as e:
-            Log.error("process_file", e)
-            return InputBlock.REJECT
+            Log.error("InputFile.on_process", e)
+            return self.reject()
 
         if max_size < file_size:
             output = OutputStatement(user_id)
             output.append_text(f"File should be smaller than {max_size} bytes")
             binder.post_message(output)
-            return InputBlock.REJECT
+            return self.reject()
 
         base64_re = re.compile(r"^data:(?P<mimetype>[^;]+);base64,(?P<data>.+)$")
         match = base64_re.match(file)
         if match:
-            input_data = {"file": file, "file_name": file_name, "file_size": file_size}
-            InputFile.save(binder, input_data)
-            return InputBlock.MOVE
+            self.save(binder, statement.input)
+            return self.move()
+    return self.reject()
 
-    return InputBlock.REJECT
 
 
 class InputBlock(BaseBlock):
