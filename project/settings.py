@@ -204,7 +204,8 @@ elif CLOUD == "aws":
     # STATIC_URL = "https://" + str(os.getenv("BUCKET_NAME")) + ".amazonaws.com/static/"
 else:
     print("The AKS cluster is not deployed yet")
-
+    MEDIA_URL = '/media/'
+    MEDIA_ROOT = os.path.join(BASE_DIR, "static")
 
 KEYCLOAK_CONFIG = {
     "KEYCLOAK_SERVER_URL": os.getenv("KEYCLOAK_SERVER_URL"),
