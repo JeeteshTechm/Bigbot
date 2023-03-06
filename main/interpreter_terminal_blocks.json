@@ -1,0 +1,221 @@
+{
+    "InterpreterBlock": {
+        "methods":{
+            "__init__": {
+                "args": ["context", "id", "properties", "connections"],
+                "body": [
+                    "super(InterpreterBlock, self).__init__(context, id, properties, connections)",
+                    "self.context = context",
+                    "self.id = id",
+                    "self.properties = properties",
+                    "self.connections = connections"
+                ]
+            },
+            "on_process": {
+                "args": ["binder", "user_id"],
+                "return": "return self.move_x()"
+            },
+            "process": {
+                "args": ["binder", "user_id"],
+                "return": "return self.on_process(binder, user_id)"
+            },
+            "get_connections": {
+                "args": ["properties"],
+                "return":" [[BLOCK_MOVE, \"Next\"],[BLOCK_MOVE_X, \"Reject\"]]"
+            },
+            "load_template": {
+                "body": [
+                    "self.append_template_properties(",
+                    " \"Component\" ,",
+                    " \"component\",",
+                    " \"string\",",
+                    " \"component\",",
+                    "required=True,",
+                    "description=\"Skill provider\",",
+                    "search_filter=SkillProvider,",
+                    ")"
+                ]
+            }
+        }
+    },
+    "DataExchange": {
+        "methods":{
+            "on_descriptor": {
+                "return":  [
+                    "{",
+                    "    \"category\": \"exchange\",",
+                    "    \"name\": \"Data Exchange\",",
+                    "    \"summary\": \"Calls a data exchange component\",",
+                    "}"
+                ]
+            },
+            "on_process": {
+                "args": ["binder", "operator_id"],
+                "body": [
+                    "component_name = self.property_value(\"component\")",
+                    "component_object = binder.get_registry().get_data_exchange(binder, component_name)",
+                    "state = binder.on_load_state()",
+                    "data = state.data",
+                    "package = state.skill[\"package\"]",
+                    "input = self.property_value(\"input\")",
+                    "if input:",
+                    "    tmp = {}",
+                    "    for from_, to in input:",
+                    "        tmp[to] = data.get(from_)",
+                    "    input = tmp",
+                    "else:",
+                    "    input = {}",
+                    "result = component_object(binder, operator_id, package, data, **input)",
+                    "output = self.property_value(\"output\")",
+                    "if output and result:",
+                    "    for from_, to in output:",
+                    "        data[to] = result.get(from_)",
+                    "elif result:",
+                    "    for key in result:",
+                    "        data[key] = result[key]",
+                    "state.data = data",
+                    "binder.on_save_state(state.serialize())",
+                    "return self.move()"
+                ]
+            },
+            "load_template": {
+                "body": [
+                    "super().load_template()",
+                    "self.append_template_properties(",
+                    "   \"Input Data\",",
+                    "   \"input\",",
+                    "   \"json\",",
+                    "   \"nodes\",",
+                    "   required=False,",
+                    "   description= \"Input data for the exchange function\",",
+                    ")",
+                    "self.append_template_properties(",
+                    "   \"Output Data\",",
+                    "   \"output\",",
+                    "   \"json\",",
+                    "   \"nodes\",",
+                    "   required=False,",
+                    "   description= \"Output data for the exchange function\",",
+                    ")"
+                ]
+            }
+        }
+    },
+    "InterpreterSkill":{
+        "methods": {
+            "on_descriptor": {
+                "return": [
+                    "{",
+                    "    \"name\": \"Skill Interpreter\",",
+                    "    \"summary\": \"This block runs logic.\",",
+                    "    \"category\": \"interpreter\",",
+                    "}"
+                ]
+            },
+            "on_process": {
+                "args": ["binder","user_id"],
+                "body": [
+                    "component_name = self.property_value(\"component\")",
+                    "component_object = binder.get_registry().get_component(binder, component_name)",
+                    "state = binder.on_load_state()",
+                    "package = state.skill[\"package\"]",
+                    "result = component_object.on_execute(",
+                    "    binder, user_id, package, state.data, properties=self.properties, skill=state.skill",
+                    ")",
+                    "if result:",
+                    "    self.context[\"result\"] = result",
+                    "    self.context[\"input\"] = state.data",
+                    "    # self.save(binder, result)",
+                    "    nodes = self.property_value(\"nodes\")",
+                    "    if nodes:",
+                    "        output = OutputStatement(user_id)",
+                    "        for item in nodes:",
+                    "            if item[\"node\"] == \"big.bot.core.text\":",
+                    "                template = Template(item[\"content\"])",
+                    "                html = template.render(self.context)",
+                    "                output.append_text(html)",
+                    "                binder.post_message(output)",
+                    "            elif item[\"node\"] == \"big.bot.core.iframe\":",
+                    "                template = Template(item[\"content\"])",
+                    "                html = template.render(self.context)",
+                    "                output.append_node(IFrameNode(html))",
+                    "                binder.post_message(output)",
+                    "            pass",
+                    "        return self.move()",
+                    "return super().on_process(binder, user_id)"
+                ]
+            },
+            "load_template": {
+                "body": [
+                    "super(InterpreterSkill, self).load_template()",
+                    "self.append_template_properties(",
+                    "   \"Output Nodes\",",
+                    "   \"nodes\",",
+                    "   \"json\",",
+                    "   \"nodes\",",
+                    "   required=True,",
+                    "   description= \"Nodes used to render the result\",",
+                    ")"
+                ]           
+            }
+        }
+    },
+    "TerminalBlock":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    "{",
+                    "    \"name\": \"Terminate\",",
+                    "    \"summary\": \"This block terminate the workflow.\",",
+                    "    \"category\": \"terminal\",",
+                    "}"
+                ]
+            },
+            "process": {
+                "args": ["binder", "user_id"],
+                "return": "move"
+            },
+            "get_connections": {
+                "args": ["properties"],
+                "return": []
+            },
+            "load_template": {
+                "body": [
+                   "self.append_template_properties(",
+                    "  \"Post Action\",",
+                    "  \"action\",",
+                    "  \"enum\",",
+                    "  \"select\",",
+                    "  required= True,",
+                    "  description=\"Action to execute after\",",
+                    "  enum=[{\"name\": \"Do Nothing\", \"value\": 0},",
+                    "      {\"name\": \"Start Skill\", \"value\": 1},",
+                    "      {\"name\": \"Hand over user\", \"value\": 2},",
+                    "      {\"name\": \"Hand over group\", \"value\": 3}],",
+                    ")" ,
+                    "self.append_template_properties(" ,
+                    "  \"Post Skill\",",
+                    "  \"post_skill\",",
+                    "  \"string\",",
+                    "  \"text\",",
+                    "  required=False,",
+                    "  description=\"Skill to call after execution\",",
+                    ")",
+                    "self.append_template_properties(",
+                    "  \"Template\",",
+                    "  \"template\",",
+                    "  \"string\",",
+                    "  \"text\",",
+                    "  required = False,",
+                    "  description=\"Template used when handing over a skill\",",
+                    ")"
+               ]
+            },
+            "post_skill":{
+                "return":"self.property_value(\"post_skill\")"
+            }
+
+        }
+    }      
+}                  
+                    
