@@ -1,0 +1,159 @@
+{
+    "DecisionBlock":{
+        "methods":{
+            "before_process":{
+                "args":["binder", "operator_id"],
+                "return":"pass"
+            },
+            "get_connections":{
+                "return":["[[BLOCK_REJECT, \"Reject\"]"]
+            },
+            "on_descriptor":{
+                "return":[
+                    "name = Decission Block",
+                    "summary = Maps a list of options to other blocks",
+                    "category = input"
+
+                ]
+            },
+            "on_process":{
+                "return":"pass"
+            },
+            "load_template":{
+                "body":[
+                    "self.append_template_properties(",
+                    
+                    "  \"text\",",
+                    "  \"string\",",
+                    "  \"string\",",
+                    "  \"text\",",
+                    "required = False,",
+                    "auto = True,",
+                    "description = \"Display text before processing block\",",
+                    "value = None",
+                    ")",
+                    "self.add_template_property(",
+                    "  \"text\",",
+                    "  \"string\",",
+                    "format = connections",
+                    "input_type = connections",
+                    "  required=True,",
+                    "unique = False,",
+                    "  auto=True,",
+                    "decription = \"Maps a list of options to blocks\"",
+                    "value = [],",
+                    ")"
+                ]
+
+            }
+
+        }
+
+    }
+}
+,
+
+{
+    "InputDate":{
+        "methods":{
+            "on_descriptor":{
+                "return":[
+                    "\"{\"name = \"Date Input ","summary = \"No description available","category =\"input\"}"
+                ]
+            },
+            "on_process":{
+                "args":["binder", "user_id", "statement"],
+                "body":[
+                    "if statement.input:",
+            "try:",
+                "datetime.datetime.strptime(statement.input,',\"%Y-%m-%d\")",
+                "self.save(binder, statement.input)",
+                "return self.move()",
+            "except",
+                "pass",
+        "return super(InputDate, self).on_process(binder, user_id, statement)"
+
+                ]
+            }
+        }
+    }
+},
+{
+    "InputDateTime":{
+        "methods":{
+            "on_descriptor":{
+                
+                "return":["\"{\"name = \"Date time Input",
+                    "summary = \"No description available",
+                    "category = \"input\"}"
+
+                ]
+            
+            },
+            "on_process":{
+                "args":["binder", "user_id", "statement"],
+                "body":[
+                    "if statement.input:",
+            "try:",
+                "datetime.datetime.strptime(statement.input, \"%Y-%m-%d %H:%M:%S\")",
+                "self.save(binder, statement.input)",
+                "return self.move()",
+            "except:",
+                "pass",
+        "return super(InputDateTime, self).on_process(binder, user_id, statement)"
+                ]
+            }
+        }
+    }
+},
+{
+    "InputDuration":{
+       "methods":{ 
+        "return":["\"{\"name = \"Date time Input",
+        "summary = \"No description available",
+        "category = \"input\"}"
+
+    ],
+    "on_process":{
+        "args":["binder", "user_id", "statement"],
+        "body":[
+            "if statement.input:",
+            "try:",
+                "dur = Duration(statement.input)",
+                "if dur.to_seconds():",
+                    "value = [int(dur.to_hours()), int(dur.to_minutes() % 60)]",
+                    "self.save(binder, value)",
+                    "return self.move()",
+            "except:",
+                "pass",
+        "return super(InputDuration, self).on_process(binder, user_id, statement)"
+        ]
+    }
+    }
+}
+},
+{
+    "InputEmail":{
+        "methods":{
+            "return":["\"{\"name = \"Date time Input",
+            "summary = \"No description available",
+            "category = \"input\"}"
+    
+        ],
+        "on_process":{
+            "args":["binder", "user_id", "statement"],
+            "body":[
+                "if statement.input:",
+                "regex = \"^[a-z0-9]+[\\._]?[a-z0-9]+[@]\\w+[.]\\w{2,3}$\"",
+                "if re.search(regex, statement.input.lower()):",
+                    "self.save(binder, statement.input)",
+                    "return self.move()",
+            "return super(InputEmail, self).on_process(binder, user_id, statement)"
+    
+            ]
+        }
+    
+        }
+    }
+}
+
