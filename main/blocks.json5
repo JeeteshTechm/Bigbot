@@ -1,0 +1,693 @@
+{
+    "DecisionBlock": {
+        "methods":{
+            "on_descriptor": {
+                "return": [  
+                    {
+                        "name": "Decision Block",
+                        "summary": "Maps a list of options to other blocks",
+                        "category": "input",
+                    }        
+                ]
+            },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Connections",
+                        "name": "connections",
+                        "format": "connections",
+                        "input_type": "connections",
+                        "required": true,
+                        "unique": false,
+                        "auto": true,
+                        "description": "Maps a list of options to blocks",
+                        "value": [],
+                    },
+                ]
+            }
+        }
+    },
+    "GoToBlock": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                     {
+                    "name": "GoTo Block",
+                    "summary": "Redirects to another block",
+                    "category": "input",
+                }        
+            ]
+        },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Prompt",
+                        "name": "prompt",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": false,
+                        "auto": true,
+                        "description": "Display text before processing block",
+                        "value": null,
+                    },
+                    {
+                        "text": "Destination Block ID",
+                        "name": "destination_block_id",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": true,
+                        "auto": false,
+                        "description": "The ID of the block to redirect to",
+                        "value": null,
+                    },
+                ]
+            }
+        }
+    },
+    "InputDate": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "Date Input", 
+                        "summary": "No description available", 
+                        "category": "input"
+                    }
+                ]
+            }
+        }
+    },
+    "InputDateTime": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "Date time Input",
+                        "summary": "No description available",
+                        "category": "input",
+                    }
+                ]
+            }
+        }
+    },
+    "InputDuration": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "Duration Input",
+                        "summary": "No description available",
+                        "category": "input",
+                    }
+                ]
+            }
+        }
+    },
+    "InputEmail": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "Email Input",
+                        "summary": "Validates and saves input as email",
+                        "category": "input"
+                    }
+                ]
+            }
+        }
+    },
+    "InputFile": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "File Input", 
+                        "summary": "Shows a file input field", 
+                        "category": "input"
+                    }
+                ]
+            }
+        }
+    },
+    "InputNumber": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "Number Input", 
+                        "summary": "No description available", 
+                        "category": "input"
+                    }
+                ]
+            }
+        }
+    },
+    "InputOAuth": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "OAuth Input",
+                        "summary": "No description available",
+                        "category": "input",
+                    }
+                ]
+            }, 
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "component",
+                        "search_filter": "OAuthProvider",
+                        "required": true,
+                        "description": "OAuth component used to handle the authorization",
+                        "value": null,
+                    }
+                ]
+            }
+        }
+    },
+    "InputPayment": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                        "name": "Payment Input", 
+                        "summary": "No description available", 
+                        "category": "input"
+                    }
+                ]
+            },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "component",
+                        "search_filter": "PaymentProvider",
+                        "required": true,
+                        "description": "Payment component used to handle the authorization",
+                        "value": null,
+                    }
+                ]
+            }
+        }
+    },
+    "InputSearchable": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                    "name": "Searchable Input",
+                    "summary": "No description available",
+                    "category": "input",
+                    }
+                ]
+            },
+        
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "search",
+                        "search_filter": "SkillProvider",
+                        "required": true,
+                        "description": "Skill provider used to handle the search",
+                        "value": null,
+                    },
+                    {
+                        "text": "Model",
+                        "name": "model",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": true,
+                        "description": "<Description of property>",
+                        "value": null,
+                    },
+                ]
+            }
+        }
+    },
+    "InputSelection": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                    "name": "Selection Input",
+                    "summary": "No description available",
+                    "category": "input",
+                    }
+                ]
+            },
+          
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Selections",
+                        "name": "selections",
+                        "format": "json",
+                        "input_type": "textarea",
+                        "required": true,
+                        "description": "List of options",
+                        "value": [["draft", "Draft"]],
+                    }
+                ]
+            }
+        }
+    },
+    "InputSkill": {
+        "methods":{
+            "on_descriptor": {
+                "return": [
+                     {
+                    "name": "Skill Input",
+                    "summary": "Passes user input to skill",
+                    "category": "input"
+                     }
+                ]
+            },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Output Nodes",
+                        "name": "nodes",
+                        "format": "json",
+                        "input_type": "nodes",
+                        "required": true,
+                        "description": "Nodes to output to the user",
+                        "value": [],
+                    }
+                ]
+            }
+        }
+    },
+    "InputText": {
+        "methods":{
+            "on_descriptor": {
+                "return": [
+                    {
+                    "name": "Text Input",
+                    "summary": "No description available",
+                    "category": "input"
+                    }
+                ]
+            }
+        }
+    },
+
+    "InterpreterBlock": {
+        "methods":{
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "component",
+                        "required": true,
+                        "description": "Skill provider",
+                        "search_filter": "SkillProvider",
+                        "value": null,
+                    }
+                ]
+            }
+        }
+    },
+    "DataExchange": {
+        "methods":{
+            "on_descriptor": {
+                "return": [ 
+                    {
+                    "category": "exchange",
+                    "name": "Data Exchange",
+                    "summary": "Calls a data exchange component",
+                    }
+                ]
+           },
+            
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Input Data",
+                        "name": "input",
+                        "format": "json",
+                        "input_type": "nodes",
+                        "required": false,
+                        "description": "Input data for the exchange function",
+                        "value": [],
+                    },
+                    {
+                        "text": "Output Data",
+                        "name": "output",
+                        "format": "json",
+                        "input_type": "nodes",
+                        "required": false,
+                        "description": "Output data for the exchange function",
+                        "value": [],
+                    }
+                ]
+            }
+        }
+    },
+    "InterpreterSkill":{
+        "methods": {
+            "on_descriptor": {
+                "return": [{
+                    "name": "Skill Interpreter",
+                    "summary": "This block runs logic.",
+                    "category": "interpreter",
+                }]
+            },
+            
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Output Nodes",
+                        "name": "nodes",
+                        "format": "json",
+                        "input_type": "nodes",
+                        "required": true,
+                        "description": "Nodes used to render the result",
+                        "value": [],
+                    }
+                ]         
+            }
+        }
+    },
+    "PromptBlock":{
+        "methods": {
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Read",
+                        "name": "read",
+                        "format": "string",
+                        "required": false,
+                        "unique": true,
+                        "auto": true,
+                        "description": "Reads data from the data instead of using the set value",
+                        "value": null,
+                    }
+                ]
+            }
+        }   
+    },
+    "PromptBinary":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Binary", 
+                        "summary": "No description available", 
+                        "category": "prompt"}
+                ]
+            },
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Binary",
+                        "name": "binary",
+                        "format": "binary",
+                        "input_type": "file",
+                        "file_limit": 1000000,
+                        "mime_types": ["*/*"],
+                        "required": true,
+                        "description": "Binary File",
+                        "value": null,
+                    },
+                ]
+            }            
+
+        }
+    },
+    "PromptChatPlatform":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Chat Platforms",
+                        "summary": "No description available",
+                        "category": "prompt",
+                    }
+                ]
+            },
+            "on_process": {
+                "data": [{
+                    "platforms": [
+                        {
+                            "name": "Telegram",
+                            "icon": "data:image/png;base64,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",
+                            "url": "https://t.me/randomNameTestBot?start=",
+                        }
+                    ]
+                    }
+                ],
+                "meta":[{"header": "Available Platforms", "button_text": "Chat now"}]
+            }
+        }
+    },
+    "PromptDate":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Date", 
+                        "summary": "No description available", 
+                        "category": "prompt"}
+                ]
+            },
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Date",
+                        "name": "date",
+                        "format": "time",
+                        "input_type": "date",
+                        "unique": false,
+                        "auto": false,
+                        "description": "Date",
+                    }
+                ]
+            }            
+
+        }
+    },
+    
+    "PromptDuration":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Duration", 
+                        "summary": "No description available", 
+                        "category": "prompt"
+                    }
+                ]
+            
+            },
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Duration",
+                        "name": "time",
+                        "format": "time",
+                        "input_type": "time",
+                        "unique": false,
+                        "auto": false,
+                        "description": "Hour",
+                    }
+                ]
+            }            
+
+        }
+    },
+    "PromptImage":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Image", 
+                        "summary": "No description available", 
+                        "category": "prompt"
+                    }
+                ]
+            
+            },
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Image",
+                        "name": "image",
+                        "format": "binary",
+                        "input_type": "file",
+                        "file_limit": 1000000,
+                        "mime_types": ["image/jpeg", "image/png", "image/gif"],
+                        "required": true,
+                        "description": "Image File",
+                        "value": null,
+                    },
+                ]
+            }            
+
+        }
+    },
+    "PromptPayment":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Payment", 
+                        "summary": "No description available", 
+                        "category": "prompt"
+                    }
+                ]
+            
+            },
+            "on_process": {
+                "meta":[
+                    {
+                        "charge_summary": "You have to pay",
+                        "currency_code": "USD",
+                        "currency_symbol": "$",
+                        "button_text": "",
+                        "payment_services": [],
+                    }
+                ],
+                "url":"https://commons.wikimedia.org/wiki/File:PayPal.svg"
+            
+            },
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Amount",
+                        "name": "amount",
+                        "format": "float",
+                        "input_type": "number",
+                        "required": true,
+                        "description": "Amount to pay",
+                        "value": 0.00,
+                    },
+                ]
+            }            
+
+        }
+    },
+    "PromptPreview":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "category": "prompt", 
+                        "name": "Preview", 
+                        "summary": "Previews a URL"
+                    }
+                ]
+            
+            },
+            "load_template": {
+                "body":[
+                    {
+                        "text": "URL",
+                        "name": "url",
+                        "format": "string",
+                        "input_type": "url",
+                        "required": true,
+                        "description": "URL to display",
+                        "value": "https://example.com",
+                    }
+                ]
+            }            
+
+        }
+    },
+    "PromptText":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Text", 
+                        "summary": "No description available", 
+                        "category": "prompt"
+                    }
+                ]
+            
+            },
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Text Primary",
+                        "name": "primary_text",
+                        "format": "array",
+                        "input_type": "text",
+                        "required": true,
+                        "description": "List of strings to display",
+                        "value": [],
+                    },
+                ]
+            }            
+
+        }
+    },
+    "TerminalBlock":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Terminate",
+                        "summary": "This block terminate the workflow.",
+                        "category": "terminal",
+                    }
+                ]
+            },
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Post Action",
+                        "name": "action",
+                        "format": "enum",
+                        "input_type": "select",
+                        "required": true,
+                        "description": "Actio to execute after",
+                        "enum": [
+                            {"name": "Do Nothing", "value": 0},
+                            {"name": "Start Skill", "value": 1},
+                            {"name": "Hand over user", "value": 2},
+                            {"name": "Hand over group", "value": 3},
+                        ],
+                        "value": 0,
+                    },
+                    {
+                        "text": "Post Skill",
+                        "name": "post_skill",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": false,
+                        "description": "Skill to call after execution",
+                        "value": null,
+                    },
+                    {
+                        "text": "Template",
+                        "name": "template",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": false,
+                        "description": "Template used when handing over a skill",
+                        "value": "",
+                    },
+                ]
+            }            
+
+        }
+    }      
+}                  
+                    
