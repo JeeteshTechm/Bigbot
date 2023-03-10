@@ -10,7 +10,16 @@ from .Log import Log
 from .Node import *Node
 from .Statement import OutputStatement
 from .Utils import Utils
+import json5
 
+# Parse config data from a JSON5 file
+try:
+    with open('blocks.json5', 'r') as f:
+        config = json5.load(f)
+except FileNotFoundError:
+    print("The file 'blocks.json5' was not found.")
+except json5.decoder.JSONDecodeError:
+    print("The file 'blocks.json5' does not contain valid JSON5.")
 
 BLOCK_REJECT = -1
 BLOCK_ACCEPT = 0
@@ -19,10 +28,8 @@ BLOCK_MOVE_X = 2
 BLOCK_MOVE_Y = 3
 BLOCK_MOVE_Z = 4
 
-
 class BlockNotFoundException(Exception):
     pass
-
 
 class ComponentNotFoundException(Exception):
     pass
@@ -188,8 +195,6 @@ def process_file(binder, user_id, statement):
             return self.move()
     return self.reject()
 
-
-
 class InputBlock(BaseBlock):
     @abstractmethod
     def on_process(self, binder, user_id, statement):
@@ -256,27 +261,11 @@ class InputBlock(BaseBlock):
 
 class DecisionBlock(InputBlock):
     def on_descriptor(self):
-        return {
-            "name": "Decision Block",
-            "summary": "Maps a list of options to other blocks",
-            "category": "input",
-        }
+        return (config["DecisionBlock"]["methods"]["on_descriptor"]["return"])
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Connections",
-                "name": "connections",
-                "format": "connections",
-                "input_type": "connections",
-                "required": True,
-                "unique": False,
-                "auto": True,
-                "description": "Maps a list of options to blocks",
-                "value": [],
-            },
-        ])
+        self.append_template_properties(config["DecisionBlock"]["methods"]["load_template"]["body"])
 
     def on_process(self, binder, user_id, statement):
         options = self.property_value("connections")
@@ -311,7 +300,6 @@ class DecisionBlock(InputBlock):
 
         return False
 
-
 class GoToBlock(InputBlock):
     def before_process(self, binder, operator_id):
         pass
@@ -320,11 +308,7 @@ class GoToBlock(InputBlock):
         return [[BLOCK_NEXT, "Next"]]
 
     def on_descriptor(self):
-        return {
-            "name": "GoTo Block",
-            "summary": "Redirects to another block",
-            "category": "input",
-        }
+        return config["GoToBlock"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         destination_block_id = self.property_value("destination_block_id")
@@ -332,34 +316,11 @@ class GoToBlock(InputBlock):
         return self.move()
 
     def load_template(self):
-        self.append_template_properties(
-            [
-                {
-                    "text": "Prompt",
-                    "name": "prompt",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": False,
-                    "auto": True,
-                    "description": "Display text before processing block",
-                    "value": None,
-                },
-                {
-                    "text": "Destination Block ID",
-                    "name": "destination_block_id",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": True,
-                    "auto": False,
-                    "description": "The ID of the block to redirect to",
-                    "value": None,
-                },
-            ]
-        )
+        self.append_template_properties(config["GoToBlock"]["methods"]["load_template"]["body"])
 
 class InputDate(InputBlock):
     def on_descriptor(self):
-        return {"name": "Date Input", "summary": "No description available", "category": "input"}
+        return config["InputDate"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
@@ -374,11 +335,7 @@ class InputDate(InputBlock):
 
 class InputDateTime(InputBlock):
     def on_descriptor(self):
-        return {
-            "name": "Date time Input",
-            "summary": "No description available",
-            "category": "input",
-        }
+        return config["InputDateTime"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
@@ -393,11 +350,7 @@ class InputDateTime(InputBlock):
 
 class InputDuration(InputBlock):
     def on_descriptor(self):
-        return {
-            "name": "Duration Input",
-            "summary": "No description available",
-            "category": "input",
-        }
+        return config["InputDuration"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
@@ -414,11 +367,7 @@ class InputDuration(InputBlock):
 
 class InputEmail(InputBlock):
     def on_descriptor(self):
-        return {
-            "name": "Email Input",
-            "summary": "Validates and saves input as email",
-            "category": "input"
-        }
+        return config["InputEmail"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         email_regex = "^[a-z0-9]+[\._]?[a-z0-9]+[@]\w+[.]\w{2,3}$"
@@ -434,7 +383,7 @@ class InputFile(InputBlock):
         self.size = InputProperty("size", "integer", required=True, default=1000000, description="Maximum file size in bytes")
 
     def on_descriptor(self):
-        return {"name": "File Input", "summary": "Shows a file input field", "category": "input"}
+        return config["InputFile"]["methods"]["on_descriptor"]["return"]
 
 """
     def process_file(binder, user_id, statement, accept, size):
@@ -477,7 +426,7 @@ class InputFile(InputBlock):
 
 class InputNumber(InputBlock):
     def on_descriptor(self):
-        return {"name": "Number Input", "summary": "No description available", "category": "input"}
+        return config["InputNumber"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
@@ -488,11 +437,7 @@ class InputNumber(InputBlock):
 
 class InputOAuth(InputBlock):
     def on_descriptor(self):
-        return {
-            "name": "OAuth Input",
-            "summary": "No description available",
-            "category": "input",
-        }
+        return data["InputOAuth"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         authorization_response = statement.input
@@ -505,27 +450,10 @@ class InputOAuth(InputBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Component",
-                    "name": "component",
-                    "format": "string",
-                    "input_type": "component",
-                    "search_filter": "OAuthProvider",
-                    "required": True,
-                    "description": "OAuth component used to handle the authorization",
-                    "value": None,
-                }
-            ]
-        )
+        self.append_template_properties(config["InputOAuth"]["methods"]["load_template"]["body"])
 
     def get_connections(self, properties):
-        return [
-            [BLOCK_MOVE, "Next"],
-            [BLOCK_REJECT, "Reject"]
-        ]
-
+        return [[BLOCK_MOVE, "Next"],[BLOCK_REJECT, "Reject"]]
 
 class InputPayment(InputBlock):
     def on_init(self):
@@ -533,7 +461,7 @@ class InputPayment(InputBlock):
         self.remove_template_properties("required")
 
     def on_descriptor(self):
-        return {"name": "Payment Input", "summary": "No description available", "category": "input"}
+        return config["InputPayment"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, input):
         try:
@@ -549,20 +477,7 @@ class InputPayment(InputBlock):
         return self.reject()
 
     def load_template(self):
-        self.append_template_properties(
-            [
-                {
-                    "text": "Component",
-                    "name": "component",
-                    "format": "string",
-                    "input_type": "component",
-                    "search_filter": "PaymentProvider",
-                    "required": True,
-                    "description": "Payment component used to handle the authorization",
-                    "value": None,
-                }
-            ]
-        )
+        self.append_template_properties(config["InputPayment"]["methods"]["load_template"]["body"])
 
     def get_connections(self, properties):
         return [[BLOCK_MOVE, "Next"], [BLOCK_REJECT, "Reject"]]
@@ -570,11 +485,7 @@ class InputPayment(InputBlock):
 
 class InputSearchable(InputBlock):
     def on_descriptor(self):
-        return {
-            "name": "Searchable Input",
-            "summary": "No description available",
-            "category": "input",
-        }
+        return config["InputSearchable"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, input):
         component_name = self.property_value("component")
@@ -604,27 +515,7 @@ class InputSearchable(InputBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Component",
-                "name": "component",
-                "format": "string",
-                "input_type": "search",
-                "search_filter": "SkillProvider",
-                "required": True,
-                "description": "Skill provider used to handle the search",
-                "value": None,
-            },
-            {
-                "text": "Model",
-                "name": "model",
-                "format": "string",
-                "input_type": "text",
-                "required": True,
-                "description": "<Description of property>",
-                "value": None,
-            },
-        ])
+        self.append_template_properties(config["InputSearchable"]["methods"]["load_template"]["body"])
 
     def on_search(self, binder, user_id, query, **kwargs):
         component_name = self.property_value("component")
@@ -640,9 +531,6 @@ class InputSearchable(InputBlock):
         resources.extend(result)
         return resources
 
-
-import spacy
-
 class InputSelection(InputBlock):
     def __init__(self, nlp=None):
         super().__init__()
@@ -651,11 +539,7 @@ class InputSelection(InputBlock):
         self.nlp = nlp
 
     def on_descriptor(self):
-        return {
-            "name": "Selection Input",
-            "summary": "No description available",
-            "category": "input",
-        }
+        return config["InputSelection"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
@@ -667,23 +551,13 @@ class InputSelection(InputBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Selections",
-                "name": "selections",
-                "format": "json",
-                "input_type": "textarea",
-                "required": True,
-                "description": "List of options",
-                "value": [["draft", "Draft"]],
-            }
-        ])
+        self.append_template_properties(config["InputSelection"]["methods"]["load_template"]["body"])
 
     def _get_value(self, statement):
         value = statement.input
         if self._in_selection(value):
             return value
-        fuzzy_item = self._fuzzy_item(value)
+.        fuzzy_item = self._fuzzy_item(value)
         if fuzzy_item is not None:
             return fuzzy_item
         augmented_results = self._augment_results(value)
@@ -749,11 +623,7 @@ class InputSkill(InputBlock):
 
     def on_descriptor(self):
         """Returns a dictionary containing metadata about this input block"""
-        return {
-            "name": "Skill Input",
-            "summary": "Passes user input to skill",
-            "category": "input"
-        }
+        return config["InputSkill"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id, statement):
         """Processes the user's input statement"""
@@ -821,26 +691,12 @@ class InputSkill(InputBlock):
     def load_template(self):
         """Loads the template for this input block"""
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Output Nodes",
-                "name": "nodes",
-                "format": "json",
-                "input_type": "nodes",
-                "required": True,
-                "description": "Nodes to output to the user",
-                "value": [],
-            }
-        ])
+        self.append_template_properties(config["InputSkill"]["methods"]["load_template"]["body"])
 
 
 class InputText(InputBlock):
     def on_descriptor(self):
-        return {
-            "name": "Text Input",
-            "summary": "No description available",
-            "category": "input"
-        }
+        return config["InputText"]["methods"]["on_descriptor"]["return"][0]
 
     def on_process(self, binder, user_id, statement):
         if statement.input:
@@ -848,8 +704,6 @@ class InputText(InputBlock):
             return self.move()
 
         return super().on_process(binder, user_id, statement)
-
-
 
 # ----------------------------------------------------------------------
 # Interpreter Blocks
@@ -869,27 +723,12 @@ class InterpreterBlock(BaseBlock):
         return [[BLOCK_MOVE, "Next"], [BLOCK_MOVE_X, "Reject"]]
 
     def load_template(self):
-        self.append_template_properties([
-            {
-                "text": "Component",
-                "name": "component",
-                "format": "string",
-                "input_type": "component",
-                "required": True,
-                "description": "Skill provider",
-                "search_filter": "SkillProvider",
-                "value": None,
-            }
-        ])
+        self.append_template_properties(config["InterpreterBlock"]["methods"]["load_template"]["body"])
 
 
 class DataExchange(InterpreterBlock):
     def on_descriptor(self):
-        return {
-            "category": "exchange",
-            "name": "Data Exchange",
-            "summary": "Calls a data exchange component",
-        }
+        return config["DataExchange"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, operator_id):
         component_name = self.property_value("component")
@@ -924,35 +763,12 @@ class DataExchange(InterpreterBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Input Data",
-                "name": "input",
-                "format": "json",
-                "input_type": "nodes",
-                "required": False,
-                "description": "Input data for the exchange function",
-                "value": [],
-            },
-            {
-                "text": "Output Data",
-                "name": "output",
-                "format": "json",
-                "input_type": "nodes",
-                "required": False,
-                "description": "Output data for the exchange function",
-                "value": [],
-            }
-        ])
+        self.append_template_properties(config["DataExchange"]["methods"]["load_template"]["body"])
 
 
 class InterpreterSkill(InterpreterBlock):
     def on_descriptor(self):
-        return {
-            "name": "Skill Interpreter",
-            "summary": "This block runs logic.",
-            "category": "interpreter",
-        }
+        return config["InterpreterSkill"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id):
         component_name = self.property_value("component")
@@ -984,18 +800,7 @@ class PromptBlock(BaseBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Read",
-                "name": "read",
-                "format": "string",
-                "required": False,
-                "unique": True,
-                "auto": True,
-                "description": "Reads data from the data instead of using the set value",
-                "value": None,
-            }
-        ])
+        self.append_template_properties(config["PromptBlock"]["methods"]["load_template"]["body"])
 
     @abstractmethod
     def on_process(self, binder, user_id):
@@ -1007,27 +812,11 @@ class PromptBlock(BaseBlock):
 
 class PromptBinary(PromptBlock):
     def on_descriptor(self):
-        return {
-            "name": "Binary",
-            "summary": "No description available",
-            "category": "prompt"
-        }
+        return config["PromptBinary"]["methods"]["on_descriptor"]["return"]
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Binary",
-                "name": "binary",
-                "format": "binary",
-                "input_type": "file",
-                "file_limit": 1000000,
-                "mime_types": ["*/*"],
-                "required": True,
-                "description": "Binary File",
-                "value": None,
-            },
-        ])
+        self.append_template_properties(config["PromptBinary"]["methods"]["load_template"]["body"])
 
     def on_process(self, binder, user_id):
         binary = self.property_value("binary")
@@ -1039,11 +828,7 @@ class PromptBinary(PromptBlock):
 
 class PromptChatPlatform(PromptBlock):
     def on_descriptor(self):
-        return {
-            "name": "Chat Platforms",
-            "summary": "No description available",
-            "category": "prompt"
-        }
+        return config["PromptChatPlatform"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id):
         real_user_id = binder.on_load_state().user_id
@@ -1059,7 +844,6 @@ class PromptChatPlatform(PromptBlock):
         }
         meta = {"header": "Available Platforms", "button_text": "Chat now"}
         chat_platform = ChatPlatformNode(data, meta)
-
         output = OutputStatement(user_id)
         output.append_node(chat_platform)
         binder.post_message(output)
@@ -1123,7 +907,7 @@ class PromptDuration(PromptTimeBlock):
 class PromptImage(PromptBlock):
     def __init__(self):
         super().__init__()
-        self.descriptor = {"name": "Image", "summary": "No description available", "category": "prompt"}
+        self.descriptor = config["PromptImage"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id):
         image = self.property_value("image")
@@ -1134,26 +918,12 @@ class PromptImage(PromptBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties(
-            [
-                {
-                    "text": "Image",
-                    "name": "image",
-                    "format": "binary",
-                    "input_type": "file",
-                    "file_limit": 1000000,
-                    "mime_types": ["image/jpeg", "image/png", "image/gif"],
-                    "required": True,
-                    "description": "Image File",
-                    "value": None,
-                },
-            ]
-        )
+        self.append_template_properties(config["PromptImage"]["methods"]["load_template"]["body"])
 
 
 class PromptPayment(PromptBlock):
     def on_descriptor(self):
-        return {"name": "Payment", "summary": "No description available", "category": "prompt"}
+        return config["PromptPayment"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id):
         real_user_id = binder.on_load_state().user_id
@@ -1172,17 +942,7 @@ class PromptPayment(PromptBlock):
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Amount",
-                "name": "amount",
-                "format": "float",
-                "input_type": "number",
-                "required": True,
-                "description": "Amount to pay",
-                "value": 0.00,
-            },
-        ])
+        self.append_template_properties(config["PromptPayment"]["methods"]["load_template"]["body"])
 
     def _get_payment_services(self, binder, user_id, amount, currency_code):
         payment_services = []
@@ -1197,7 +957,7 @@ class PromptPayment(PromptBlock):
             if "name" not in payment_method:
                 payment_method["name"] = "None"
             if "icon" not in payment_method:
-                payment_method["icon"] = "https://commons.wikimedia.org/wiki/File:PayPal.svg"
+                payment_method["icon"] = config["PromptPayment"]["methods"]["_get_payment_services"]["url"]
 
             payment_method["payment_url"] = payment_url
             payment_services.append(payment_method)
@@ -1216,25 +976,10 @@ class PromptPayment(PromptBlock):
 
 class PromptPreview(PromptBlock):
     def on_descriptor(self):
-        return {
-            "category": "prompt",
-            "name": "Preview",
-            "summary": "Previews a URL"
-        }
-
+        return config["PromptPreview"]["methods"]["on_descriptor"]["return"]
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "URL",
-                "name": "url",
-                "format": "string",
-                "input_type": "url",
-                "required": True,
-                "description": "URL to display",
-                "value": "https://example.com"
-            }
-        ])
+        self.append_template_properties(config["PromptPreview"]["methods"]["load_template"]["body")
 
     def on_process(self, binder, user_id):
         url = self.property_value("url")
@@ -1246,25 +991,11 @@ class PromptPreview(PromptBlock):
 
 class PromptText(PromptBlock):
     def on_descriptor(self):
-        return {
-            "name": "Text",
-            "summary": "No description available",
-            "category": "prompt"
-        }
+        return config["PromptText"]["methods"]["on_descriptor"]["return"]
 
     def load_template(self):
         super().load_template()
-        self.append_template_properties([
-            {
-                "text": "Text Primary",
-                "name": "primary_text",
-                "format": "array",
-                "input_type": "text",
-                "required": True,
-                "description": "List of strings to display",
-                "value": []
-            }
-        ])
+        self.append_template_properties(config["PromptText"]["methods"]["load_template"]["body"])
 
     def on_process(self, binder, user_id):
         output = OutputStatement(user_id)
@@ -1285,56 +1016,15 @@ class PromptText(PromptBlock):
 # Terminal Blocks
 # ----------------------------------------------------------------------
 
-
 class TerminalBlock(BaseBlock):
     def on_descriptor(self):
-        return {
-            "name": "Terminate",
-            "summary": "This block terminates the workflow.",
-            "category": "terminal",
-        }
+        return config["TerminalBlock"]["methods"]["on_descriptor"]["return"]
 
     def on_process(self, binder, user_id):
         return self.move()
 
     def load_template(self):
-        self.append_template_properties(
-            [
-                {
-                    "text": "Post Action",
-                    "name": "action",
-                    "format": "enum",
-                    "input_type": "select",
-                    "required": True,
-                    "description": "Action to execute after",
-                    "enum": [
-                        {"name": "Do Nothing", "value": 0},
-                        {"name": "Start Skill", "value": 1},
-                        {"name": "Hand over user", "value": 2},
-                        {"name": "Hand over group", "value": 3},
-                    ],
-                    "value": 0,
-                },
-                {
-                    "text": "Post Skill",
-                    "name": "post_skill",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": False,
-                    "description": "Skill to call after execution",
-                    "value": None,
-                },
-                {
-                    "text": "Template",
-                    "name": "template",
-                    "format": "string",
-                    "input_type": "text",
-                    "required": False,
-                    "description": "Template used when handing over a skill",
-                    "value": "",
-                },
-            ]
-        )
+        self.append_template_properties(config["TerminalBlock"]["methods"]["load_template"]["body"])
 
     @property
     def post_skill(self):
