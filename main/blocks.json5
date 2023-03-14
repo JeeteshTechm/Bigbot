@@ -1,0 +1,579 @@
+{
+    "DecisionBlock": {
+        "methods":{
+            "on_descriptor": {
+                "return":  
+                    {
+                        "name": "Decision Block",
+                        "summary": "Maps a list of options to other blocks",
+                        "category": "input",
+                    }        
+            },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Connections",
+                        "name": "connections",
+                        "format": "connections",
+                        "input_type": "connections",
+                        "required": true,
+                        "unique": false,
+                        "auto": true,
+                        "description": "Maps a list of options to blocks",
+                        "value": [],
+                    },
+                ]
+            }
+        }
+    },
+    "GoToBlock": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                     {
+                    "name": "GoTo Block",
+                    "summary": "Redirects to another block",
+                    "category": "input",
+                }        
+            
+        },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Prompt",
+                        "name": "prompt",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": false,
+                        "auto": true,
+                        "description": "Display text before processing block",
+                        "value": null,
+                    },
+                    {
+                        "text": "Destination Block ID",
+                        "name": "destination_block_id",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": true,
+                        "auto": false,
+                        "description": "The ID of the block to redirect to",
+                        "value": null,
+                    },
+                ]
+            }
+        }
+    },
+    "InputDate": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                        "name": "Date Input", 
+                        "summary": "No description available", 
+                        "category": "input"
+                    }
+                
+            }
+        }
+    },
+    "InputDateTime": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                        "name": "Date time Input",
+                        "summary": "No description available",
+                        "category": "input",
+                    }
+                
+            }
+        }
+    },
+    "InputDuration": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                        "name": "Duration Input",
+                        "summary": "No description available",
+                        "category": "input",
+                    }
+                
+            }
+        }
+    },
+    "InputEmail": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                        "name": "Email Input",
+                        "summary": "Validates and saves input as email",
+                        "category": "input"
+                    }
+            }
+        }
+    },
+    "InputFile": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                        "name": "File Input", 
+                        "summary": "Shows a file input field", 
+                        "category": "input"
+                    }
+            }
+        }
+    },
+    "InputNumber": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                        "name": "Number Input", 
+                        "summary": "No description available", 
+                        "category": "input"
+                    }
+            }
+        }
+    },
+    "InputOAuth": {
+        "methods":{
+            "on_descriptor": {
+                "return":  
+                    {
+                        "name": "OAuth Input",
+                        "summary": "No description available",
+                        "category": "input",
+                    }
+            }, 
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "component",
+                        "search_filter": "OAuthProvider",
+                        "required": true,
+                        "description": "OAuth component used to handle the authorization",
+                        "value": null,
+                    }
+                ]
+            }
+        }
+    },
+    "InputPayment": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                        "name": "Payment Input", 
+                        "summary": "No description available", 
+                        "category": "input"
+                    }
+            },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "component",
+                        "search_filter": "PaymentProvider",
+                        "required": true,
+                        "description": "Payment component used to handle the authorization",
+                        "value": null,
+                    }
+                ]
+            }
+        }
+    },
+    "InputSearchable": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                    "name": "Searchable Input",
+                    "summary": "No description available",
+                    "category": "input",
+                    }
+            }, 
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "search",
+                        "search_filter": "SkillProvider",
+                        "required": true,
+                        "description": "Skill provider used to handle the search",
+                        "value": null,
+                    },
+                    {
+                        "text": "Model",
+                        "name": "model",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": true,
+                        "description": "<Description of property>",
+                        "value": null,
+                    },
+                ]
+            }
+        }
+    },
+    "InputSelection": {
+        "methods":{
+            "on_descriptor": {
+                "return":  
+                    {
+                    "name": "Selection Input",
+                    "summary": "No description available",
+                    "category": "input",
+                    }
+            },
+          
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Selections",
+                        "name": "selections",
+                        "format": "json",
+                        "input_type": "textarea",
+                        "required": true,
+                        "description": "List of options",
+                        "value": [["draft", "Draft"]],
+                    }
+                ]
+            }
+        }
+    },
+    "InputSkill": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                     {
+                    "name": "Skill Input",
+                    "summary": "Passes user input to skill",
+                    "category": "input"
+                     }
+            },
+            
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Output Nodes",
+                        "name": "nodes",
+                        "format": "json",
+                        "input_type": "nodes",
+                        "required": true,
+                        "description": "Nodes to output to the user",
+                        "value": [],
+                    }
+                ]
+            }
+        }
+    },
+    "InputText": {
+        "methods":{
+            "on_descriptor": {
+                "return": 
+                    {
+                    "name": "Text Input",
+                    "summary": "No description available",
+                    "category": "input"
+                    }
+            }
+        }
+    },
+    "InterpreterBlock": {
+        "methods":{
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Component",
+                        "name": "component",
+                        "format": "string",
+                        "input_type": "component",
+                        "required": true,
+                        "description": "Skill provider",
+                        "search_filter": "SkillProvider",
+                        "value": null,
+                    }
+                ]
+            }
+        }
+    },
+    "DataExchange": {
+        "methods":{
+            "on_descriptor": {
+                "return":  
+                    {
+                    "category": "exchange",
+                    "name": "Data Exchange",
+                    "summary": "Calls a data exchange component",
+                    }
+           },    
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Input Data",
+                        "name": "input",
+                        "format": "json",
+                        "input_type": "nodes",
+                        "required": false,
+                        "description": "Input data for the exchange function",
+                        "value": [],
+                    },
+                    {
+                        "text": "Output Data",
+                        "name": "output",
+                        "format": "json",
+                        "input_type": "nodes",
+                        "required": false,
+                        "description": "Output data for the exchange function",
+                        "value": [],
+                    }
+                ]
+            }
+        }
+    },
+    "InterpreterSkill":{
+        "methods": {
+            "on_descriptor": {
+                "return": {
+                    "name": "Skill Interpreter",
+                    "summary": "This block runs logic.",
+                    "category": "interpreter",
+                }
+            }
+        }
+    },
+    "PromptBlock":{
+        "methods": {
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Read",
+                        "name": "read",
+                        "format": "string",
+                        "required": false,
+                        "unique": true,
+                        "auto": true,
+                        "description": "Reads data from the data instead of using the set value",
+                        "value": null,
+                    }
+                ]
+            }
+        }   
+    },
+    "PromptBinary":{
+        "methods": {
+            "on_descriptor": {
+                "return":
+                    {
+                        "name": "Binary", 
+                        "summary": "No description available", 
+                        "category": "prompt"}
+            },
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Binary",
+                        "name": "binary",
+                        "format": "binary",
+                        "input_type": "file",
+                        "file_limit": 1000000,
+                        "mime_types": ["*/*"],
+                        "required": true,
+                        "description": "Binary File",
+                        "value": null,
+                    },
+                ]
+            }            
+
+        }
+    },
+    "PromptChatPlatform":{
+        "methods": {
+            "on_descriptor": {
+                "return":
+                    {
+                        "name": "Chat Platforms",
+                        "summary": "No description available",
+                        "category": "prompt",
+                    }
+            }
+        }
+    },
+    
+    "PromptImage":{
+        "methods": {
+            "on_descriptor": {
+                "return":[
+                    {
+                        "name": "Image", 
+                        "summary": "No description available", 
+                        "category": "prompt"
+                    }
+                ]
+            
+            },
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Image",
+                        "name": "image",
+                        "format": "binary",
+                        "input_type": "file",
+                        "file_limit": 1000000,
+                        "mime_types": ["image/jpeg", "image/png", "image/gif"],
+                        "required": true,
+                        "description": "Image File",
+                        "value": null,
+                    },
+                ]
+            }            
+
+        }
+    },
+    "PromptPayment":{
+        "methods": {
+            "on_descriptor": {
+                "return":
+                    {
+                        "name": "Payment", 
+                        "summary": "No description available", 
+                        "category": "prompt"
+                    }
+            },
+            "_get_payment_services": {
+                "url":"https://commons.wikimedia.org/wiki/File:PayPal.svg"
+            
+            },
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Amount",
+                        "name": "amount",
+                        "format": "float",
+                        "input_type": "number",
+                        "required": true,
+                        "description": "Amount to pay",
+                        "value": 0.00,
+                    },
+                ]
+            }            
+
+        }
+    },
+    "PromptPreview":{
+        "methods": {
+            "on_descriptor": {
+                "return":
+                    {
+                        "category": "prompt", 
+                        "name": "Preview", 
+                        "summary": "Previews a URL"
+                    }
+            },
+            "load_template": {
+                "body":[
+                    {
+                        "text": "URL",
+                        "name": "url",
+                        "format": "string",
+                        "input_type": "url",
+                        "required": true,
+                        "description": "URL to display",
+                        "value": "https://example.com",
+                    }
+                ]
+            }            
+
+        }
+    },
+    "PromptText":{
+        "methods": {
+            "on_descriptor": {
+                "return":
+                    {
+                        "name": "Text", 
+                        "summary": "No description available", 
+                        "category": "prompt"
+                    }
+            },
+            "load_template": {
+                "body":[
+                    {
+                        "text": "Text Primary",
+                        "name": "primary_text",
+                        "format": "array",
+                        "input_type": "text",
+                        "required": true,
+                        "description": "List of strings to display",
+                        "value": [],
+                    },
+                ]
+            }            
+
+        }
+    },
+    "TerminalBlock":{
+        "methods": {
+            "on_descriptor": {
+                "return":
+                    {
+                        "name": "Terminate",
+                        "summary": "This block terminate the workflow.",
+                        "category": "terminal",
+                    }
+            },
+            "load_template": {
+                "body": [
+                    {
+                        "text": "Post Action",
+                        "name": "action",
+                        "format": "enum",
+                        "input_type": "select",
+                        "required": true,
+                        "description": "Actio to execute after",
+                        "enum": [
+                            {"name": "Do Nothing", "value": 0},
+                            {"name": "Start Skill", "value": 1},
+                            {"name": "Hand over user", "value": 2},
+                            {"name": "Hand over group", "value": 3},
+                        ],
+                        "value": 0,
+                    },
+                    {
+                        "text": "Post Skill",
+                        "name": "post_skill",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": false,
+                        "description": "Skill to call after execution",
+                        "value": null,
+                    },
+                    {
+                        "text": "Template",
+                        "name": "template",
+                        "format": "string",
+                        "input_type": "text",
+                        "required": false,
+                        "description": "Template used when handing over a skill",
+                        "value": "",
+                    },
+                ]
+            }            
+
+        }
+    }      
+}                  
+                    
