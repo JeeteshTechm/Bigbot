@@ -2,41 +2,44 @@ import json
 import os
 import yaml
 import rasa
-from rasa.shared.nlu.training_data.loading import load_data
-from rasa.shared.nlu.training_data.message import Message
-from rasa.shared.nlu.training_data.training_data import TrainingData
-from rasa.shared.core.domain import Domain
-from rasa.shared.nlu.training_data.loading import load_data
-from rasa.core.utils import  EndpointConfig
-from rasa.shared.core.training_data.structures import StoryGraph
-from rasa.shared.core.generator import TrainingDataGenerator
-from rasa.shared.core.events import ActionExecuted, UserUttered
-from rasa.core.agent import Agent
-from rasa.shared.nlu.interpreter import RegexInterpreter
-from rasa.core.policies.memoization import MemoizationPolicy
-from rasa.core.policies.rule_policy import RulePolicy
-from rasa.core.policies.ted_policy import TEDPolicy
 
+#Generate training data from blocks
+def convert_flow_to_training_data(flow):
 
-def generate_domain_file(payload,bot_id):
+    ### This function should generate a specific format of training_data,then only remaining functions work ###
+
+    training_data = {"common_examples": []}
+    for block in flow.blocks:
+
+        tags = block.tags
+        properties = block.properties
+        intent_label = "_".join(tags)
+        entity_label = " ".join([f"{key}:{value}" for key, value in properties.items()])
+
+        input_example = block.input_property
+        output_example = block.output_property
+
+        training_data["common_examples"].append({"text": input_example, "intent": intent_label, "entities": [{"start": 0, "end": len(entity_label), "value": entity_label, "entity": "property"}]})
+        training_data["common_examples"].append({"text": output_example, "intent": intent_label, "entities": [{"start": 0, "end": len(entity_label), "value": entity_label, "entity": "property"}]})
+
+    return training_data
+
+def utterance_generator(training_data):
+
+    #### Needs implementation ###
+
+    return updated_training_data
+
+#Creates domain.yml file for the given training data
+def generate_domain_file(training_data,bot_id):
     domain = {}
     domain['version'] = '3.4.4'
-    intents = [{'name': intent['name']} for intent in payload['intents']]
-    domain['intents'] = intents
-    entities = [{'name': entity['name']} for entity in payload['entities']]
-    domain['entities'] = entities
 
-    slots = {}
-    for slot in payload['slots']:
-        slot_name = slot['name']
-        slot_type = slot['type']
-        slots[slot_name] = {'type': slot_type, 'influence_conversation': False}
-        mappings = []
-        for value in slot.get('values', []):
-            mappings.append({'value': value, 'synonyms': [value]})
-        if mappings:
-            slots[slot_name]['mappings'] = mappings
-    domain['slots'] = slots
+    intents = [{'name': intent['name']} for intent in training_data['intents']]
+    domain['intents'] = intents
+
+    entities = [{'name': entity['name']} for entity in training_data['entities']]
+    domain['entities'] = entities
 
     responses = {}
     for intent in payload['intents']:
@@ -52,40 +55,23 @@ def generate_domain_file(payload,bot_id):
     domain['session_config'] = session_config
 
     domain_file_path = f"{bot_id}/domain.yml"
+
     with open(domain_file_path, "w") as f:
         yaml.dump(domain_file_path, f, sort_keys=False)
 
     return ('Domain saved to given path')
 
-
-def generate_config_file(payload, bot_id):
-    config_yaml_data = {
-        "recipe": payload.get("recipe", "default.v1"),
-        "language": payload.get("language", "en"),
-        "pipeline": payload.get("pipeline", []),
-        "policies": payload.get("policies", [])
-    }
-
-    config_file_path = f"{bot_id}/config.yml"
-    with open(config_file_path, "w") as f:
-        yaml.dump(config_yaml_data, f, sort_keys=False)
-
-    return ('Domain saved to given path')
-
-
+#Creates nlu.yml file for the given training data
 def generate_nlu_file(data, bot_id):
     nlu_data = {'version': '3.4.4'}
     nlu_data['nlu'] = []
 
-    # Loop through the intents in the payload data
     for intent in data['intents']:
-        # If the intent has utterances, create a NLU example
         if intent['utterances']:
             nlu_example = {
                 'intent': intent['name'],
                 'examples': []
             }
-            # Add the examples for the intent
             for utterance in intent['utterances']:
                 example = {'text': utterance}
                 if intent.get('slots'):
@@ -101,95 +87,36 @@ def generate_nlu_file(data, bot_id):
                 nlu_example['examples'].append(example)
             nlu_data['nlu'].append(nlu_example)
 
-    # Save the NLU data to file
     nlu_file_path = os.path.join(bot_id, 'data', 'nlu.yml')
     with open(nlu_file_path, 'w') as f:
         yaml.dump(nlu_data, f)
         
     return nlu_data
 
-
+#Creates stories.yml file for the given training data
 def generate_stories_file(payload, bot_id):
-    # Create the directory if it doesn't exist
     data_dir = f"{bot_id}/data"
     if not os.path.exists(data_dir):
         os.makedirs(data_dir)
 
-    # Generate stories
     stories = []
-    for story in payload['stories']:
-        steps = []
-        for step in story['steps']:
-            if 'intent' in step:
-                steps.append({'intent': step['intent']})
-            elif 'action' in step:
-                steps.append({'action': step['action']})
-            elif 'entities' in step:
-                entities = {}
-                for entity, value in step['entities'].items():
-                    entities[entity] = value['value']
-                steps.append({'entities': entities})
-        stories.append({'story': story['story'], 'steps': steps})
+    
+    #### Needs implementation ####
 
-    # Convert stories dictionary to YAML format
     stories_yaml = yaml.dump({'stories': stories}, sort_keys=False)
-
-    # Write the YAML to a file
     with open(f"{data_dir}/stories.yml", 'w') as file:
         file.write(stories_yaml)
 
     return stories_yaml
 
-def generate_rules_file(payload, bot_id):
-    rules = {}
 
-    # Generate rules from the rules block
-    for rule in payload['rules']:
-        rule_name = rule['rule']
-        steps = []
-
-        for step in rule['steps']:
-            if 'intent' in step:
-                steps.append({'intent': step['intent']})
-            elif 'action' in step:
-                steps.append({'action': step['action']})
-            elif 'entities' in step:
-                entities = {}
-                for entity, value in step['entities'].items():
-                    entities[entity] = {'value': value['value']}
-                steps.append({'entities': entities})
-
-        rules[rule_name] = {'steps': steps}
-
-    # Generate rules from intents
-    for intent in payload['intents']:
-        rule_name = f"{intent['name']}_rule"
-        steps = [
-            {'intent': intent['name']},
-            {'action': f"utter_{intent['name']}"}
-        ]
-        rules[rule_name] = {'steps': steps}
-
-    # Convert rules dictionary to YAML format
-    rules_yaml = yaml.dump({'rules': rules}, sort_keys=False)
-
-    # Save rules.yaml to bot_id/data/rules.yaml
-    if not os.path.exists(f"{bot_id}/data"):
-        os.makedirs(f"{bot_id}/data")
-    with open(f"{bot_id}/data/rules.yml", "w") as f:
-        f.write(rules_yaml)
-
-    return rules_yaml
-
-
-def create_rasa_model(payload_data,config_data,bot_id):
+# Train and save the rasa model for the training data
+def train_save_rasa_model(training_data,config_file_path,bot_id):
     os.makedirs(bot_id)
-    generate_domain_file(payload_data,bot_id)
-    generate_config_file(config_data,bot_id)
-    generate_nlu_file(payload_data,bot_id)
-    generate_stories_file(payload_data,bot_id)
-    generate_rules_file(payload_data,bot_id)
-
+    generate_domain_file(training_data,bot_id)
+    generate_nlu_file(training_data,bot_id)
+    generate_stories_file(training_data,bot_id)
+    shutil.copy(config_file_path, f"{bot_id}/config.yml")
 
     config = f"{bot_id}/config.yml"
     training_files = f"{bot_id}/data/"
@@ -198,5 +125,13 @@ def create_rasa_model(payload_data,config_data,bot_id):
 
     rasa.train(domain, config, [training_files], output, fixed_model_name='rasa_model')  
 
-
     return("Your Rasa model has been trained and saved")
+
+
+##Load the training model as interpreter to get the response for the user query
+def get_response(text,bot_id):
+
+  ### Needs Implementation ###
+
+    return reponse
+
