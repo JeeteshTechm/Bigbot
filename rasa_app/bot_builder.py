@@ -2,11 +2,15 @@ import json
 import os
 import yaml
 import rasa
+from transformers import *
+
+model = PegasusForConditionalGeneration.from_pretrained("tuner007/pegasus_paraphrase")
+tokenizer = PegasusTokenizerFast.from_pretrained("tuner007/pegasus_paraphrase")
 
 #Generate training data from blocks
 def convert_flow_to_training_data(flow):
 
-    ### This function should generate a specific format of training_data,then only remaining functions work ###
+    ### This function should generate a specific format of training_data,then only remaining functions work###
 
     training_data = {"common_examples": []}
     for block in flow.blocks:
@@ -24,11 +28,18 @@ def convert_flow_to_training_data(flow):
 
     return training_data
 
-def utterance_generator(training_data):
+# Generate similar sentences for text
+def get_paraphrased_sentences(model, tokenizer, sentence, num_return_sequences=5, num_beams=5):
 
-    #### Needs implementation ###
+    inputs = tokenizer([sentence], truncation=True, padding="longest", return_tensors="pt")
+    outputs = model.generate(
+        **inputs,
+        num_beams=num_beams,
+        num_return_sequences=num_return_sequences,
+    )
 
-    return updated_training_data
+    return tokenizer.batch_decode(outputs, skip_special_tokens=True)
+
 
 #Creates domain.yml file for the given training data
 def generate_domain_file(training_data,bot_id):
@@ -110,7 +121,7 @@ def generate_stories_file(payload, bot_id):
     return stories_yaml
 
 
-# Train and save the rasa model for the training data
+
 def train_save_rasa_model(training_data,config_file_path,bot_id):
     os.makedirs(bot_id)
     generate_domain_file(training_data,bot_id)
@@ -118,12 +129,14 @@ def train_save_rasa_model(training_data,config_file_path,bot_id):
     generate_stories_file(training_data,bot_id)
     shutil.copy(config_file_path, f"{bot_id}/config.yml")
 
+
     config = f"{bot_id}/config.yml"
     training_files = f"{bot_id}/data/"
     domain = f"{bot_id}/domain.yml"
     output = f"{bot_id}/models/"
 
     rasa.train(domain, config, [training_files], output, fixed_model_name='rasa_model')  
+
 
     return("Your Rasa model has been trained and saved")
 
@@ -134,4 +147,3 @@ def get_response(text,bot_id):
   ### Needs Implementation ###
 
     return reponse
-
