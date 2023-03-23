@@ -8,25 +8,40 @@ model = PegasusForConditionalGeneration.from_pretrained("tuner007/pegasus_paraph
 tokenizer = PegasusTokenizerFast.from_pretrained("tuner007/pegasus_paraphrase")
 
 #Generate training data from blocks
-def convert_flow_to_training_data(flow):
+def get_rasa_training_data(file_path):
+    with open(file_path, 'r') as f:
+        skill_builder_json = json.load(f)
 
-    ### This function should generate a specific format of training_data,then only remaining functions work###
+    rasa_training_data = {"intents": []}
+    current_intent = None
 
-    training_data = {"common_examples": []}
-    for block in flow.blocks:
+    for i, block in enumerate(skill_builder_json['blocks']):
+        if block['component'] == 'main.Block.InputText':
+            tags = block.get('tags', [])
+            current_intent = {
+                'tag': '_'.join(tags),
+                'utterances': [],
+                'responses': []
+            }
 
-        tags = block.tags
-        properties = block.properties
-        intent_label = "_".join(tags)
-        entity_label = " ".join([f"{key}:{value}" for key, value in properties.items()])
+            for prop in block['properties']:
+                if prop['name'] == 'value':
+                    current_intent['utterances'].append(prop['value'])
 
-        input_example = block.input_property
-        output_example = block.output_property
+            # Check if the next block is a PromptText block
+            if i + 1 < len(skill_builder_json['blocks']):
+                next_block = skill_builder_json['blocks'][i + 1]
+                if next_block['component'] == 'main.Block.PromptText':
+                    for prop in next_block['properties']:
+                        if prop['name'] == 'value':
+                            current_intent['responses'].append(prop['value'])
+                            break
 
-        training_data["common_examples"].append({"text": input_example, "intent": intent_label, "entities": [{"start": 0, "end": len(entity_label), "value": entity_label, "entity": "property"}]})
-        training_data["common_examples"].append({"text": output_example, "intent": intent_label, "entities": [{"start": 0, "end": len(entity_label), "value": entity_label, "entity": "property"}]})
+            rasa_training_data['intents'].append(current_intent)
+            current_intent = None
 
-    return training_data
+    return rasa_training_data
+
 
 # Generate similar sentences for text
 def get_paraphrased_sentences(model, tokenizer, sentence, num_return_sequences=5, num_beams=5):
