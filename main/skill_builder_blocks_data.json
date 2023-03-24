@@ -1,0 +1,1126 @@
+{
+    "id": null,
+    "jsonrpc": "2.0",
+    "result": [
+        {
+            "component": "main.Block.PromptBinary",
+            "descriptor": {
+                "name": "Binary",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "Binary",
+                    "name": "binary",
+                    "format": "binary",
+                    "input_type": "file",
+                    "file_limit": 1000000,
+                    "mime_types": [
+                        "*/*"
+                    ],
+                    "required": true,
+                    "description": "Binary File",
+                    "value": null
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptChatPlatform",
+            "descriptor": {
+                "name": "Chat Platforms",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptDate",
+            "descriptor": {
+                "name": "Date",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "Date",
+                    "name": "date",
+                    "format": "time",
+                    "input_type": "date",
+                    "unique": false,
+                    "auto": false,
+                    "description": "Date"
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptDateTime",
+            "descriptor": {
+                "name": "Date Time",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "Datetime",
+                    "name": "datetime",
+                    "format": "time",
+                    "input_type": "datetime",
+                    "unique": false,
+                    "auto": false,
+                    "description": "Hour and Date"
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptDuration",
+            "descriptor": {
+                "name": "Duration",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "Duration",
+                    "name": "time",
+                    "format": "time",
+                    "input_type": "time",
+                    "unique": false,
+                    "auto": false,
+                    "description": "Hour"
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptImage",
+            "descriptor": {
+                "name": "Image",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "Image",
+                    "name": "image",
+                    "format": "binary",
+                    "input_type": "file",
+                    "file_limit": 1000000,
+                    "mime_types": [
+                        "image/jpeg",
+                        "image/png",
+                        "image/gif"
+                    ],
+                    "required": true,
+                    "description": "Image File",
+                    "value": null
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptPayment",
+            "descriptor": {
+                "name": "Payment",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "Amount",
+                    "name": "amount",
+                    "format": "float",
+                    "input_type": "number",
+                    "required": true,
+                    "description": "Amount to pay",
+                    "value": 0.0
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptPreview",
+            "descriptor": {
+                "category": "prompt",
+                "name": "Preview",
+                "summary": "Previews a URL"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "URL",
+                    "name": "url",
+                    "format": "string",
+                    "input_type": "url",
+                    "required": true,
+                    "description": "URL to display",
+                    "value": "https://example.com"
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.PromptText",
+            "descriptor": {
+                "name": "Text",
+                "summary": "No description available",
+                "category": "prompt"
+            },
+            "template": [
+                {
+                    "text": "Read",
+                    "name": "read",
+                    "format": "string",
+                    "required": false,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Reads data from the data instead of using the set value",
+                    "value": null
+                },
+                {
+                    "text": "Text Primary",
+                    "name": "primary_text",
+                    "format": "array",
+                    "input_type": "text",
+                    "required": true,
+                    "description": "List of strings to display",
+                    "value": []
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.DecisionBlock",
+            "descriptor": {
+                "name": "Decision Block",
+                "summary": "Maps a list of options to other blocks",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Connections",
+                    "name": "connections",
+                    "format": "connections",
+                    "input_type": "connections",
+                    "required": true,
+                    "unique": false,
+                    "auto": true,
+                    "description": "Maps a list of options to blocks",
+                    "value": []
+                }
+            ],
+            "connections": [
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputDate",
+            "descriptor": {
+                "name": "Date Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputDateTime",
+            "descriptor": {
+                "name": "Date time Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputDuration",
+            "descriptor": {
+                "name": "Duration Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputEmail",
+            "descriptor": {
+                "name": "Email Input",
+                "summary": "Validates and saves input as email",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputFile",
+            "descriptor": {
+                "name": "File Input",
+                "summary": "Shows a file input field",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                },
+                {
+                    "text": "File type",
+                    "name": "accept",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Valid file extensions",
+                    "value": ""
+                },
+                {
+                    "text": "Size",
+                    "name": "size",
+                    "format": "integer",
+                    "input_type": "number",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Maximum file size in bytes",
+                    "value": 1000000
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputNumber",
+            "descriptor": {
+                "name": "Number Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputOAuth",
+            "descriptor": {
+                "name": "OAuth Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Component",
+                    "name": "component",
+                    "format": "string",
+                    "input_type": "component",
+                    "search_filter": "OAuthProvider",
+                    "required": true,
+                    "description": "OAuth component used to handle the authorization",
+                    "value": null
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputPayment",
+            "descriptor": {
+                "name": "Payment Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Component",
+                    "name": "component",
+                    "format": "string",
+                    "input_type": "component",
+                    "search_filter": "PaymentProvider",
+                    "required": true,
+                    "description": "Payment component used to handle the authorization",
+                    "value": null
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputSearchable",
+            "descriptor": {
+                "name": "Searchable Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                },
+                {
+                    "text": "Component",
+                    "name": "component",
+                    "format": "string",
+                    "input_type": "search",
+                    "search_filter": "SkillProvider",
+                    "required": true,
+                    "description": "Skill provider userd to handle the search",
+                    "value": null
+                },
+                {
+                    "text": "Model",
+                    "name": "model",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "description": "<Description of property.>",
+                    "value": null
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputSelection",
+            "descriptor": {
+                "name": "Selection Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                },
+                {
+                    "text": "Selections",
+                    "name": "selections",
+                    "format": "json",
+                    "input_type": "textarea",
+                    "required": true,
+                    "description": "List of options",
+                    "value": [
+                        [
+                            "draft",
+                            "Draft"
+                        ]
+                    ]
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputSkill",
+            "descriptor": {
+                "name": "Skill Input",
+                "summary": "Passes user input to skill",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                },
+                {
+                    "text": "Output Nodes",
+                    "name": "nodes",
+                    "format": "json",
+                    "input_type": "nodes",
+                    "required": true,
+                    "description": "Skill provider",
+                    "value": []
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InputText",
+            "descriptor": {
+                "name": "Text Input",
+                "summary": "No description available",
+                "category": "input"
+            },
+            "template": [
+                {
+                    "text": "Key",
+                    "name": "key",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": true,
+                    "unique": true,
+                    "auto": true,
+                    "description": "Key used to store the data",
+                    "value": null
+                },
+                {
+                    "text": "Prompt",
+                    "name": "prompt",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "auto": true,
+                    "description": "Display text before processing block",
+                    "value": null
+                },
+                {
+                    "text": "Required",
+                    "name": "required",
+                    "format": "boolean",
+                    "input_type": "checkbox",
+                    "required": true,
+                    "description": "If set to false this property become optional.",
+                    "value": false
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    -1,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.InterpreterSkill",
+            "descriptor": {
+                "name": "Skill Interpreter",
+                "summary": "This block runs logic.",
+                "category": "interpreter"
+            },
+            "template": [
+                {
+                    "text": "Component",
+                    "name": "component",
+                    "format": "string",
+                    "input_type": "component",
+                    "required": true,
+                    "description": "Skill provider",
+                    "search_filter": "SkillProvider",
+                    "value": null
+                },
+                {
+                    "text": "Output Nodes",
+                    "name": "nodes",
+                    "format": "json",
+                    "input_type": "nodes",
+                    "required": true,
+                    "description": "Nodes used to render the result",
+                    "value": []
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    2,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.DataExchange",
+            "descriptor": {
+                "category": "exchange",
+                "name": "Data Exchange",
+                "summary": "Calls a data exchange component"
+            },
+            "template": [
+                {
+                    "text": "Component",
+                    "name": "component",
+                    "format": "string",
+                    "input_type": "component",
+                    "required": true,
+                    "description": "Skill provider",
+                    "search_filter": "SkillProvider",
+                    "value": null
+                },
+                {
+                    "text": "Input Data",
+                    "name": "input",
+                    "format": "json",
+                    "input_type": "nodes",
+                    "required": false,
+                    "description": "Input data for the exchange function",
+                    "value": []
+                },
+                {
+                    "text": "Output Data",
+                    "name": "output",
+                    "format": "json",
+                    "input_type": "nodes",
+                    "required": false,
+                    "description": "Output data for the exchange function",
+                    "value": []
+                }
+            ],
+            "connections": [
+                [
+                    1,
+                    "Next"
+                ],
+                [
+                    2,
+                    "Reject"
+                ]
+            ]
+        },
+        {
+            "component": "main.Block.TerminalBlock",
+            "descriptor": {
+                "name": "Terminate",
+                "summary": "This block terminate the workflow.",
+                "category": "terminal"
+            },
+            "template": [
+                {
+                    "text": "Post Action",
+                    "name": "action",
+                    "format": "enum",
+                    "input_type": "select",
+                    "required": true,
+                    "description": "Actio to execute after",
+                    "enum": [
+                        {
+                            "name": "Do Nothing",
+                            "value": 0
+                        },
+                        {
+                            "name": "Start Skill",
+                            "value": 1
+                        },
+                        {
+                            "name": "Hand over user",
+                            "value": 2
+                        },
+                        {
+                            "name": "Hand over group",
+                            "value": 3
+                        }
+                    ],
+                    "value": 0
+                },
+                {
+                    "text": "Post Skill",
+                    "name": "post_skill",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "description": "Skill to call after execution",
+                    "value": null
+                },
+                {
+                    "text": "Template",
+                    "name": "template",
+                    "format": "string",
+                    "input_type": "text",
+                    "required": false,
+                    "description": "Template used when handing over a skill",
+                    "value": ""
+                }
+            ],
+            "connections": []
+        }
+    ]
+}
