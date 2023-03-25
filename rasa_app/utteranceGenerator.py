@@ -2,8 +2,9 @@ import random
 import threading
 from queue import Queue
 import spacy
+import torch
 from langdetect import detect
-from transformers import pipeline
+from transformers import pipeline, AutoTokenizer, AutoModelForSeq2SeqLM
 from nltk.corpus import wordnet
 
 # Load the spaCy models
@@ -26,7 +27,6 @@ text_generators = {
         pipeline("text-generation", model="dbmdz/german-gpt2", tokenizer="dbmdz/german-gpt2"),
     ],
 }
-
 
 # Detect the language of the input text
 def detect_language(input_text):
@@ -58,11 +58,24 @@ def generate_nltk_sentence(input_sentence, replacement_rate, language):
             new_sentence.append(lemmatized_tokens[synonyms.index(token_synonyms)])
 
     return ' '.join(new_sentence)
-        
-def generate_transformers_sentence(input_text, temperature, language, generator):
-    generated_sentence = generator(input_text, max_length=20, do_sample=True, temperature=temperature, top_p=0.9)[0]["generated_text"]
-    return generated_sentence
 
+def generate_transformers_sentence(input_text, temperature, language, generator, num_return_sequences, num_beams):
+    generated_sentences = generator(
+        input_text,
+        max_length=20,
+        do_sample=True,
+        temperature=temperature,
+        top_p=0.9,
+        num_return_sequences=num_return_sequences,
+        num_beams=num_beams,
+    )
+    return [generated_sentence["generated_text"] for generated_sentence in generated_sentences]
+
+def transformers_worker(generator):
+    while len(sentence_list) < target_count:
+        generated_sentences = generate_transformers_sentence(input_text, temperature, language, generator, num_return_sequences=5, num_beams=5)
+        for sentence in generated_sentences:
+            sentence_queue.put(sentence)
 
 def generate_sentences(target_count, similarity, input_text, language):
     if not (0.0 <= similarity <= 1.0):
@@ -76,11 +89,7 @@ def generate_sentences(target_count, similarity, input_text, language):
 
     def nltk_worker():
         while len(sentence_list) < target_count:
-            sentence_queue.put(generate_nltk_sentence(input_text, replacement_rate, language))
-
-    def transformers_worker(generator):
-        while len(sentence_list) < target_count:
-            sentence_queue.put(generate_transformers_sentence(input_text, temperature, language, generator))
+                        sentence_queue.put(generate_nltk_sentence(input_text, replacement_rate, language))
 
     workers = [threading.Thread(target=nltk_worker)]
     for generator in text_generators[language]:
