@@ -1,65 +1,114 @@
-
-# NLTK way to generate similar sentences
-
-import nltk
-# nltk.download('punkt')
-# nltk.download('averaged_perceptron_tagger')
-# nltk.download('wordnet')
-from nltk.tokenize import word_tokenize
-from nltk.corpus import wordnet
-from nltk.stem import WordNetLemmatizer
 import random
+import threading
+from queue import Queue
+import spacy
+from langdetect import detect
+from transformers import pipeline
+from nltk.corpus import wordnet
 
-# Example sentence
-sentence = "How to book a hotel"
+# Load the spaCy models
+nlp_models = {
+    "en": spacy.load("en_core_web_sm"),
+    "es": spacy.load("es_core_news_sm"),
+    "de": spacy.load("de_core_news_sm"),
+}
 
-# Tokenize the sentence
-tokens = word_tokenize(sentence)
+# Define the Transformers text generation pipelines for each language
+text_generators = {
+    "en": [
+        pipeline("text-generation", model="gpt2", tokenizer="gpt2"),
+        pipeline("text-generation", model="distilgpt2", tokenizer="distilgpt2")
+    ],
+    "es": [
+        pipeline("text-generation", model="mrm8488/spanish-gpt2", tokenizer="mrm8488/spanish-gpt2"),
+    ],
+    "de": [
+        pipeline("text-generation", model="dbmdz/german-gpt2", tokenizer="dbmdz/german-gpt2"),
+    ],
+}
 
-# Identify the POS tags for each token
-pos_tags = nltk.pos_tag(tokens)
 
-# Lemmatize the tokens to reduce words to their base form
-lemmatizer = WordNetLemmatizer()
-lemmatized_tokens = []
-for token, pos in pos_tags:
-    if pos.startswith('V'):
-        # If the token is a verb, use 'v' as the pos argument for the lemmatizer
-        lemmatized_tokens.append(lemmatizer.lemmatize(token, pos='v'))
+# Detect the language of the input text
+def detect_language(input_text):
+    detected_language = detect(input_text)
+    if detected_language in nlp_models and detected_language in text_generators:
+        return detected_language
     else:
-        lemmatized_tokens.append(lemmatizer.lemmatize(token))
+        raise ValueError("Unsupported language. Please use English, Spanish, or German.")
 
-# Identify synonyms for each token
-synonyms = []
-for token in lemmatized_tokens:
-    token_synonyms = []
-    for syn in wordnet.synsets(token):
-        for lemma in syn.lemmas():
-            if lemma.name() != token:
-                token_synonyms.append(lemma.name().replace('_', ' '))
-    synonyms.append(token_synonyms)
+def generate_nltk_sentence(input_sentence, replacement_rate, language):
+    nlp = nlp_models[language]
+    doc = nlp(input_sentence)
+    lemmatized_tokens = [token.lemma_ for token in doc]
 
-# Generate a random sentence using the synonyms
-generated_sentence = []
-for token_synonyms in synonyms:
-    if token_synonyms:
-        generated_sentence.append(random.choice(token_synonyms))
-    else:
-        generated_sentence.append(lemmatized_tokens[synonyms.index(token_synonyms)])
+    synonyms = []
+    for token in lemmatized_tokens:
+        token_synonyms = []
+        for syn in wordnet.synsets(token):
+            for lemma in syn.lemmas():
+                if lemma.name() != token:
+                    token_synonyms.append(lemma.name().replace('_', ' '))
+        synonyms.append(token_synonyms)
 
-print(' '.join(generated_sentence))
+    new_sentence = []
+    for token_synonyms in synonyms:
+        if token_synonyms and random.random() < replacement_rate:
+            new_sentence.append(random.choice(token_synonyms))
+        else:
+            new_sentence.append(lemmatized_tokens[synonyms.index(token_synonyms)])
+
+    return ' '.join(new_sentence)
+        
+def generate_transformers_sentence(input_text, temperature, language, generator):
+    generated_sentence = generator(input_text, max_length=20, do_sample=True, temperature=temperature, top_p=0.9)[0]["generated_text"]
+    return generated_sentence
 
 
+def generate_sentences(target_count, similarity, input_text, language):
+    if not (0.0 <= similarity <= 1.0):
+        raise ValueError("Similarity should be a float between 0.0 and 1.0")
 
-# gpt library way to generate similar utterances
-import gpt_2_simple as gpt2
+    sentence_list = []
+    sentence_queue = Queue()
 
-model_name = "774M"
-# gpt2.download_gpt2(model_name=model_name)
-model_dir=".\models"
-sess = gpt2.start_tf_sess()
-gpt2.load_gpt2(sess, model_name=model_name,model_dir=model_dir)
-input_text = "I want to book an hotel"
-generated_text = gpt2.generate(sess, model_name=model_name, prefix=input_text, length=20, temperature=0.7, top_p=0.9, return_as_list=True)[0]
+    temperature = 1.0 - similarity
+    replacement_rate = 1.0 - similarity
 
-print(generated_text)
+    def nltk_worker():
+        while len(sentence_list) < target_count:
+            sentence_queue.put(generate_nltk_sentence(input_text, replacement_rate, language))
+
+    def transformers_worker(generator):
+        while len(sentence_list) < target_count:
+            sentence_queue.put(generate_transformers_sentence(input_text, temperature, language, generator))
+
+    workers = [threading.Thread(target=nltk_worker)]
+    for generator in text_generators[language]:
+        workers.append(threading.Thread(target=transformers_worker, args=(generator,)))
+
+    for worker in workers:
+        worker.start()
+
+    while len(sentence_list) < target_count:
+        sentence_list.append(sentence_queue.get())
+
+    for worker in workers:
+        worker.join()
+
+    return sentence_list
+
+
+if __name__ == "__main__":
+    input_sentence = "How to book a hotel"
+    target_count = 10
+    similarity = 0.5
+    language = detect_language(input_sentence)
+
+    if language not in nlp_models or language not in text_generators:
+        raise ValueError("Unsupported language. Please choose 'en', 'es', or 'de'.")
+
+    sentences = generate_sentences(target_count, similarity, input_sentence, language)
+
+    print("Generated sentences:")
+    for sentence in sentences:
+        print(sentence)
