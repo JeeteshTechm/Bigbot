@@ -8,7 +8,7 @@ import re
 from durations import Duration
 from jinja2 import Template
 
-from .Log import Log
+from . import Log
 from .Node import (
     BinaryNode,
     DateNode,
@@ -23,7 +23,7 @@ from .Node import (
     SearchNode,
 )
 from .Statement import OutputStatement
-from .Utils import Utils
+from . import Utils
 
 
 BLOCK_REJECT = -1
@@ -49,7 +49,7 @@ def get_block_by_id(binder, skill, block_id):
 def get_block_by_property(binder, skill, key_name, key_value):
     match = next((item for item in skill["blocks"] 
                   if item["component"] in (f"{b.__module__}.{b.__name__}" for b in binder.get_registry().blocks)
-                  and block_obj:=block(binder.on_context(), item["id"], item["properties"], item.get("connections"))
+                  and block(binder.on_context(), item["id"], item["properties"], item.get("connections"))
                   and block_obj.property_value(key_name) == key_value), None)
     if match is None:
         raise ValueError(f"Block not found for property {key_name} with value {key_value}")
@@ -103,7 +103,7 @@ class BaseBlock(ABC):
             "connections": self.get_connections(self.properties),
         }
 
-    def property_value(self, key: str) -> Union[str, int, float, dict]:
+    def property_value(self, key: str):
         """Return the value of the property with the given key"""
         for item in self.properties:
             name = item["name"]

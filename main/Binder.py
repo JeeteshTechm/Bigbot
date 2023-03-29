@@ -162,11 +162,11 @@ class Registry:
         self.blocks = []
         self.components = []
 
-        self.blocks.extend(PROMPT_BLOCKS)
-        self.blocks.extend(INPUT_BLOCKS)
-        self.blocks.extend(INTERPRETER_BLOCKS)
-        self.blocks.extend(DATA_EXCHANGE)
-        self.blocks.extend(OTHER_BLOCKS)
+        self.blocks.extend(BlockType.PROMPT_BLOCKS)
+        self.blocks.extend(BlockType.INPUT_BLOCKS)
+        self.blocks.extend(BlockType.INTERPRETER_BLOCKS)
+        self.blocks.extend(BlockType.DATA_EXCHANGE)
+        self.blocks.extend(BlockType.OTHER_BLOCKS)
 
     def register(self, object):
         self.components.append(object)

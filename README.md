@@ -658,3 +658,20 @@ The above can also be achieved from the portal. Clicking on the api listed in **
     }]
 **"node" :** The response type. It can be **"text"**,**"iframe"**, **"image"**, etc.  
 **"content" :** The final message that will be displayed on the template. 
+
+
+
+# How to Run the Django APP
+
+#### STEP 1 : Prepare Virtual Environment
+* Open the bigbot repo in vscode, go to script/ci_dev/conf.json
+* Configure the paths.venv variables according to your operating system, the script will download the required libraries to this location.
+* Be sure the python alias has been added in your system or you can directly give the python path with configure the which_python variable according to your OS.
+* Press ctrl-shift-b to open tasks and select Python Environment Preperation (.vscode/tasks.json)
+* You can see the virtual environment has been downloaded when the task is finished.
+
+
+#### STEP 2 : Launch the Django App
+* Configure "python" value in the .vscode/launch.json task, it will open a new terminal with given virtual environment.
+* Check out your env variables, ports and django settings can be editable.
+* Go to Run and Debug page, click the Python: Django.
