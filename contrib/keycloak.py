@@ -589,7 +589,32 @@ class MasterRealmController(RealmController):
         client_id = self.create_client(
             "internal-realm-admin",
             {
-                "enabled": True,
+                "enabled": True,class RealmController:
+    def __init__(self, realm, admin_username, admin_password, client_id):
+        # implementation details
+
+    def create_realm(self, realm_name):
+        # implementation details
+
+    def delete_realm(self, realm_id):
+        # implementation details
+
+    def get_realm(self, realm_id):
+        # implementation details
+
+class MasterRealmController(RealmController):
+    def __init__(self):
+        # implementation details
+
+    def create_realm(self, realm_name):
+        # implementation details
+
+    def get_template_realm(self):
+        # implementation details
+
+    def setup_admin_account(self, realm, admin_email="admin@bigbot.ai"):
+        # implementation details
+
                 "publicClient": True,
                 "directAccessGrantsEnabled": True,
                 "standardFlowEnabled": False,
