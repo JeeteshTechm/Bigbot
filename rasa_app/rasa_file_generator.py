@@ -4,6 +4,7 @@ import yaml
 import requests
 import shutil
 from rasa_sdk import Action
+from jsonschema import validate, ValidationError
 
 
 class RasaFileGenerator:
@@ -45,6 +46,12 @@ class RasaFileGenerator:
         entities = [{'name': entity['name'], 'values': entity.get('values', [])} for entity in self.payload['entities']]
         domain['entities'] = entities
 
+        slots = {slot['name']: {'type': slot['type']} for slot in self.payload.get('slots', [])}
+        domain['slots'] = slots
+
+        forms = {form['name']: {slot['name']: {'type': slot['type']} for slot in form['slots']} for form in self.payload.get('forms', [])}
+        domain['forms'] = forms
+
         session_config = {'session_expiration_time': 60, 'carry_over_slots_to_new_session': True}
         domain['session_config'] = session_config
 
@@ -80,6 +87,7 @@ class RasaFileGenerator:
                 actions_code += f"    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:\n"
                 actions_code += f"        return self._call_api_and_utter_response(dispatcher, tracker, domain)\n\n"
                 actions_code += f"    def _call_api_and_utter_response(self, dispatcher, tracker, domain):\n"
+                actions_code += f"        dispatcher.utter_message(text=response_text)\n\n"
 
                 # check if API call requires request body
                 if "request_body" in intent["api_call"]:
@@ -106,6 +114,33 @@ class RasaFileGenerator:
             pass
 
         return f"Actions saved to {actions_file_path}"
+
+    def generate_forms_code(self):
+        # Load the Rasa validation schema from the JSON file
+        with open(os.path.join(os.path.dirname(__file__), 'rasa_validation.json'), 'r') as f:
+            rasa_validation_schema = json.load(f)
+
+        forms_code = ""
+        for form in self.payload.get('forms', []):
+            # Validate the form configuration using the JSON schema
+            try:
+                validate(instance=form, schema=rasa_validation_schema["properties"]["domain"]["properties"]["forms"]["additionalProperties"])
+                print(f"Validation successful for form {form['name']}")
+            except ValidationError as e:
+                print(f"Validation failed for form {form['name']}: {e.message}")
+                continue
+
+            class_name = f"{form['name'].title().replace(' ', '')}Form"
+            forms_code += f"class {class_name}(FormValidationAction):\n"
+            forms_code += f"    def name(self) -> Text:\n"
+            forms_code += f"        return '{form['name']}'\n\n"
+
+            for slot in form['slots']:
+                if 'validation' in slot:
+                    forms_code += f"    async def validate_{slot['name']}(self, slot_value: Any, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:\n"
+                    forms_code += f"        return {{'{slot['name']}': slot_value}}\n\n"
+
+        return forms_code
 
     def create_stories_yml(self):
         # Create the data directory if it doesn't exist
