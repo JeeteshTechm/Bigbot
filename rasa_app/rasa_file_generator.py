@@ -57,14 +57,18 @@ class RasaFileGenerator:
         domain['session_config'] = session_config
 
         responses = {}
-        for intent in self.payload['intents']:
-            for response_idx, response_text in enumerate(intent['responses']):
-                response_key = f'utter_{intent["name"]}_{response_idx}'
-                responses[response_key] = [{'text': response_text}]
-        domain['responses'] = responses
+        actions=[]
+        for intent in payload['intents']:
+            if 'api_call' in intent:
+                actions.append(f'action_{intent["name"]}')
+            else:
+                for response_idx, response_text in enumerate(intent['responses']):
+                    response_key = f'utter_{intent["name"]}'
+                    responses[response_key] = [{'text': response_text}]
 
-        actions = [{'name': f'action_{intent["name"]}', 'type': 'response'} for intent in self.payload['intents']]
         domain['actions'] = actions
+        
+        domain['responses'] = responses
 
         domain_file_path = f"{self.skill_id}/domain.yml"
 
