@@ -24,17 +24,18 @@ class RasaFileGenerator:
     def create_nlu_file(self):
         nlu_file = os.path.join(self.skill_id, "data", "nlu.yml")
 
-        nlu_data = {"nlu": [], "version": "3.1"}
-
-        for intent in self.payload["intents"]:
-            nlu_data["nlu"].append({"intent": intent["name"], "examples": intent["utterances"]})
-
-        yaml_data = yaml.dump(nlu_data)
+        intents = self.payload["intents"]
+        yaml_output = "version: '3.1'\n"
+        yaml_output += "nlu:\n"
+        for intent in intents:
+            yaml_output += f"  - intent: {intent['name']}\n"
+            yaml_output += f"    examples: |\n"
+            for example in intent['utterances']:
+                yaml_output += f"      - {example}\n"
 
         with open(nlu_file, "w") as yaml_file:
-            yaml_file.write(yaml_data)
-
-        return "success"
+            yaml_file.write(yaml_output)
+        return "nlu created"
 
     def generate_domain_file(self):
         domain = {}
