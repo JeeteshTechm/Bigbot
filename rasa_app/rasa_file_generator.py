@@ -215,31 +215,123 @@ class RasaFileGenerator:
 
         return forms_code
 
-    def create_stories_yml(self):
-        # Create the data directory if it doesn't exist
-        if not os.path.exists(f"{self.skill_id}/data"):
-            os.makedirs(f"{self.skill_id}/data")
+#     def create_stories_yml(self):
+#         # Create the data directory if it doesn't exist
+#         if not os.path.exists(f"{self.skill_id}/data"):
+#             os.makedirs(f"{self.skill_id}/data")
 
-        # Create the stories.yml file
-        with open(f"{self.skill_id}/data/stories.yml", 'w') as f:
-            for intent in self.payload['intents']:
-                f.write(f"- story: {intent['name']}\n")
-                f.write("  steps:\n")
-                f.write(f"  - intent: {intent['name']}\n")
-                for i, response_text in enumerate(intent['responses']):
-                    f.write(f"    - action: utter_{intent['name']}_{i}\n")
-                f.write("\n")
-        return(f"Stories generated and saved in data/stories.yml")
+#         # Create the stories.yml file
+#         with open(f"{self.skill_id}/data/stories.yml", 'w') as f:
+#             for intent in self.payload['intents']:
+#                 f.write(f"- story: {intent['name']}\n")
+#                 f.write("  steps:\n")
+#                 f.write(f"  - intent: {intent['name']}\n")
+#                 for i, response_text in enumerate(intent['responses']):
+#                     f.write(f"    - action: utter_{intent['name']}_{i}\n")
+#                 f.write("\n")
+#         return(f"Stories generated and saved in data/stories.yml")
+
+    def generate_stories_json(self):
+            with open('payload3.json', 'r') as f:
+                bot_data = json.load(f)
+            intentList = []
+            child=None
+            for intent in bot_data['intents']:
+                if(intent["parent_id"]==-1):
+                    intentList.append(intent["name"])
+                    child=intent["child_id"]
+                for intent in bot_data["intents"]:
+                    if(intent["id"]==child):
+                        intentList.append(intent["name"])
+                        child=intent["child_id"]
+            return intentList
+        
+    def generate_stories(self,intents):
+            story_dict = {
+            "version": "3.1",
+            "stories": [
+                {
+                    "story": f"Story path {'-'.join(intents)}"},
+                {   "steps": []
+                }
+                    ]
+            }
+            for intent in intents:
+                step_intent = {
+                "intent": intent
+                }
+                step_action={"action":"utter_"+intent}
+                story_dict["stories"][1]["steps"].append(step_intent)
+                story_dict["stories"][1]["steps"].append(step_action)
+
+            if not os.path.exists(f"{self.skill_id}/data"):
+                os.makedirs(f"{self.skill_id}/data")
+            with open(f"{self.skill_id}/data/stories.yml", "w") as f:
+                yaml.dump(story_dict, f,default_flow_style=False,sort_keys=False)
+
+#     def generate_rules(self):
+#         rules = []
+#         for intent in self.payload['intents']:
+#             for utterance in intent['utterances']:
+#                 rule = {
+#                     "rule": f"{intent['name']}_{utterance}",
+#                     "steps": [
+#                         {"intent": intent['name']},
+#                         {"text": utterance},
+#                         {"action": f"utter_{intent['name']}"}
+#                     ]
+#                 }
+#                 rules.append(rule)
+
+#         data_dir = f"{self.skill_id}/data"
+#         if not os.path.exists(data_dir):
+#             os.makedirs(data_dir)
+
+#         with open(f"{data_dir}/rules.yml", 'w') as f:
+#             f.write("version: \"3.1\"\n\n")
+#             for rule in rules:
+#                 f.write("- rule: ")
+#                 f.write(rule['rule'])
+#                 f.write("\n  steps:\n")
+#                 for step in rule['steps']:
+#                     for key, value in step.items():
+#                         f.write(f"    - {key}: {value}\n")
+
+#         return(f"Rules generated and saved in {data_dir}/rules.yml")
 
     def generate_rules(self):
         rules = []
         for intent in self.payload['intents']:
-            for utterance in intent['utterances']:
+
+            if "form" in intent:
+                form_name = intent["form"]
+                trigger_intent = intent["name"]
                 rule = {
-                    "rule": f"{intent['name']}_{utterance}",
+                    "rule": f"Activate form",
+                    "steps": [
+                        {"intent": trigger_intent},
+                        {"action": form_name},
+                        {"active_loop": form_name}
+                    ]
+                }
+                rules.append(rule)
+
+                rule ={"rule": "Submit form", "condition": [{"active_loop": form_name}],
+                        "steps": [
+                                    {"action": form_name},
+                                    {"active_loop": None},
+                                    {"slot_was_set": [{"requested_slot": None}]},
+                                    {"action": "utter_submit"},
+                                    {"action": "utter_slots_values"}
+                                 ]
+                        }
+                rules.append(rule)
+
+            else:
+                rule = {
+                    "rule": f"{intent['name']}",
                     "steps": [
                         {"intent": intent['name']},
-                        {"text": utterance},
                         {"action": f"utter_{intent['name']}"}
                     ]
                 }
@@ -258,7 +350,7 @@ class RasaFileGenerator:
                 for step in rule['steps']:
                     for key, value in step.items():
                         f.write(f"    - {key}: {value}\n")
-
+                        
         return(f"Rules generated and saved in {data_dir}/rules.yml")
 
 
@@ -274,7 +366,9 @@ rasa_file_generator.create_nlu_file()
 rasa_file_generator.generate_domain_file()
 rasa_file_generator.upload_config_file("config.yml")
 rasa_file_generator.generate_actions_file()
-rasa_file_generator.create_stories_yml()
+intents=rasa_project.generate_stories_json()
+rasa_project.generate_stories(intents)
+# rasa_file_generator.create_stories_yml()
 rasa_file_generator.generate_rules()
 
 
