@@ -50,20 +50,18 @@ class RasaFileGenerator:
         domain = {}
         domain['version'] = '3.4.4'
 
-        intents = [{'name': intent['name']} for intent in self.payload['intents']]
+        intents = [{'name': intent['name']} for intent in payload['intents']]
         domain['intents'] = intents
 
-        entities = [{'name': entity['name'], 'values': entity.get('values', [])} for entity in self.payload['entities']]
+        entity_list=[]
+        for intent in payload["intents"]:
+            if "entities" in intent:
+                for entity in intent["entities"]:
+                    entity_name = entity["name"]
+                    entity_list.append(entity_name)
+
+        entities = [{'name': entity} for entity in entity_list]
         domain['entities'] = entities
-
-        slots = {slot['name']: {'type': slot['type']} for slot in self.payload.get('slots', [])}
-        domain['slots'] = slots
-
-        forms = {form['name']: {slot['name']: {'type': slot['type']} for slot in form['slots']} for form in self.payload.get('forms', [])}
-        domain['forms'] = forms
-
-        session_config = {'session_expiration_time': 60, 'carry_over_slots_to_new_session': True}
-        domain['session_config'] = session_config
 
         responses = {}
         actions=[]
@@ -78,11 +76,29 @@ class RasaFileGenerator:
         domain['actions'] = actions
         
         domain['responses'] = responses
+        domain["slots"]={}
 
-        domain_file_path = f"{self.skill_id}/domain.yml"
+        for intent in payload["intents"]:
+            if "form" in intent:
+                form_name = intent["form"]
+                form_slots = intent["slots"]
+                domain["forms"] = {form_name: {}}
+                domain["forms"][form_name] = {"required_slots": [slot["name"] for slot in form_slots]}
+
+                for slot in form_slots:
+                    slot_name = slot["name"]
+                    slot_type = slot["type"]
+                    domain["slots"][slot_name] = { "type": slot_type,"mappings": [{"type": "from_entity", "entity": slot_name}]}
+            
+
+
+        session_config = {'session_expiration_time': 60, 'carry_over_slots_to_new_session': True}
+        domain['session_config'] = session_config
+
+        domain_file_path = f"{skill_id}/domain.yml"
 
         with open(domain_file_path, "w") as f:
-            yaml.dump(domain, f)
+            yaml.dump(domain, f, sort_keys=False)
 
         return ('Domain saved to given path')
 
@@ -91,11 +107,42 @@ class RasaFileGenerator:
         return "Config file uploaded successfully"
 
 
-    def generate_actions_file(self):
+   def generate_actions_file(self):
         actions_code = ""
         for intent in self.payload["intents"]:
-            if "api_call" in intent:
+            if "form" in intent:
+                actions_code +=  f"from typing import Any, Text, Dict, List, Union\n"
+                actions_code +=  f"from rasa_sdk import Action, Tracker\n"
+                actions_code +=  f"from rasa_sdk.executor import CollectingDispatcher\n"
+                actions_code +=  f"import request\n"
+                actions_code +=  f" \n"
                 class_name = f"Action{intent['name'].title().replace(' ', '')}"
+                class_name=class_name.replace("_","")
+                actions_code += f"class {class_name}(FormAction):\n"
+                actions_code += f"    def name(self) -> Text:\n"
+                actions_code += f"        return '{intent['form']}'\n\n"
+                actions_code += f"    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:\n"
+                
+                actions_code += f"        return self._call_api_and_utter_response(dispatcher, tracker, domain)\n\n"
+                actions_code += f"    def _call_api_and_utter_response(self, dispatcher, tracker, domain):\n"
+
+                required_slots=[]
+                if "slots" in intent:
+                    for slots in intent["slots"]:
+                        slot_name = slots["name"]
+                        required_slots.append(slot_name)
+            
+                for i in required_slots:  
+                    actions_code += f"        {i} = tracker.get_slot({i})\n"
+    
+                required_slots = ["cuisine", "num_people"]
+                actions_code += f"        response = requests.{intent['api_call']['method']}('{intent['api_call']['url']}', json=request_body)\n"
+                actions_code += f"        response_text = response.json()\n"
+                actions_code += f"        dispatcher.utter_message(text=response_text)\n\n"
+
+            if "api_call" in intent and not "form" in intent:
+                class_name = f"Action{intent['name'].title().replace(' ', '')}"
+                class_name=class_name.replace("_","")
                 actions_code += f"class {class_name}(Action):\n"
                 
                 actions_code += f"    def name(self) -> Text:\n"
@@ -118,14 +165,11 @@ class RasaFileGenerator:
 
                 request_body = dict(zip(request_body_list, entity_list))
                 
-                
                 for key, value in request_body.items():
-                    
                     actions_code += f"        {value} = tracker.get_slot({value})\n"
                
-
                 actions_code += f"        response = requests.{intent['api_call']['method']}('{intent['api_call']['url']}', json=request_body)\n"
-                actions_code += f"        response_text = response.json()['{intent['response_field']}']\n"
+                actions_code += f"        response_text = response.json()\n"
                 actions_code += f"        dispatcher.utter_message(text=response_text)\n\n"
 
         # create the actions folder if it doesn't exist
