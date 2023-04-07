@@ -135,7 +135,6 @@ class RasaFileGenerator:
                 for i in required_slots:  
                     actions_code += f"        {i} = tracker.get_slot({i})\n"
     
-                required_slots = ["cuisine", "num_people"]
                 actions_code += f"        response = requests.{intent['api_call']['method']}('{intent['api_call']['url']}', json=request_body)\n"
                 actions_code += f"        response_text = response.json()\n"
                 actions_code += f"        dispatcher.utter_message(text=response_text)\n\n"
