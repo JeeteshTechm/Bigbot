@@ -1,0 +1,70 @@
+{
+  "bot_id": "faq_bot1",
+  "message": "Hello, how can I help you?",
+  "intents": [
+    {
+      "id":"id_az",
+      "name": "price_faq",
+      "utterances": [
+        "How much does your service cost?",
+        "Is there a fee for using your product?",
+        "What is the pricing model for your service?",
+        "Can you give me an estimate of how much it would cost to use your product?",
+        "Is there a free trial available?"
+      ],
+      "responses": [
+        "Our pricing depends on the specific plan you choose. You can find more information about our pricing on our website."
+      ],
+      "parent_id":-1,
+      "child_id":"id_by"
+    },
+    {
+      "id":"id_cx",
+      "name": "features_faq",
+      "utterances": [
+        "What features does your product have?",
+        "Can you tell me more about what your product can do?",
+        "What sets your product apart from competitors?",
+        "Is there a feature roadmap available?",
+        "Can I suggest new features to be added to your product?"
+      ],
+      "responses": [
+        "Our product offers a range of features including [list of features]. You can find more information on our website"
+        ],
+      "parent_id":"id_by",
+      "child_id":"id_dw"
+    },
+    {
+      "id":"id_by",
+      "name": "support_faq",
+      "utterances": [
+        "How can I get in touch with customer support?",
+        "Is there a knowledge base or FAQ available?",
+        "What kind of support is provided for your product?",
+        "Can you provide assistance with troubleshooting issues?",
+        "Is there a community forum or chat where I can get help from other users?"
+      ],
+      "responses": [
+        "You can get in touch with our customer support team through [support channels]. You can find more information on our website"
+      ],
+      "parent_id":"id_az",
+      "child_id":"id_cx"
+    },
+    {
+      "id":"id_by",
+      "name": "security_faq",
+      "utterances": [
+        "How secure is your product?",
+        "What measures do you take to protect user data?",
+        "Is two-factor authentication supported?",
+        "What is your company's approach to data privacy?",
+        "Are there any security certifications or audits for your product?"
+      ],
+      "responses": [
+        "Our product follows strict security measures and protocols to protect user data. You can find more information on our website"
+      ],
+      "parent_id":"id_az",
+      "child_id":"id_cx"
+    }
+  ]
+}
