@@ -17,7 +17,7 @@ class RasaFileGenerator:
     def create_rasa_folder_structure(self):
         skill_path = f"./{self.skill_id}"
         action_path = f"{skill_path}/actions"
-        self.payload_path = f"{skill_path}/self.payload"
+        self.payload_path = f"{skill_path}/data"
 
         try:
             os.mkdir(skill_path)
@@ -67,14 +67,8 @@ class RasaFileGenerator:
 
         return rules
 
-
-    
     def create_combined_yml(self, rules):
-        self.payload_dir = f"{self.skill_id}/self.payload"
-        if not os.path.exists(self.payload_dir):
-            os.makedirs(self.payload_dir)
-        nlu_file = os.path.join(self.payload_dir, "nlu.yml")
-
+        nlu_file = os.path.join(self.skill_id, "data", "nlu.yml")
         intents = self.payload["intents"]
         yaml_output = "version: '3.1'\n"
         yaml_output += "nlu:\n"
@@ -112,8 +106,6 @@ class RasaFileGenerator:
         result = self.create_combined_yml(rules)
         return result
 
-
-
     def generate_domain_file(self):
         intents = self.payload["intents"]
         yaml_output = "version: '3.1'\n"
@@ -127,6 +119,57 @@ class RasaFileGenerator:
             yaml_output += f"  {key}: {value}\n"
 
         domain_file_path = f"{self.skill_id}/domain.yml"
+
+        responses = {}
+        actions = []
+        for intent in intents:
+            if "api_call" in intent:
+                actions.append(f'action_{intent["name"]}')
+            else:
+                response_key = f'utter_{intent["name"]}'
+                response_texts = intent['responses']
+                responses[response_key] = [{'text': response_text} for response_text in response_texts]
+
+        yaml_output += "responses:\n"
+        for response_key, response_texts in responses.items():
+            yaml_output += f"  {response_key}:\n"
+            for response_text in response_texts:
+                yaml_output += f"    - text: {response_text['text']}\n"
+                
+        yaml_output += "actions:\n"
+        for action in actions:
+            yaml_output += f"  - {action}\n"
+
+        forms = {}
+        slots = set()
+        for intent in intents:
+            if "form" in intent:
+                form_name = intent["form"]
+                form_slots = intent["slots"]
+                forms[form_name] = {"required_slots": [slot["name"] for slot in form_slots]}
+                for slot in form_slots:
+                    slot_name = slot["name"]
+                    slot_type = slot["type"]
+                    slots.add(slot_name)
+                    forms[form_name][slot_name] = {"type": slot_type, "mapping": [{"type": "from_entity", "entity": slot_name}]}
+
+        yaml_output += "forms:\n"
+        for form_name, form_data in forms.items():
+            yaml_output += f"  {form_name}:\n"
+            yaml_output += f"    required_slots: {form_data['required_slots']}\n"
+            for slot_name, slot_data in form_data.items():
+                if slot_name != "required_slots":
+                    yaml_output += f"    {slot_name}:\n"
+                    yaml_output += f"      type: {slot_data['type']}\n"
+                    yaml_output += f"      mappings:\n"
+                    for mapping in slot_data["mapping"]:
+                        yaml_output += f"        - type: {mapping['type']}\n"
+                        yaml_output += f"          entity: {mapping['entity']}\n"
+
+        yaml_output += "slots:\n"
+        for slot in slots:
+            yaml_output += f"  {slot}:\n"
+            yaml_output += f"    type: unfeaturized\n"
 
         with open(domain_file_path, "w") as f:
             f.write(yaml_output)
@@ -224,9 +267,8 @@ class RasaFileGenerator:
         return f"Actions saved to {actions_file_path}"
 
 
-
 # read the JSON payload
-with open("payload.json", "r") as f:
+with open("paylod.json", "r") as f:
     payload = json.load(f)
 
 skill_id=str(payload["bot_id"])
@@ -237,4 +279,3 @@ rasa_project.generate_training_data()
 rasa_project.generate_domain_file()
 rasa_project.upload_config_file("config.yml")
 rasa_project.generate_actions_file()
-
