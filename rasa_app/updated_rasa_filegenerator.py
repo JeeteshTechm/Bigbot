@@ -116,6 +116,27 @@ class RasaFileGenerator:
         for intent in intents:
             yaml_output += f"  - {intent['name']}\n"
 
+        # slotData=[]
+        for intent in intents:
+            if("form") in intent:
+                yaml_output+=f"slots:\n"
+                for slot in intent['slots']:
+                    yaml_output+=f"  {slot['name']}:\n"
+                    yaml_output+=f"    type: {slot['type']}\n"
+                    yaml_output+=f"    influence_conversation: false\n"
+                    yaml_output+=f"    mappings:\n"
+                    yaml_output+=f"    - type : from_entity\n"
+                    yaml_output+=f"      entity : {slot['name']}\n"
+
+
+        for intent in intents:
+            if("form" in intent):
+                yaml_output+=f"forms:\n"
+                yaml_output+=f"  {intent['name']}_form:\n"
+                yaml_output+=f"    required_slots:\n"
+                for slot in intent['slots']:
+                    yaml_output+=f"      - {slot['name']}\n"
+
         session_config = {'session_expiration_time': 60, 'carry_over_slots_to_new_session': True}
         yaml_output += "session_config:\n"
         for key, value in session_config.items():
@@ -138,41 +159,8 @@ class RasaFileGenerator:
             yaml_output += f"  {response_key}:\n"
             for response_text in response_texts:
                 yaml_output += f"    - text: {response_text['text']}\n"
-                
-        yaml_output += "actions:\n"
-        for action in actions:
-            yaml_output += f"  - {action}\n"
 
-        forms = {}
-        slots = set()
-        for intent in intents:
-            if "form" in intent:
-                form_name = intent["form"]
-                form_slots = intent["slots"]
-                forms[form_name] = {"required_slots": [slot["name"] for slot in form_slots]}
-                for slot in form_slots:
-                    slot_name = slot["name"]
-                    slot_type = slot["type"]
-                    slots.add(slot_name)
-                    forms[form_name][slot_name] = {"type": slot_type, "mapping": [{"type": "from_entity", "entity": slot_name}]}
 
-        yaml_output += "forms:\n"
-        for form_name, form_data in forms.items():
-            yaml_output += f"  {form_name}:\n"
-            yaml_output += f"    required_slots: {form_data['required_slots']}\n"
-            for slot_name, slot_data in form_data.items():
-                if slot_name != "required_slots":
-                    yaml_output += f"    {slot_name}:\n"
-                    yaml_output += f"      type: {slot_data['type']}\n"
-                    yaml_output += f"      mappings:\n"
-                    for mapping in slot_data["mapping"]:
-                        yaml_output += f"        - type: {mapping['type']}\n"
-                        yaml_output += f"          entity: {mapping['entity']}\n"
-
-        yaml_output += "slots:\n"
-        for slot in slots:
-            yaml_output += f"  {slot}:\n"
-            yaml_output += f"    type: unfeaturized\n"
 
         with open(domain_file_path, "w") as f:
             f.write(yaml_output)
