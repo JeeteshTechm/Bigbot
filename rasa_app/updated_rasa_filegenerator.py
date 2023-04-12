@@ -132,10 +132,15 @@ class RasaFileGenerator:
         for intent in intents:
             if("form" in intent):
                 yaml_output+=f"forms:\n"
-                yaml_output+=f"  {intent['name']}_form:\n"
+                yaml_output+=f"  {intent['form']}:\n"
                 yaml_output+=f"    required_slots:\n"
                 for slot in intent['slots']:
                     yaml_output+=f"      - {slot['name']}\n"
+
+                yaml_output+=f"entities:\n"
+                for slot in intent['slots']:
+                    yaml_output+=f"  - {slot['name']}\n"
+
 
         session_config = {'session_expiration_time': 60, 'carry_over_slots_to_new_session': True}
         yaml_output += "session_config:\n"
@@ -147,8 +152,8 @@ class RasaFileGenerator:
         responses = {}
         actions = []
         for intent in intents:
-            if "api_call" in intent:
-                actions.append(f'action_{intent["name"]}')
+            if "form" in intent:
+                actions.append(f'validate_{intent["form"]}_form')
             else:
                 response_key = f'utter_{intent["name"]}'
                 response_texts = intent['responses']
@@ -160,6 +165,9 @@ class RasaFileGenerator:
             for response_text in response_texts:
                 yaml_output += f"    - text: {response_text['text']}\n"
 
+        yaml_output += "actions:\n"
+        for action in actions:
+            yaml_output += f"  - {action}\n"
 
 
         with open(domain_file_path, "w") as f:
@@ -168,78 +176,59 @@ class RasaFileGenerator:
         return ('Domain saved to given path')
 
 
-
     def upload_config_file(self, config_file_path):
         shutil.copyfile(config_file_path, os.path.join(self.skill_id, 'config.yml'))
         return "Config file uploaded successfully"
 
+    
+
     def generate_actions_file(self):
-        actions_code = ""
+        actions_template = """from typing import Dict, Text, Any, List, Union
+
+from rasa_sdk import Tracker
+from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.forms import FormValidationAction
+
+
+class Validate{form}Form(FormValidationAction):
+
+    def name(self) -> Text:
+        return "validate_{form}_form"
+
+    {validations}
+    """
+
+        form_validations = {}
+
         for intent in self.payload["intents"]:
             if "form" in intent:
-                actions_code +=  f"from typing import Any, Text, Dict, List, Union\n"
-                actions_code +=  f"from rasa_sdk import Action, Tracker\n"
-                actions_code +=  f"from rasa_sdk.executor import CollectingDispatcher\n"
-                actions_code +=  f"import request\n"
-                actions_code +=  f" \n"
-                class_name = f"Action{intent['name'].title().replace(' ', '')}"
-                class_name=class_name.replace("_","")
-                actions_code += f"class {class_name}(FormAction):\n"
-                actions_code += f"    def name(self) -> Text:\n"
-                actions_code += f"        return '{intent['form']}'\n\n"
-                actions_code += f"    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:\n"
-                
-                actions_code += f"        return self._call_api_and_utter_response(dispatcher, tracker, domain)\n\n"
-                actions_code += f"    def _call_api_and_utter_response(self, dispatcher, tracker, domain):\n"
-
-                required_slots=[]
+                form_name = intent["form"]
+                if form_name not in form_validations:
+                    form_validations[form_name] = []
                 if "slots" in intent:
-                    for slots in intent["slots"]:
-                        slot_name = slots["name"]
-                        required_slots.append(slot_name)
-            
-                for i in required_slots:  
-                    actions_code += f"        {i} = tracker.get_slot({i})\n"
-    
-                required_slots = ["cuisine", "num_people"]
-                actions_code += f"        response = requests.{intent['api_call']['method']}('{intent['api_call']['url']}', json=request_body)\n"
-                actions_code += f"        response_text = response.json()\n"
-                actions_code += f"        dispatcher.utter_message(text=response_text)\n\n"
+                    for slot in intent["slots"]:
+                        slot_name = slot["name"]
+                        form_validations[form_name].append(slot_name)
 
-            if "api_call" in intent and not "form" in intent:
-                class_name = f"Action{intent['name'].title().replace(' ', '')}"
-                class_name=class_name.replace("_","")
-                actions_code += f"class {class_name}(Action):\n"
-                
-                actions_code += f"    def name(self) -> Text:\n"
-                actions_code += f"        return 'action_{intent['name']}'\n\n"
+        actions = ""
+        for form_name, slots in form_validations.items():
+            validations = ""
+            for slot in slots:
+                validations += f"""
+    def validate_{slot}(self, value: Text, dispatcher: CollectingDispatcher,
+                            tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
+        \"\"\"Validate {slot} value.\"\"\"
 
-                actions_code += f"    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: Dict[Text, Any]) -> List[Dict[Text, Any]]:\n"
-                actions_code += f"        return self._call_api_and_utter_response(dispatcher, tracker, domain)\n\n"
-                actions_code += f"    def _call_api_and_utter_response(self, dispatcher, tracker, domain):\n"
+        if value:
+            return {{ "{slot}": value }}
+        else:
+            dispatcher.utter_message(response="utter_ask_{slot}")
+            # validation failed, set this slot to None, meaning the
+            # user will be asked for the slot again
+            return {{ "{slot}": None }}
+            \n"""
 
-                # check if API call requires request body
-                entity_list=[]
-                if "entities" in intent:
-                    for entity in intent["entities"]:
-                        entity_name = entity["name"]
-                        entity_list.append(entity_name)
-                #entity_list = [ast.literal_eval(s) for s in entity_list]
-
-
-                request_body_list=intent["api_call"]["request_body"]
-
-                request_body = dict(zip(request_body_list, entity_list))
-                
-                
-                for key, value in request_body.items():
-                    
-                    actions_code += f"        {value} = tracker.get_slot({value})\n"
-               
-
-                actions_code += f"        response = requests.{intent['api_call']['method']}('{intent['api_call']['url']}', json=request_body)\n"
-                actions_code += f"        response_text = response.json()\n"
-                actions_code += f"        dispatcher.utter_message(text=response_text)\n\n"
+            actions += actions_template.format(form=form_name, validations=validations)
 
         # create the actions folder if it doesn't exist
         actions_folder_path = os.path.join(self.skill_id, "actions")
@@ -248,7 +237,7 @@ class RasaFileGenerator:
         # write the actions code to a file
         actions_file_path = os.path.join(actions_folder_path, "actions.py")
         with open(actions_file_path, "w") as f:
-            f.write(actions_code)
+            f.write(actions)
 
         # create an empty __init__.py file
         init_file_path = os.path.join(actions_folder_path, "__init__.py")
