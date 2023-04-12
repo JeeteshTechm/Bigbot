@@ -5,6 +5,9 @@ import ast
 import requests
 import shutil
 from rasa_sdk import Action
+from rasa_sdk import Tracker
+from rasa_sdk.forms import FormAction
+from rasa_sdk.executor import CollectingDispatcher
 from ruamel.yaml import YAML
 from collections import OrderedDict
 import re
@@ -268,10 +271,10 @@ class RasaFileGenerator:
 
 
 # read the JSON payload
-with open("paylod.json", "r") as f:
+with open("payload.json", "r") as f:
     payload = json.load(f)
 
-skill_id=str(payload["bot_id"])
+skill_id = str(payload["bot_id"])
 rasa_project = RasaFileGenerator(skill_id, payload)
 
 rasa_project.create_rasa_folder_structure()
