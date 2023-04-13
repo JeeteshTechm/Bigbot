@@ -64,7 +64,19 @@ class RasaFileGenerator:
                         {"action": f"utter_{intent['name']}"}
                     ]
                 }
+                submit={
+                     "rule": f"submit form",
+                    "condition": f"\n    - active_loop: {form_name}",
+                    "steps": [
+                        {"action": form_name},
+                        {"active_loop":"null"},
+                        {"action": "utter_submit"},
+                        {"action": "utter_slots_values"}
+                    ]
+
+                }
                 rules.append(rule)
+                rules.append(submit)
 
         return rules
 
@@ -94,6 +106,8 @@ class RasaFileGenerator:
         yaml_output += "rules:\n"
         for rule in rules:
             yaml_output += f"  - rule: {rule['rule']}\n"
+            if "submit" in rule['rule']:
+                yaml_output+=f"    condition: {rule['condition']}\n"
             yaml_output += "    steps:\n"
             for step in rule['steps']:
                 for key, value in step.items():
