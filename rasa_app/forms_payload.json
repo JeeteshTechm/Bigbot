@@ -1,0 +1,75 @@
+{
+    "bot_id": "latest",
+    "message": "Hello, how can I help you?",
+    "intents": [
+      {
+        "id":"id_az",
+        "name": "greet",
+        "utterances": [
+          "Hi",
+          "Hello",
+          "Hey",
+          "Hi there"
+        ],
+        "responses": [
+          "Hello! How can I assist you?"
+        ],
+        "parent_id":-1,
+        "child_id":"id_by"
+      },
+      {
+        "id":"id_cx",
+        "name": "book_restaurant",
+        "utterances": [
+          "im looking for a restaurant that serves indian food",
+          "book a italian retaurant for 5 people",
+          "I want to eat out",
+          "i need a table for 7",
+          "can i find a restaurant and it should serve italian food",
+          "book a table"
+        ],
+        "positive_responses": [
+          "Great, I've booked a {cuisine} restaurant for {num_people} people and a hotel named {hotel_name}.",
+          "Sorry, I could not book a hotel for you. Please try again later."
+        ],
+        "form":"restaurant",
+        "slots": [
+          {
+            "name": "cuisine",
+            "type": "text",
+            "bot_ask_positive":"What cuisine?",
+            "bot_ask_negative":"Cuisine type is not in the database, please try again",
+            "slot_validation" :[]
+          },
+          {
+            "name": "num_people",
+            "type": "any",
+            "bot_ask_positive":"How many people?",
+            "bot_ask_negative":"Number of people should be a positive integer, please try again",
+            "slot_validation" :[]
+          }
+        ],
+        "entities": [
+          {
+            "name": "cusine",
+            "values": [
+              "italian",
+              "german",
+              "indian"
+            ]
+          },
+          {
+            "name": "num_people",
+            "values": [
+              5,
+              7,
+              9
+            ]
+          } 
+        ],
+        "parent_id":"id_by",
+        "child_id":"id_dw"
+      }
+    ]
+  }
+  
