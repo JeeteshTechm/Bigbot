@@ -1,26 +1,42 @@
 import os
 import json
 import yaml
-import ast
-import requests
 import shutil
-from rasa_sdk import Action
-from rasa_sdk import Tracker
-from rasa_sdk.forms import FormAction
-from rasa_sdk.executor import CollectingDispatcher
-from ruamel.yaml import YAML
-from collections import OrderedDict
-import re
 
 class RasaFileGenerator:
     def __init__(self, skill_id, payload):
         self.skill_id = skill_id
         self.payload = payload
+        self.actions_template = """from typing import Dict, Text, Any, List, Union
+
+from rasa_sdk import Tracker
+from rasa_sdk.executor import CollectingDispatcher
+from rasa_sdk.forms import FormValidationAction
+
+
+class Validate{form}Form(FormValidationAction):
+
+    def name(self) -> Text:
+        return "validate_{form}_form"
+
+    {validations}
+    """
+
+    def create_folder(self, path):
+        try:
+            os.mkdir(path)
+        except FileExistsError:
+            print(f"Folder {path} already exists")
+        else:
+            print(f"Folder {path} created")
 
     def create_rasa_folder_structure(self):
-        skill_path = f"./{self.skill_id}"
-        action_path = f"{skill_path}/actions"
-        self.payload_path = f"{skill_path}/data"
+        self.skill_path = f"./{self.skill_id}"
+        self.action_path = f"{self.skill_path}/actions"
+        self.payload_path = f"{self.skill_path}/data"
+
+        for path in [self.skill_path, self.action_path, self.payload_path]:
+            self.create_folder(path)
 
         try:
             os.mkdir(skill_path)
