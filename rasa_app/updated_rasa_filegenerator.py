@@ -5,8 +5,11 @@ import shutil
 
 class RasaFileGenerator:
     def __init__(self, skill_id, payload):
+        # initialize class with skill id and payload
         self.skill_id = skill_id
         self.payload = payload
+        
+        # initialize the actions template
         self.actions_template = """from typing import Dict, Text, Any, List, Union
 
 from rasa_sdk import Tracker
@@ -21,7 +24,8 @@ class Validate{form}Form(FormValidationAction):
 
     {validations}
     """
-
+    
+    # create a folder if it doesn't exist
     def create_folder(self, path):
         try:
             os.mkdir(path)
@@ -29,7 +33,8 @@ class Validate{form}Form(FormValidationAction):
             print(f"Folder {path} already exists")
         else:
             print(f"Folder {path} created")
-
+    
+    # create the directory structure for the Rasa project
     def create_rasa_folder_structure(self):
         self.skill_path = f"./{self.skill_id}"
         self.action_path = f"{self.skill_path}/actions"
@@ -58,7 +63,8 @@ class Validate{form}Form(FormValidationAction):
             print(f"Folder {self.payload_path} already exists")
         else:
             print(f"Folder {self.payload_path} created")
-
+    
+    # generate rules for Rasa
     def generate_rules(self):
         rules = []
         for intent in self.payload['intents']:
@@ -85,7 +91,8 @@ class Validate{form}Form(FormValidationAction):
                 rules.append(rule)
 
         return rules
-
+    
+    # create a combined YAML file for NLU and Rules
     def create_combined_yml(self, rules):
         nlu_file = os.path.join(self.skill_id, "data", "nlu.yml")
         intents = self.payload["intents"]
@@ -157,7 +164,7 @@ class Validate{form}Form(FormValidationAction):
                 for slot in intent['slots']:
                     yaml_output+=f"  - {slot['name']}\n"
 
-
+        # create the session configuration dictionary
         session_config = {'session_expiration_time': 60, 'carry_over_slots_to_new_session': True}
         yaml_output += "session_config:\n"
         for key, value in session_config.items():
@@ -165,6 +172,7 @@ class Validate{form}Form(FormValidationAction):
 
         domain_file_path = f"{self.skill_id}/domain.yml"
 
+        # create the responses and actions
         responses = {}
         actions = []
         for intent in intents:
@@ -175,16 +183,17 @@ class Validate{form}Form(FormValidationAction):
                 response_texts = intent['responses']
                 responses[response_key] = [{'text': response_text} for response_text in response_texts]
 
+        # write the responses to the YAML output
         yaml_output += "responses:\n"
         for response_key, response_texts in responses.items():
             yaml_output += f"  {response_key}:\n"
             for response_text in response_texts:
                 yaml_output += f"    - text: {response_text['text']}\n"
 
+        # write the actions to the YAML output
         yaml_output += "actions:\n"
         for action in actions:
             yaml_output += f"  - {action}\n"
-
 
         with open(domain_file_path, "w") as f:
             f.write(yaml_output)
