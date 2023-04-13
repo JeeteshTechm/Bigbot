@@ -8,31 +8,6 @@ class RasaFileGenerator:
         # initialize class with skill id and payload
         self.skill_id = skill_id
         self.payload = payload
-        
-        # initialize the actions template
-        self.actions_template = """from typing import Dict, Text, Any, List, Union
-
-from rasa_sdk import Tracker
-from rasa_sdk.executor import CollectingDispatcher
-from rasa_sdk.forms import FormValidationAction
-
-
-class Validate{form}Form(FormValidationAction):
-
-    def name(self) -> Text:
-        return "validate_{form}_form"
-
-    {validations}
-    """
-    
-    # create a folder if it doesn't exist
-    def create_folder(self, path):
-        try:
-            os.mkdir(path)
-        except FileExistsError:
-            print(f"Folder {path} already exists")
-        else:
-            print(f"Folder {path} created")
     
     # create the directory structure for the Rasa project
     def create_rasa_folder_structure(self):
@@ -206,7 +181,6 @@ class Validate{form}Form(FormValidationAction):
         return "Config file uploaded successfully"
 
     
-
     def generate_actions_file(self):
         actions_template = """from typing import Dict, Text, Any, List, Union
 
