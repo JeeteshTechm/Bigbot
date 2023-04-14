@@ -1,5 +1,5 @@
 {
-    "bot_id": "latest",
+    "bot_id": "latest_forms",
     "message": "Hello, how can I help you?",
     "intents": [
       {
@@ -22,13 +22,17 @@
         "name": "book_restaurant",
         "utterances": [
           "im looking for a restaurant that serves indian food",
-          "book a italian retaurant for 5 people",
+          "book a italian retaurant for five people",
           "I want to eat out",
-          "i need a table for 7",
-          "can i find a restaurant and it should serve italian food",
-          "book a table"
+          "i need a table for 8 ",
+          "can i find a restaurant and it should serve italian food for two",
+          "book a table",
+          "i want to outside seating with 9 ",
+          "i prefer inside seating",
+          "i need a table for 2 people",
+          "book a table for 9"
         ],
-        "positive_responses": [
+        "responses": [
           "Great, I've booked a {cuisine} restaurant for {num_people} people and a hotel named {hotel_name}.",
           "Sorry, I could not book a hotel for you. Please try again later."
         ],
@@ -43,15 +47,22 @@
           },
           {
             "name": "num_people",
-            "type": "any",
+            "type": "text",
             "bot_ask_positive":"How many people?",
             "bot_ask_negative":"Number of people should be a positive integer, please try again",
+            "slot_validation" :[]
+          },
+          {
+            "name": "preference",
+            "type": "text",
+            "bot_ask_positive":"What is your preference?",
+            "bot_ask_negative":"Can you give your preference agian?",
             "slot_validation" :[]
           }
         ],
         "entities": [
           {
-            "name": "cusine",
+            "name": "cuisine",
             "values": [
               "italian",
               "german",
@@ -61,12 +72,25 @@
           {
             "name": "num_people",
             "values": [
-              5,
-              7,
+              2,
+              6,
+              8,
               9
+            ]
+          },
+          {
+            "name": "preference",
+            "values": [
+              "outside seating",
+              "inside seating"
             ]
           } 
         ],
+        "api_call":{
+          "method":"post",
+          "URL":"http://37.224.68.171:8080/book-restaurant",
+          "request_body":["cusiine","num_of_people","preference"]
+        },
         "parent_id":"id_by",
         "child_id":"id_dw"
       }
