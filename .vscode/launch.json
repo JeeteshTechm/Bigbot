@@ -21,11 +21,29 @@
             "console": "integratedTerminal",
             "args": [
                 "runserver",
-                "0.0.0.0:8000"
+                "0.0.0.0:8000",
+                "--settings=project.settings.development"
             ],
             "env":{
                 "DATABASE_NAME":"postgres",
                 "DATABASE_PASSWORD":"foo",
+                "DATABASE_USER":"postgres",
+                "IS_DEVELOPMENT":"True"
+            },
+            "django": true
+        },
+        {
+            "name": "Python: Run Unit Test (pytest)",
+            "type": "python",
+            "python": "D:\\Environments\\bigbot-env\\Scripts\\python",
+            "request": "launch",
+            // "preLaunchTask": "prelaunch",
+            "module": "pytest",
+            "console": "integratedTerminal",
+            "cwd": "${workspaceFolder}/tests",
+            "env":{
+                "DATABASE_NAME":"postgres",
+                "DATABASE_PASSWORD":"admin",
                 "DATABASE_USER":"postgres",
                 "IS_DEVELOPMENT":"True"
             },
