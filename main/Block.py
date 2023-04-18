@@ -96,12 +96,12 @@ class BlockResult:
 
 
 class BaseBlock(ABC):
-    def __init__(self, context, id, properties, connections):
+    def __init__(self, **kwargs):
         self.component = f"{self.__class__.__module__}.{self.__class__.__name__}"
-        self.context = context
-        self.id = id
-        self.properties = properties
-        self.connections = connections
+        self.context = kwargs.get('context')
+        self.id = kwargs.get('id')
+        self.properties = kwargs.get('properties')
+        self.connections = kwargs.get('connections')
         self.template_properties = []
         self.load_template()
         # should call after load template
@@ -208,31 +208,32 @@ class InputBlock(BaseBlock):
         return state.data.get(key)
 
     def load_template(self):
-        self.add_template_property(
-            "key",
-            "string",
-            "text",
-            required=True,
-            unique=True,
-            auto=True,
-            description="Key used to store the data",
-        )
-        self.add_template_property(
-            "prompt",
-            "string",
-            "text",
-            required=False,
-            auto=True,
-            description="Display text before processing block",
-        )
-        self.add_template_property(
-            "required",
-            "boolean",
-            "checkbox",
-            required=True,
-            description="If set to false this property becomes optional.",
-            value=False,
-        )
+        pass
+        # self.add_template_property(
+        #     "key",
+        #     "string",
+        #     "text",
+        #     required=True,
+        #     unique=True,
+        #     auto=True,
+        #     description="Key used to store the data",
+        # )
+        # self.add_template_property(
+        #     "prompt",
+        #     "string",
+        #     "text",
+        #     required=False,
+        #     auto=True,
+        #     description="Display text before processing block",
+        # )
+        # self.add_template_property(
+        #     "required",
+        #     "boolean",
+        #     "checkbox",
+        #     required=True,
+        #     description="If set to false this property becomes optional.",
+        #     value=False,
+        # )
 
     def on_search(self, binder, user_id, query, **kwargs):
         required = self.property_value("required")
@@ -416,10 +417,10 @@ class InputEmail(InputBlock):
         return super().on_process(binder, user_id, statement)
 
 class InputFile(InputBlock):
-    def __init__(self):
-        super().__init__()
-        self.accept = InputProperty("accept", "string", required=True, description="Valid file extensions")
-        self.size = InputProperty("size", "integer", required=True, default=1000000, description="Maximum file size in bytes")
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        # self.accept = InputProperty("accept", "string", required=True, description="Valid file extensions")
+        # self.size = InputProperty("size", "integer", required=True, default=1000000, description="Maximum file size in bytes")
 
     def on_descriptor(self):
         return {"name": "File Input", "summary": "Shows a file input field", "category": "input"}
@@ -628,10 +629,13 @@ class InputSearchable(InputBlock):
 import spacy
 
 class InputSelection(InputBlock):
-    def __init__(self, nlp=None):
-        super().__init__()
+    def __init__(self, nlp=None, **kwargs):
+        super().__init__(**kwargs)
         if nlp is None:
-            nlp = spacy.load("en_core_web_sm")
+            try:
+                nlp = spacy.load("en_core_web_sm")
+            except IOError as e:
+                Log.error("Exception", e)
         self.nlp = nlp
 
     def on_descriptor(self):
@@ -840,8 +844,8 @@ class InputText(InputBlock):
 # ----------------------------------------------------------------------
 
 class InterpreterBlock(BaseBlock):
-    def __init__(self, context, id, properties, connections):
-        super().__init__(context, id, properties, connections)
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
 
     def on_process(self, binder, user_id):
         return self.move_x()
@@ -1102,6 +1106,9 @@ class PromptDate(PromptTimeBlock):
 
     def get_time_node(self, value):
         return self.get_output_node()
+    
+    def on_descriptor(self):
+        pass
 
 class PromptDateTime(PromptTimeBlock):
     def get_output_node(self):
@@ -1110,17 +1117,23 @@ class PromptDateTime(PromptTimeBlock):
     def get_time_node(self, value):
         return self.get_output_node()
 
+    def on_descriptor(self):
+        pass
+
 class PromptDuration(PromptTimeBlock):
     def get_output_node(self):
         return DurationNode(None)
 
     def get_time_node(self, value):
         return self.get_output_node()
+    
+    def on_descriptor(self):
+        pass
 
 
 class PromptImage(PromptBlock):
-    def __init__(self):
-        super().__init__()
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
         self.descriptor = {"name": "Image", "summary": "No description available", "category": "prompt"}
 
     def on_process(self, binder, user_id):
@@ -1147,6 +1160,9 @@ class PromptImage(PromptBlock):
                 },
             ]
         )
+    
+    def on_descriptor(self):
+        pass
 
 
 class PromptPayment(PromptBlock):

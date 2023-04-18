@@ -58,7 +58,7 @@ class BaseNode:
             elif node == "big.bot.core.picker.date":
                 return DateNode(data, meta)
             elif node == "big.bot.core.picker.datetime":
-                return DateTimeNode(date, meta)
+                return DateTimeNode(data, meta)
             elif node == "big.bot.core.picker.duration":
                 return DurationNode(data, meta)
             elif node == "big.bot.core.picker.file":
@@ -166,8 +166,8 @@ class ImageNode(BaseNode):
         + size: Maximun size of the file in bytes.
     """
 class InputFileNode(BaseNode):
-    def __init__(self, meta=None):
-        super().__init__("big.bot.core.picker.file", None, meta)
+    def __init__(self, data, meta=None):
+        super().__init__("big.bot.core.picker.file", data, meta)
 
 
 class NotificationNode(BaseNode):
