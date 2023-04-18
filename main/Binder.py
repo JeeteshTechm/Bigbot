@@ -16,7 +16,7 @@ from contrib.exceptions import JsonRPCException
 from . import Flag, Log
 from .Component import PaymentProvider, state_from_response, user_id_from_state
 from .Flag import FlagManager
-from .Processor import StartSkill, CancelSkill, StandardInput, SkillProcessor
+from .Processor import StartSkill, SkillProcessor # ,CancelSkill, StandardInput,
 from .Statement import InputStatement
 from .Block import (
     get_block_by_id,
@@ -98,8 +98,8 @@ def get_blocks():
     data = []
     reg = Registry()
     for block in reg.blocks:
-        block_object = block(None, None, None, None)
-        data.append(block_object.serialize())
+            block_object = block(context=None, id=None, properties=None, connections=None)
+            data.append(block_object.serialize())
     return data
 
 
@@ -142,7 +142,7 @@ def validate_skill(skill):
     has_terminal_end = False
     for item in blocks:
         if item["id"] == start_id:
-            if item["component"] not in _get_block_names(INPUT_BLOCKS):
+            if item["component"] not in _get_block_names(BlockType.INPUT_BLOCKS):
                 break
             raise JsonRPCException("Start block should not be InputBlock")
 

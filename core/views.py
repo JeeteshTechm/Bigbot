@@ -28,10 +28,10 @@ def _create_local_user(request):
     import os
     from django.contrib.auth.models import User
 
-    username = os.getenv("LOCAL_USERNAME")
-    password = os.getenv("LOCAL_PASSWORD")
+    username = os.getenv("LOCAL_USERNAME", None)
+    password = os.getenv("LOCAL_PASSWORD", None)
     print("====Local Username====", username)
-    if not username and password:
+    if not username and not password:
         return HttpResponse(status=400)
     user = User.objects.filter(username=username).first()
     if not user:
