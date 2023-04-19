@@ -2,23 +2,6 @@
 import json
 from jinja2 import Template
 
-# Define a list of node types that can be set by the user
-NODE_TYPES = [
-    AudioNode,
-    BinaryNode,
-    DateNode,
-    DateTimeNode,
-    DurationNode,
-    IFrameNode,
-    ImageNode,
-    InputFileNode,
-    NotificationNode,
-    OAuthNode,
-    PaymentNode,
-    PreviewNode,
-    TextNode,
-]
-
 # Define a function to return serialized data for all node types
 def all():
     serialized_data = []
@@ -75,7 +58,7 @@ class BaseNode:
             elif node == "big.bot.core.picker.date":
                 return DateNode(data, meta)
             elif node == "big.bot.core.picker.datetime":
-                return DateTimeNode(date, meta)
+                return DateTimeNode(data, meta)
             elif node == "big.bot.core.picker.duration":
                 return DurationNode(data, meta)
             elif node == "big.bot.core.picker.file":
@@ -183,8 +166,8 @@ class ImageNode(BaseNode):
         + size: Maximun size of the file in bytes.
     """
 class InputFileNode(BaseNode):
-    def __init__(self, meta=None):
-        super().__init__("big.bot.core.picker.file", None, meta)
+    def __init__(self, data, meta=None):
+        super().__init__("big.bot.core.picker.file", data, meta)
 
 
 class NotificationNode(BaseNode):
@@ -308,3 +291,22 @@ class TTSNode(BaseNode):
 
     def __init__(self, data, meta=None):
         super().__init__(TTSNode.NODE_TYPE, data, meta)
+
+
+
+# Define a list of node types that can be set by the user
+NODE_TYPES = [
+    AudioNode,
+    BinaryNode,
+    DateNode,
+    DateTimeNode,
+    DurationNode,
+    IFrameNode,
+    ImageNode,
+    InputFileNode,
+    NotificationNode,
+    OAuthNode,
+    PaymentNode,
+    PreviewNode,
+    TextNode,
+]

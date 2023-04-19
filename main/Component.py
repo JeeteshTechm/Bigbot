@@ -1,9 +1,10 @@
-import abc
 import base64
 import json
 import os
 import urllib.parse as urlparse
+from urllib.parse import urlencode
 import cryptocode
+from abc import ABC, abstractmethod
 from django.conf import settings
 from jinja2 import Template
 from requests_oauthlib import OAuth2Session
@@ -106,7 +107,7 @@ class ChatProvider(BaseComponent):
 
 
 class OAuthProvider(BaseComponent):
-    @abc.abstractmethod
+    @abstractmethod
     def authorization_url(self, redirect_uri, user_id, **kwargs):
         """Return the authorization url. This method must be overridden."""
         pass
@@ -149,12 +150,12 @@ class OAuthProvider(BaseComponent):
     def get_redirect_uri(self, binder):
         return binder.oauth_redirect_url
 
-    @abc.abstractmethod
+    @abstractmethod
     def fetch_token(self, redirect_uri, authorization_response, **kwargs):
         """Fetch authorization token. This method must be overridden."""
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def is_expired(self, user_id, token, **kwargs):
         pass
 
@@ -180,7 +181,7 @@ class OAuthProvider(BaseComponent):
 
         return False
 
-    @abc.abstractmethod
+    @abstractmethod
     def refresh_token(self, user_id, token, **kwargs):
         """Refresh authorization token."""
         pass
@@ -190,12 +191,12 @@ class OAuthProvider(BaseComponent):
 
 class PaymentProvider(BaseComponent):
 
-    @abc.abstractmethod
+    @abstractmethod
     def build_payment_page(self, binder, state, *args, **kwargs):
         """Builds a payment page. This method must be overridden."""
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def make_payment(self, binder, state, params, *args, **kwargs):
         """Makes a payment. This method must be overridden."""
         pass
@@ -253,7 +254,7 @@ class PaymentProvider(BaseComponent):
 
 
 class SkillProvider(BaseComponent):
-    @abc.abstractmethod
+    @abstractmethod
     def on_execute(self, binder, user_id, package, data, *args, **kwargs):
         """Process skill. This method must be overridden.
 
@@ -276,7 +277,7 @@ class SkillProvider(BaseComponent):
         """
         pass
 
-    @abc.abstractmethod
+    @abstractmethod
     def on_search(self, binder, user_id, package, searchable, query, **kwargs):
         """Returns a list of suggestions based on a user query. This method must be overridden.
 

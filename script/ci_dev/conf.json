@@ -1,0 +1,12 @@
+{
+    "paths": {
+        "venv": {
+            "Windows": "D:\\Environments\\bigbot-env",
+            "Linux": "/usr1/virtualenv/bigbot-env"
+        }
+    },
+    "which_python": {
+        "Windows": "C:\\Users\\o00542966\\AppData\\Local\\Programs\\Python\\Python38\\python",
+        "Linux": "python"
+    }
+}
