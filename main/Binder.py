@@ -16,7 +16,7 @@ from contrib.exceptions import JsonRPCException
 from . import Flag, Log
 from .Component import PaymentProvider, state_from_response, user_id_from_state
 from .Flag import FlagManager
-from .Processor import StartSkill, CancelSkill, StandardInput, SkillProcessor
+from .Processor import StartSkill, SkillProcessor # ,CancelSkill, StandardInput,
 from .Statement import InputStatement
 from .Block import (
     get_block_by_id,
@@ -48,35 +48,43 @@ from .Block import (
 )
 
 
-DATA_EXCHANGE = [DataExchange]
-INPUT_BLOCKS = [
-    DecisionBlock,
-    InputDate,
-    InputDateTime,
-    InputDuration,
-    InputEmail,
-    InputFile,
-    InputNumber,
-    InputOAuth,
-    InputPayment,
-    InputSearchable,
-    InputSelection,
-    InputSkill,
-    InputText,
-]
-INTERPRETER_BLOCKS = [InterpreterSkill]
-OTHER_BLOCKS = [TerminalBlock]
-PROMPT_BLOCKS = [
-    PromptBinary,
-    PromptChatPlatform,
-    PromptDate,
-    PromptDateTime,
-    PromptDuration,
-    PromptImage,
-    PromptPayment,
-    PromptPreview,
-    PromptText,
-]
+class BlockType:
+    PROMPT_BLOCKS = [
+        PromptBinary,
+        PromptChatPlatform,
+        PromptDate,
+        PromptDateTime,
+        PromptDuration,
+        PromptImage,
+        PromptPayment,
+        PromptPreview,
+        PromptText,
+    ]
+
+    INPUT_BLOCKS = [
+        DecisionBlock,
+        InputDate,
+        InputDateTime,
+        InputDuration,
+        InputEmail,
+        InputFile,
+        InputNumber,
+        InputOAuth,
+        InputPayment,
+        InputSearchable,
+        InputSelection,
+        InputSkill,
+        InputText,
+    ]
+
+    INTERPRETER_BLOCKS = [InterpreterSkill]
+
+    DATA_EXCHANGE = [DataExchange]
+
+    OTHER_BLOCKS = [TerminalBlock]
+
+    ALL_BLOCKS = PROMPT_BLOCKS + INPUT_BLOCKS + INTERPRETER_BLOCKS + DATA_EXCHANGE + OTHER_BLOCKS
+
 
 
 def _get_block_names(block_classes):
@@ -90,8 +98,8 @@ def get_blocks():
     data = []
     reg = Registry()
     for block in reg.blocks:
-        block_object = block(None, None, None, None)
-        data.append(block_object.serialize())
+            block_object = block(context=None, id=None, properties=None, connections=None)
+            data.append(block_object.serialize())
     return data
 
 
@@ -134,7 +142,7 @@ def validate_skill(skill):
     has_terminal_end = False
     for item in blocks:
         if item["id"] == start_id:
-            if item["component"] not in _get_block_names(INPUT_BLOCKS):
+            if item["component"] not in _get_block_names(BlockType.INPUT_BLOCKS):
                 break
             raise JsonRPCException("Start block should not be InputBlock")
 
@@ -154,11 +162,11 @@ class Registry:
         self.blocks = []
         self.components = []
 
-        self.blocks.extend(PROMPT_BLOCKS)
-        self.blocks.extend(INPUT_BLOCKS)
-        self.blocks.extend(INTERPRETER_BLOCKS)
-        self.blocks.extend(DATA_EXCHANGE)
-        self.blocks.extend(OTHER_BLOCKS)
+        self.blocks.extend(BlockType.PROMPT_BLOCKS)
+        self.blocks.extend(BlockType.INPUT_BLOCKS)
+        self.blocks.extend(BlockType.INTERPRETER_BLOCKS)
+        self.blocks.extend(BlockType.DATA_EXCHANGE)
+        self.blocks.extend(BlockType.OTHER_BLOCKS)
 
     def register(self, object):
         self.components.append(object)

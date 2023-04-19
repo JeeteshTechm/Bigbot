@@ -1,5 +1,5 @@
 import os
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings')
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'project.settings.development')
 import django
 django.setup()
 from django.urls import path
@@ -14,12 +14,10 @@ application = ProtocolTypeRouter({
     "http": get_asgi_application(),
     'websocket': AllowedHostsOriginValidator(
         AuthMiddlewareStack(
-            URLRouter(
-                [
-                    path('', WebSocketConsumer.as_asgi()),
-                    path('debug/', WebSocketDebug.as_asgi()),
-                ]
-            )
+            URLRouter([
+                path('ws/', WebSocketConsumer.as_asgi()),
+                path('ws/debug/', WebSocketDebug.as_asgi()),
+            ])
         )
     ),
 })

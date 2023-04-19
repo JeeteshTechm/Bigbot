@@ -1,0 +1,83 @@
+{
+  "InputBlock": {
+    "methods": {
+      "on_process": {
+        "args": ["binder", "user_id", "statement"],
+        "return": "self.reject()"
+      },
+      "process": {
+        "args": ["binder", "user_id", "statement"],
+        "body": [
+          "# bypass input validation while skip node given",
+          "required = self.property_value(\"required\")",
+          "if not required and statement.input is None:",
+          "  self.save(binder, None)",
+          "  return self.move()",
+          "return self.on_process(binder, user_id, statement)"
+        ]
+      },
+      "get_connections": {
+        "args": ["properties"],
+        "return": "[[BLOCK_MOVE, \"Next\"], [BLOCK_REJECT, \"Reject\"]]"
+      },
+      "save": {
+        "args": ["binder", "value"],
+        "body": [
+          "state = binder.load_state()",
+          "key = self.property_value(\"key\")",
+          "state.data[key] = value",
+          "binder.save_state(state)"
+        ]
+      },
+      "load": {
+        "args": ["binder"],
+        "body": [
+          "state = binder.load_state()",
+          "key = self.property_value(\"key\")",
+          "return state.data.get(key)"
+        ],
+        "return": "state.data.get(key)"
+      },
+      "load_template": {
+        "body": [
+          "self.add_template_property(",
+          "  \"key\",",
+          "  \"string\",",
+          "  \"text\",",
+          "  required=True,",
+          "  unique=True,",
+          "  auto=True,",
+          "  description=\"Key used to store the data\",",
+          ")",
+          "self.add_template_property(",
+          "  \"prompt\",",
+          "  \"string\",",
+          "  \"text\",",
+          "  required=False,",
+          "  auto=True,",
+          "  description=\"Display text before processing block\",",
+          ")",
+          "self.add_template_property(",
+          "  \"required\",",
+          "  \"boolean\",",
+          "  \"checkbox\",",
+          "  required=True,",
+          "  description=\"If set to false this property becomes optional.\",",
+          "  value=False,",
+          ")"
+        ]
+      },
+      "on_search": {
+        "args": ["binder", "user_id", "query"],
+        "body": [
+          "required = self.property_value(\"required\")",
+          "if required is not None and not required:",
+          "  resources = super().on_search(binder, user_id, query, **kwargs)",
+          "  resources.append(SearchNode.wrap_skip())",
+          "  return resources",
+          "return super().on_search(binder, user_id, query, **kwargs)"
+        ]
+      }
+    }
+  }
+}
