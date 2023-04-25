@@ -1,6 +1,6 @@
 from typing import Dict, Text, Any, List, Union
 
-from rasa_sdk import Tracker,Action
+from rasa_sdk import Tracker, Action
 from rasa_sdk.executor import CollectingDispatcher
 from rasa_sdk.forms import FormValidationAction
 import requests
@@ -9,62 +9,55 @@ from rasa_sdk.events import SlotSet
 import json
 
 
-class ValidaterestaurantForm(Action):
+def generate_form_class(form_config):
+    form_name = form_config["form_name"]
 
-    def name(self) -> Text:
-        return "validate_restaurant_form"
+    class GeneratedForm(Action):
+        def name(self) -> Text:
+            return form_name
 
-    
-    def validate_cuisine(self, value: Text, dispatcher: CollectingDispatcher,
-                            tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
-        """Validate cuisine value."""
+        def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+            if "slots" in form_config:
+                for slot_config in form_config["slots"]:
+                    slot_name = slot_config["name"]
+                    slot_utter = slot_config["utter"]
+                    slot_value = tracker.get_slot(slot_name)
 
-        if value:
-            return { "cuisine": value }
-        else:
-            dispatcher.utter_message(response="utter_ask_cuisine")
-            # validation failed, set this slot to None, meaning the
-            # user will be asked for the slot again
-            return { "cuisine": None }
-            
+                    if not slot_value:
+                        dispatcher.utter_message(response=slot_utter)
+                        return [SlotSet(slot_name, None)]
+            else:
+                if form_name == "submit_restaurant_form":
+                    cuisine = tracker.get_slot("cuisine")
+                    num_people = tracker.get_slot("num_people")
 
-    def validate_num_people(self, value: Text, dispatcher: CollectingDispatcher,
-                            tracker: Tracker, domain: Dict[Text, Any]) -> Dict[Text, Any]:
-        """Validate num_people value."""
+                    slots = ['cuisine', 'num_people']
 
-        if value:
-            return { "num_people": value }
-        else:
-            dispatcher.utter_message(response="utter_ask_num_people")
-            # validation failed, set this slot to None, meaning the
-            # user will be asked for the slot again
-            return { "num_people": None }
-            
+                    api_config = form_config["api"]
+                    url = api_config["url"]
+                    method = api_config["method"]
+                    params = api_config["params"]
 
-    
-        
+                    response = requests.request(method, url, params=params)
+                    res = json.loads(response.text)
+                    dispatcher.utter_message(res)
 
-class SubmitrestaurantForm(Action):
+                    return [SlotSet("cuisine", None), SlotSet("num_people", None)]
 
-    def name(self) -> Text:
-        return "submit_restaurant_form"
-    def run(self, dispatcher: CollectingDispatcher, tracker: Tracker, domain: DomainDict) -> List[Dict[Text, Any]]:
+            return []
 
-        cuisine = tracker.get_slot("cuisine")
-        num_people = tracker.get_slot("num_people")
+    return GeneratedForm
 
-        slots=['cuisine', 'num_people']
-        url = "https://postman-echo.com/get?foo1=bar1&foo2=bar2"
 
-        payload={}
-        headers = {
-        }
+with open("rasa_forms.json") as forms_file:
+    forms_config = json.load(forms_file)
 
-        response = requests.request("GET", url, headers=headers, data=payload)
-        res=json.loads(response.text)
-        dispatcher.utter_message(res)
-    
-        return [SlotSet("cuisine", None),SlotSet("num_people", None),]
-    
+form_class_mapping = {}
+for form_config in forms_config:
+    form_name = form_config["form_name"]
+    form_class = generate_form_class(form_config)
+    form_class_mapping[form_name] = form_class
 
-    
+
+def get_form_class_by_name(form_name):
+    return form_class_mapping.get(form_name, None)

@@ -1,0 +1,26 @@
+[
+    {
+      "form_name": "validate_restaurant_form",
+      "slots": [
+        {
+          "name": "cuisine",
+          "utter": "utter_ask_cuisine"
+        },
+        {
+          "name": "num_people",
+          "utter": "utter_ask_num_people"
+        }
+      ]
+    },
+    {
+      "form_name": "submit_restaurant_form",
+      "api": {
+        "url": "https://postman-echo.com/get",
+        "params": {
+          "foo2": "bar2"
+        },
+        "method": "GET"
+      }
+    }
+  ]
+  
