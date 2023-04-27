@@ -1,6 +1,6 @@
 from rasa.core.agent import Agent
 from rasa.utils.endpoints import EndpointConfig
-from rasa.core.tracker_store import SQLTrackerStore
+from rasa.core.tracker_store import SQLTrackerStore,InMemoryTrackerStore
 from rasa.shared.core.domain import Domain
 import asyncio
 import json
@@ -10,6 +10,7 @@ class Bot:
         model_path = config["model_path"]
         endpoint_url = config["endpoint_url"]
         domain = Domain.load(config["domain_path"])
+        #tracker_store = InMemoryTrackerStore(max_event_history=10, domain=domain,sender_id=sender_id)
 
         tracker_store_config = config["tracker_store"]
         tracker_store = SQLTrackerStore(
