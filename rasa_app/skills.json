@@ -1,0 +1,54 @@
+{
+  "intents": [
+    {
+      "name": "Hotel_booking",
+      "utterances": [
+        "I want to book a hotel room",
+        "Can you help me with a hotel reservation?",
+        "I need to book a hotel for two nights",
+        "Do you have any available hotels in the city center?",
+        "I would like to reserve a room at a hotel near the beach"
+      ]
+    },
+    {
+      "name": "Hotel_search",
+      "utterances": [
+        "Can you help me find a hotel in this area?",
+        "I am looking for a hotel near the airport",
+        "Which hotels are available in the city center?",
+        "Can you show me some hotels with good reviews?",
+        "Do you have any budget-friendly hotel options?"
+      ]
+    },
+    {
+      "name": "Restaurant_search",
+      "utterances": [
+        "Can you recommend a good restaurant in the area?",
+        "I am looking for a restaurant that serves vegetarian food",
+        "Which restaurants have outdoor seating?",
+        "Do you have any Italian restaurant suggestions?",
+        "I want to find a restaurant that is open late"
+      ]
+    },
+    {
+      "name": "Book_cab",
+      "utterances": [
+        "Can you help me book a taxi to the airport?",
+        "I need a cab to take me to my hotel",
+        "Can you arrange a car for me to go to the conference center?",
+        "I want to book a ride to the train station",
+        "Can you help me schedule a taxi for tomorrow morning?"
+      ]
+    },
+    {
+      "name": "Book_game",
+      "utterances": [
+        "I want to book a snorkeling tour for tomorrow",
+        "Can you help me schedule a scuba diving excursion?",
+        "I would like to book a paddle boarding lesson for next week",
+        "Can you recommend any water sports activities?",
+        "I am interested in booking a boat tour around the island."
+      ]
+    }
+  ]
+}
