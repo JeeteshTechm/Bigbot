@@ -1,0 +1,138 @@
+[
+  {
+    "intents": [
+      {
+        "name": "greet",
+        "utterances": [
+          "Hello!",
+          "Hi there!",
+          "Hey, how can I assist you?"
+        ],
+        "responses": [
+          "greet"
+        ],
+        "actions": []
+      }
+    ]
+  },
+  {
+    "intents": [
+      {
+        "name": "search_product",
+        "utterances": [
+          "Find me a product.",
+          "Search for products within my [100$](budget) budget.",
+          "I want to buy a new product with [Android](os) operating system.",
+          "Show me [laptops](product_type) under [500$](budget).",
+          "Search for [smartphones](product_type) with [iOS](os) OS."
+        ],
+        "responses": [],
+        "actions": [
+          "action_search_product",
+          "action_display_product_options"
+        ]
+      }
+    ],
+    "forms": [
+      {
+        "name": "search_product_form",
+        "slots": [
+          {
+            "name": "budget",
+            "type": "text"
+          },
+          {
+            "name": "os",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "intents": [
+      {
+        "name": "add_to_cart",
+        "utterances": [
+          "Add this item to my cart.",
+          "I want to purchase this product with [credit card](payment_method).",
+          "Put it in my shopping cart.",
+          "Add [headphones](product_type) to my cart.",
+          "Can you help me buy [shoes](product_type)?"
+        ],
+        "responses": [],
+        "actions": [
+          "action_search_product",
+          "action_display_product_options",
+          "action_add_to_cart",
+          "action_confirm_added_to_cart"
+        ]
+      }
+    ],
+    "forms": [
+      {
+        "name": "add_to_cart_form",
+        "slots": [
+          {
+            "name": "preference",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "intents": [
+      {
+        "name": "continue_shopping",
+        "utterances": [
+          "Keep browsing products.",
+          "I want to see more options.",
+          "Show me other [items](product_type).",
+          "Find additional [laptops](product_type) for me."
+        ],
+        "responses": [],
+        "actions": [
+          "action_display_product_options"
+        ]
+      }
+    ]
+  },
+  {
+    "intents": [
+      {
+        "name": "checkout",
+        "utterances": [
+          "Proceed to checkout.",
+          "I'm ready to place an order.",
+          "Finalize my purchase.",
+          "Complete the checkout process.",
+          "Place my order for [laptop](product_type) with [credit card](payment_method)."
+        ],
+        "responses": [],
+        "actions": [
+          "action_confirm_order"
+        ]
+      }
+    ],
+    "forms": [
+      {
+        "name": "checkout_form",
+        "slots": [
+          {
+            "name": "name",
+            "type": "text"
+          },
+          {
+            "name": "address",
+            "type": "text"
+          },
+          {
+            "name": "info",
+            "type": "text"
+          }
+        ]
+      }
+    ]
+  }
+]
