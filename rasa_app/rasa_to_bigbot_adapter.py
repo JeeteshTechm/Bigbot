@@ -1,5 +1,7 @@
 import yaml
 import json
+import os
+import glob
 
 
 class YamlToJsonConverter:
@@ -11,52 +13,25 @@ class YamlToJsonConverter:
         with open(self.file_path, 'r') as file:
             self.data = yaml.safe_load(file)
 
-    def process_steps(self, steps):
-        intent = ''
-        responses = []
-        form_slots = []
-        actions = []
-        utterances = []
+    def process_intents(self):
+        intents = self.data.get('nlu', [])
+        intent_data = {}
+        for intent in intents:
+            intent_name = intent.get('intent', '')
+            examples = intent.get('examples', '').split('\n')[1:]
+            examples = [example.strip() for example in examples if example.strip()]
+            intent_data[intent_name] = examples
+        return intent_data
 
-        for step in steps:
-            if 'intent' in step:
-                intent = step['intent']
-                if 'utterances' in step:
-                    utterances = step['utterances']
-            if 'action' in step:
-                action = step['action']
+    def process_responses(self):
+        responses = self.data.get('responses', {})
+        response_data = {}
+        for key, value in responses.items():
+            response_key = key.split('_')[-1]
+            response_data[response_key] = value[0]['text']
+        return response_data
 
-                if action.startswith('utter'):
-                    response = action.split('_')[-1]
-                    responses.append(response)
-                elif action.startswith('action_ask'):
-                    slot_name = action.split('_')[-1]
-                    slot = {
-                        "name": slot_name,
-                        "type": "text"
-                    }
-                    form_slots.append(slot)
-                else:
-                    actions.append(action)
-
-        actions = [x for x in actions if x]
-
-        processed_json = {
-            "name": intent,
-            "utterances": utterances,
-            "responses": responses,
-            "actions": actions
-        }
-
-        if form_slots:
-            processed_json["form"] = {
-                "name": intent + "_form",
-                "slots": form_slots
-            }
-
-        return processed_json
-
-    def convert_to_json(self):
+    def process_rules_and_stories(self):
         json_objects = {}
 
         for key in ['rules', 'stories']:
@@ -64,23 +39,110 @@ class YamlToJsonConverter:
                 for item in self.data[key]:
                     steps = item['steps']
                     if steps:
-                        processed_json = self.process_steps(steps)
-                        json_objects[processed_json['name']] = processed_json
+                        intents = []
+                        actions = []
 
-        unique_json_objects = list(json_objects.values())
+                        for step in steps:
+                            if "intent" in step:
+                                intents.append(step["intent"])
+                            if "action" in step:
+                                actions.append(step["action"])
 
-        json_str = json.dumps(unique_json_objects, indent=2)
+                        for intent in intents:
+                            processed_json = {
+                                "name": intent,
+                                "actions": actions,
+                            }
+                            json_objects[processed_json['name']] = processed_json
 
-        with open('converted_bigbot_data.json', 'w') as file:
+        return json_objects
+
+    def process_form_slots(self, actions):
+        form_slots = []
+        for action in actions:
+            if action.startswith('action_ask'):
+                slot_name = action.split('_')[-1]
+                slot = {
+                    "name": slot_name,
+                    "type": "text"
+                }
+                form_slots.append(slot)
+        return form_slots
+
+    def process_forms(self):
+        forms = self.data.get('forms', {})
+        form_data = {}
+        for key, value in forms.items():
+            form_data[key] = value
+        return form_data
+
+    def process_slots(self):
+        slots = self.data.get('slots', {})
+        slot_data = {}
+        for key, value in slots.items():
+            slot_data[key] = value
+        return slot_data
+
+    def process_custom_actions(self, actions):
+        custom_actions = [action for action in actions if not action.startswith(('utter', 'action_ask'))]
+        return custom_actions
+
+    def process_config(self):
+        config = self.data.get('config', {})
+        return config
+
+    def convert_to_json(self, output_file):
+        intents = self.process_intents()
+        responses = self.process_responses()
+        rules_and_stories = self.process_rules_and_stories()
+        forms = self.process_forms()
+        slots = self.process_slots()
+
+        json_objects = []
+        for key, value in rules_and_stories.items():
+            actions = [action for action in value['actions'] if not action.startswith('utter')]
+            form_slots = self.process_form_slots(actions)
+            custom_actions = self.process_custom_actions(actions)
+
+            json_object = {
+                "name": key,
+                "utterances": intents.get(key, []),
+                "responses": [responses.get(action.split('_')[-1], '') for action in value['actions'] if action.startswith('utter')],
+                "actions": custom_actions,
+                "slots": slots,
+                "forms": forms
+            }
+
+            if form_slots:
+                json_object["form"] = {
+                    "name": key + "_form",
+                    "slots": form_slots
+                }
+
+            json_objects.append(json_object)
+
+        json_str = json.dumps(json_objects, indent=2)
+
+        with open(output_file, 'w') as file:
             file.write(json_str)
 
         return json_str
 
 
 def main():
-    converter = YamlToJsonConverter('rasa_input.yml')
-    converter.load_yaml()
-    json_str = converter.convert_to_json()
+    input_dir = 'input'
+    output_dir = 'output'
+
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    input_files = glob.glob(os.path.join(input_dir, '*.yml'))
+
+    for idx, input_file in enumerate(input_files):
+        output_file = os.path.join(output_dir, f'converted_bigbot_data_{idx:03d}.json')
+        converter = YamlToJsonConverter(input_file)
+        converter.load_yaml()
+        json_str = converter.convert_to_json(output_file)
 
 
 if __name__ == "__main__":
