@@ -1,0 +1,85 @@
+[
+  {
+    "name": "greet",
+    "utterances": [
+      "Hello!",
+      "Hi there!",
+      "Hey, how can I assist you?"
+    ],
+    "responses": [
+      "greet"
+    ],
+    "actions": []
+  },
+  {
+    "name": "search_product",
+    "responses": [],
+    "actions": [
+      "action_search_product",
+      "action_display_product_options"
+    ],
+    "form": {
+      "name": "search_product_form",
+      "slots": [
+        {
+          "name": "budget",
+          "type": "text"
+        },
+        {
+          "name": "os",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "add_to_cart",
+    "responses": [],
+    "actions": [
+      "action_search_product",
+      "action_display_product_options",
+      "action_add_to_cart",
+      "action_confirm_added_to_cart"
+    ],
+    "form": {
+      "name": "add_to_cart_form",
+      "slots": [
+        {
+          "name": "preference",
+          "type": "text"
+        }
+      ]
+    }
+  },
+  {
+    "name": "continue_shopping",
+    "responses": [],
+    "actions": [
+      "action_display_product_options"
+    ]
+  },
+  {
+    "name": "checkout",
+    "responses": [],
+    "actions": [
+      "action_confirm_order"
+    ],
+    "form": {
+      "name": "checkout_form",
+      "slots": [
+        {
+          "name": "name",
+          "type": "text"
+        },
+        {
+          "name": "address",
+          "type": "text"
+        },
+        {
+          "name": "info",
+          "type": "text"
+        }
+      ]
+    }
+  }
+]
