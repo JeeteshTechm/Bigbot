@@ -90,14 +90,13 @@ class YamlToJsonConverter:
     def process_config(self):
         config = self.data.get('config', {})
         return config
-
+    
     def convert_to_json(self, output_file):
         intents = self.process_intents()
         responses = self.process_responses()
         rules_and_stories = self.process_rules_and_stories()
         forms = self.process_forms()
         slots = self.process_slots()
-        bot_id = str(uuid.uuid4())
         json_objects = []
 
         for i, (key, value) in enumerate(rules_and_stories.items()):  
@@ -108,16 +107,16 @@ class YamlToJsonConverter:
             utterances= intents.get(key, [])
             utterances = [utterance.replace("-", "") for utterance in intents.get(key, [])]
 
-            parent_id = f"id_{i-1}" if i > 0 else -1
-            child_id = f"id_{i+1}" if i < len(rules_and_stories) - 1 else ""
+            parent_intent_id = f"id_{i-1}" if i > 0 else -1
+            child_intent_id = f"id_{i+1}" if i < len(rules_and_stories) - 1 else ""
 
             json_object = {
                 "id": f"id_{len(json_objects)}",
                 "name": key,
                 "utterances": utterances,
                 "responses": [responses.get(action.split('_')[-1], '') for action in value['actions'] if action.startswith('utter')],
-                "parent_id": parent_id,
-                "child_id": child_id
+                "parent_intent_id": parent_intent_id,
+                "child_intent_id": child_intent_id
             }
             entities = [{"name": slot["name"], "value": ""} for slot in form_slots] 
             api_call={"method":" ", "URL":" ","request_body":" "}
@@ -132,7 +131,7 @@ class YamlToJsonConverter:
 
             json_objects.append(json_object)
 
-        json_data = {"bot_id": bot_id,"intents": json_objects}
+        json_data = {"intents": json_objects}
 
         json_str = json.dumps(json_data, indent=2)
         
