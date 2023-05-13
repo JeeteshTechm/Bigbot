@@ -2,7 +2,7 @@ import yaml
 import json
 import os
 import glob
-
+import uuid
 
 class YamlToJsonConverter:
     def __init__(self, file_path):
@@ -97,31 +97,45 @@ class YamlToJsonConverter:
         rules_and_stories = self.process_rules_and_stories()
         forms = self.process_forms()
         slots = self.process_slots()
-
+        bot_id = str(uuid.uuid4())
         json_objects = []
-        for key, value in rules_and_stories.items():
+
+        for i, (key, value) in enumerate(rules_and_stories.items()):  
             actions = [action for action in value['actions'] if not action.startswith('utter')]
             form_slots = self.process_form_slots(actions)
             custom_actions = self.process_custom_actions(actions)
 
-            json_object = {
-                "name": key,
-                "utterances": intents.get(key, []),
-                "responses": [responses.get(action.split('_')[-1], '') for action in value['actions'] if action.startswith('utter')],
-                "actions": custom_actions,
-                "slots": slots,
-                "forms": forms
-            }
+            utterances= intents.get(key, [])
+            utterances = [utterance.replace("-", "") for utterance in intents.get(key, [])]
 
+            parent_id = f"id_{i-1}" if i > 0 else -1
+            child_id = f"id_{i+1}" if i < len(rules_and_stories) - 1 else ""
+
+            json_object = {
+                "id": f"id_{len(json_objects)}",
+                "name": key,
+                "utterances": utterances,
+                "responses": [responses.get(action.split('_')[-1], '') for action in value['actions'] if action.startswith('utter')],
+                "parent_id": parent_id,
+                "child_id": child_id
+            }
+            entities = [{"name": slot["name"], "value": ""} for slot in form_slots] 
+            api_call={"method":" ", "URL":" ","request_body":" "}
+        
             if form_slots:
                 json_object["form"] = {
                     "name": key + "_form",
-                    "slots": form_slots
+                    "slots": form_slots,
+                    "entities":entities,
+                    "api_call":api_call
                 }
 
             json_objects.append(json_object)
 
-        json_str = json.dumps(json_objects, indent=2)
+        json_data = {"bot_id": bot_id,"intents": json_objects}
+
+        json_str = json.dumps(json_data, indent=2)
+        
 
         with open(output_file, 'w') as file:
             file.write(json_str)
