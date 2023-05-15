@@ -33,7 +33,7 @@ class YamlToJsonConverter:
         intents = {}
         for intent in self.data.get('nlu', []):
             name = intent.get('intent', '')
-            examples = [ex.strip() for ex in intent.get('examples', '').split('\n') if ex.strip()]
+            examples = [ex.strip('- ') for ex in intent.get('examples', '').split('\n') if ex.strip()]
             intents[name] = {
                 "examples": examples,
                 "entities": self.extract_entities(examples)
