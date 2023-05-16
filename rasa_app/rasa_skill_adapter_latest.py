@@ -23,15 +23,6 @@ class YAMLToJsonConverter:
                 "utterances": []
             }
 
-            response_prefix = 'utter_' + intent_name
-            for response_key, response_value in self.yaml_content['responses'].items():
-                if response_key.startswith(response_prefix):
-                    if isinstance(response_value, list):
-                        for response in response_value:
-                            intent['responses'].append(response['text'])
-                    elif isinstance(response_value, dict):
-                        intent['responses'].append(response_value['text'])
-
             if intent_name in self.yaml_content['forms']:
                 form_name = intent_name + '_form'
                 slots = self.yaml_content['forms'][form_name]
@@ -46,9 +37,34 @@ class YAMLToJsonConverter:
                     intent['slots'].append(slot)
 
             for example in intent_data['examples'].strip().split('\n'):
-                intent['utterances'].append(example.strip())
+                utterance = example.strip()
+                if utterance.startswith('-'):
+                    utterance = utterance[1:].strip()
+                intent['utterances'].append(utterance)
 
             self.json_data['intents'].append(intent)
+        # Process stories to map intents with responses and add forms
+        for story in self.yaml_content['stories']:
+            for step in story['steps']:
+                if 'intent' in step:
+                    intent_name = step['intent']
+                if 'action' in step and step['action'].startswith('utter_'):
+                    response_key = step['action']
+                    if response_key in self.yaml_content['responses']:
+                        response_value = self.yaml_content['responses'][response_key]
+                        if isinstance(response_value, list):
+                            for response in response_value:
+                                # Find the intent in the existing JSON structure and append the response
+                                for existing_intent in self.json_data['intents']:
+                                    if existing_intent['name'] == intent_name:
+                                        existing_intent['responses'].append(response['text'])
+                                        break
+                        elif isinstance(response_value, dict):
+                            # Find the intent in the existing JSON structure and append the response
+                            for existing_intent in json_data['intents']:
+                                if existing_intent['name'] == intent_name:
+                                    existing_intent['responses'].append(response_value['text'])
+                                    break
 
     def process_forms(self):
         form_intent_list = []
@@ -80,14 +96,46 @@ class YAMLToJsonConverter:
                             "name": slot_name,
                             "type": slot_type[0]['type'] if isinstance(slot_type, list) else slot_type
                         }
+
+                        if 'responses' in self.yaml_content and 'utter_ask_' + slot_name in self.yaml_content['responses']:
+                            bot_ask_list = self.yaml_content['responses']['utter_ask_' + slot_name]
+                            if isinstance(bot_ask_list, list) and len(bot_ask_list) > 0:
+                                slot['bot_ask'] = bot_ask_list[0]['text']
+                                slot['examples']=[]
+   
                         intent_data['slots'].append(slot)
+                        intent_data['api_call'] = {
+                                "method": "",
+                                "URL": "",
+                                "request_body": []
+                            }
 
                     break
+
+    def add_ids_and_relations(self):
+        intents = self.json_data['intents']
+        num_intents = len(intents)
+
+        # Add IDs to intents
+        for i in range(num_intents):
+            intent = intents[i]
+            intent_id = 'id_' + str(i+1)
+            intent['id'] = intent_id
+
+        # Add parent and child IDs
+        for i in range(num_intents - 1):
+            intent = intents[i]
+            intent['child_id'] = intents[i+1]['id']
+        
+        for i in range(1, num_intents):
+            intent = intents[i]
+            intent['parent_id'] = intents[i-1]['id']
 
     def convert_to_json(self):
         self.load_yaml()
         self.process_intents()
         self.process_forms()
+        self.add_ids_and_relations()
 
         json_string = json.dumps(self.json_data, indent=4)
 
