@@ -1,0 +1,88 @@
+version: '3.1'
+nlu:
+  - intent: greet
+    examples: |
+      - hi
+      - hello
+      - hey
+  - intent: inquire_sindalah
+    examples: |
+      - I want to know more about Sindalah Island
+      - Tell me about Sindalah
+      - What can I expect at Sindalah?
+  - intent: book_flight
+    examples: |
+      - I want to book a flight to Sindalah
+      - Can I reserve a flight to Sindalah?
+      - I'd like to fly to Sindalah
+  - intent: ask_recommendations
+    examples: |
+      - What activities would you recommend in Sindalah?
+      - Can you suggest things to do in Sindalah?
+      - I'm looking for recommendations in Sindalah
+  - intent: inquire_booking_status
+    examples: |
+      - What's the status of my booking?
+      - Can you confirm my flight details?
+      - I'd like to check my booking
+responses:
+  utter_greet:
+    - text: Hello! How can I assist you with your luxury travel plans today?
+  utter_inquire_sindalah:
+    - text: Sindalah Island is a paradise for luxury travel with pristine beaches, exotic flora and fauna, and our exclusive, futuristic airport. You can expect a truly unique experience.
+  utter_book_flight:
+    - text: Your flight to Sindalah is booked for {travel_date} in {travel_class}. Your booking ID is {booking_id}.
+  utter_ask_travel_date:
+    - text: When do you plan to travel to Sindalah?
+  utter_ask_travel_class:
+    - text: Which class would you prefer for your flight - First, Business or VIP Private?
+  utter_ask_recommendations:
+    - text: In Sindalah, you can enjoy beachfront dining, snorkeling in crystal clear waters, explore exotic wildlife, or simply relax on our pristine beaches.
+  utter_inquire_booking_status:
+    - text: Your flight to Sindalah is booked for {travel_date} in {travel_class}. Your booking ID is {booking_id}.
+  utter_ask_booking_id:
+    - text: Could you please provide your booking ID for me to check your booking details?
+slots:
+  travel_date:
+    type: from_text
+    influence_conversation: true
+  travel_class:
+    type: from_text
+    influence_conversation: true
+  booking_id:
+    type: from_text
+    influence_conversation: true
+forms:
+  flight_booking_form:
+ travel_date:
+ - type: from_text
+ travel_class:
+ - type: from_text
+  booking_inquiry_form:
+ booking_id:
+ - type: from_text
+stories:
+  - story: greet
+    steps:
+      - intent: greet
+      - action: utter_greet
+  - story: inquire_sindalah
+    steps:
+      - intent: inquire_sindalah
+      - action: utter_inquire_sindalah
+  - story: book_flight_activateform
+    steps:
+      - intent: book_flight
+      - action: flight_booking_form
+      - active_loop: flight_booking_form
+      - active_loop: None
+  - story: ask_recommendations
+    steps:
+      - intent: ask_recommendations
+      - action: utter_ask_recommendations
+  - story: inquire_booking_status_activateform
+    steps:
+      - intent: inquire_booking_status
+      - action: booking_inquiry_form
+      - active_loop: booking_inquiry_form
+      - active_loop: None
