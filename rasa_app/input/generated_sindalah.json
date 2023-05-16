@@ -1,0 +1,106 @@
+{
+    "intents": [
+        {
+            "name": "greet",
+            "responses": [
+                "Hello! How can I assist you with your luxury travel plans today?"
+            ],
+            "utterances": [
+                "hi",
+                "hello",
+                "hey"
+            ],
+            "id": "id_1",
+            "child_id": "id_2"
+        },
+        {
+            "name": "inquire_sindalah",
+            "responses": [
+                "Sindalah Island is a paradise for luxury travel with pristine beaches, exotic flora and fauna, and our exclusive, futuristic airport. You can expect a truly unique experience."
+            ],
+            "utterances": [
+                "I want to know more about Sindalah Island",
+                "Tell me about Sindalah",
+                "What can I expect at Sindalah?"
+            ],
+            "id": "id_2",
+            "child_id": "id_3",
+            "parent_id": "id_1"
+        },
+        {
+            "name": "book_flight",
+            "responses": [
+                "Your flight to Sindalah is booked for {travel_date} in {travel_class}. Your booking ID is {booking_id}."
+            ],
+            "utterances": [
+                "I want to book a flight to Sindalah",
+                "Can I reserve a flight to Sindalah?",
+                "I'd like to fly to Sindalah"
+            ],
+            "form": "flight_booking_form",
+            "slots": [
+                {
+                    "name": "travel_date",
+                    "type": "from_text",
+                    "bot_ask": "When do you plan to travel to Sindalah?",
+                    "examples": []
+                },
+                {
+                    "name": "travel_class",
+                    "type": "from_text",
+                    "bot_ask": "Which class would you prefer for your flight - First, Business or VIP Private?",
+                    "examples": []
+                }
+            ],
+            "api_call": {
+                "method": "",
+                "URL": "",
+                "request_body": []
+            },
+            "id": "id_3",
+            "child_id": "id_4",
+            "parent_id": "id_2"
+        },
+        {
+            "name": "ask_recommendations",
+            "responses": [
+                "In Sindalah, you can enjoy beachfront dining, snorkeling in crystal clear waters, explore exotic wildlife, or simply relax on our pristine beaches."
+            ],
+            "utterances": [
+                "What activities would you recommend in Sindalah?",
+                "Can you suggest things to do in Sindalah?",
+                "I'm looking for recommendations in Sindalah"
+            ],
+            "id": "id_4",
+            "child_id": "id_5",
+            "parent_id": "id_3"
+        },
+        {
+            "name": "inquire_booking_status",
+            "responses": [
+                "Your flight to Sindalah is booked for {travel_date} in {travel_class}. Your booking ID is {booking_id}."
+            ],
+            "utterances": [
+                "What's the status of my booking?",
+                "Can you confirm my flight details?",
+                "I'd like to check my booking"
+            ],
+            "form": "booking_inquiry_form",
+            "slots": [
+                {
+                    "name": "booking_id",
+                    "type": "from_text",
+                    "bot_ask": "Could you please provide your booking ID for me to check your booking details?",
+                    "examples": []
+                }
+            ],
+            "api_call": {
+                "method": "",
+                "URL": "",
+                "request_body": []
+            },
+            "id": "id_5",
+            "parent_id": "id_4"
+        }
+    ]
+}
