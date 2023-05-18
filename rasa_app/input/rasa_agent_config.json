@@ -1,0 +1,12 @@
+{
+  "model_path": "latest/models",
+  "endpoint_url": "http://localhost:5055/webhook",
+  "domain_path": "latest/domain.yml",
+  "tracker_store": {
+    "dialect": "postgresql",
+    "url": "37.224.68.171",
+    "db": "rasa_safana",
+    "username": "bigbot",
+    "password": "safana2023"
+  }
+}
