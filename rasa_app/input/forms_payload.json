@@ -1,0 +1,99 @@
+{
+    "bot_id": "latest_forms",
+    "message": "Hello, how can I help you?",
+    "intents": [
+      {
+        "id":"id_az",
+        "name": "greet",
+        "utterances": [
+          "Hi",
+          "Hello",
+          "Hey",
+          "Hi there"
+        ],
+        "responses": [
+          "Hello! How can I assist you?"
+        ],
+        "parent_id":-1,
+        "child_id":"id_by"
+      },
+      {
+        "id":"id_cx",
+        "name": "book_restaurant",
+        "utterances": [
+          "im looking for a restaurant that serves indian food",
+          "book a italian retaurant for five people",
+          "I want to eat out",
+          "i need a table for 8 ",
+          "can i find a restaurant and it should serve italian food for two",
+          "book a table",
+          "i want to outside seating with 9 ",
+          "i prefer inside seating",
+          "i need a table for 2 people",
+          "book a table for 9"
+        ],
+        "responses": [
+          "Great, I've booked a {cuisine} restaurant for {num_people} people and a hotel named {hotel_name}.",
+          "Sorry, I could not book a hotel for you. Please try again later."
+        ],
+        "form":"restaurant",
+        "slots": [
+          {
+            "name": "cuisine",
+            "type": "text",
+            "bot_ask_positive":"What cuisine?",
+            "bot_ask_negative":"Cuisine type is not in the database, please try again",
+            "slot_validation" :[]
+          },
+          {
+            "name": "num_people",
+            "type": "text",
+            "bot_ask_positive":"How many people?",
+            "bot_ask_negative":"Number of people should be a positive integer, please try again",
+            "slot_validation" :[]
+          },
+          {
+            "name": "preference",
+            "type": "text",
+            "bot_ask_positive":"What is your preference?",
+            "bot_ask_negative":"Can you give your preference agian?",
+            "slot_validation" :[]
+          }
+        ],
+        "entities": [
+          {
+            "name": "cuisine",
+            "values": [
+              "italian",
+              "german",
+              "indian"
+            ]
+          },
+          {
+            "name": "num_people",
+            "values": [
+              2,
+              6,
+              8,
+              9
+            ]
+          },
+          {
+            "name": "preference",
+            "values": [
+              "outside seating",
+              "inside seating"
+            ]
+          } 
+        ],
+        "api_call":{
+          "method":"post",
+          "URL":"http://37.224.68.171:8080/book-restaurant",
+          "request_body":["cusiine","num_of_people","preference"]
+        },
+        "parent_id":"id_by",
+        "child_id":"id_dw"
+      }
+    ]
+  }
+  
