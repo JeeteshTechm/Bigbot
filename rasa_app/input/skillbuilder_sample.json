@@ -1,0 +1,102 @@
+{
+  "language": "en",
+  "bot_id": "12345",
+  "message": "Hello, how can I help you?",
+  "blocks": [
+    {
+      "id": "greet_01",
+      "name": "greet",
+      "intents": [
+        {
+          "utterances": [
+            "Hi",
+            "Hello",
+            "Hey",
+            "Hi there"
+          ],
+          "responses": [
+            {
+              "name": "greet_response",
+              "text": "Hello! How can I assist you?"
+            }
+          ]
+        }
+      ],
+      "slots": [],
+      "parent_id": -1,
+      "child_id": "schedule_appointment_01"
+    },
+    {
+      "id": "schedule_appointment_01",
+      "name": "schedule_appointment",
+      "intents": [
+        {
+          "utterances": [
+            {
+              "text": "Schedule an appointment for tomorrow",
+              "entities": [
+                {
+                  "start": 0,
+                  "end": 8,
+                  "value": "Schedule",
+                  "entity": "action"
+                },
+                {
+                  "start": 30,
+                  "end": 38,
+                  "value": "tomorrow",
+                  "entity": "date"
+                }
+              ]
+            },
+            "I want to book an appointment for next week",
+            "Set up a meeting next Monday"
+          ],
+          "responses": [
+            {
+              "name": "appointment_success",
+              "text": "I've scheduled an appointment for {date}."
+            },
+            {
+              "name": "appointment_failure",
+              "text": "Sorry, I couldn't schedule the appointment. Please try again later."
+            }
+          ]
+        }
+      ],
+      "slots": [
+        {
+          "name": "date",
+          "type": "text"
+        }
+      ],
+      "form": {
+        "name": "appointment_form",
+        "required_slots": {
+          "date": {
+            "type": "from_text"
+          }
+        },
+        "slot_mappings": {
+          "date": [
+            {
+              "type": "from_entity",
+              "details": {
+                "entity": "date"
+              }
+            }
+          ]
+        }
+      },
+      "parent_id": "greet_01",
+      "child_id": -1
+    }
+  ],
+  "entities": [
+    "action",
+    "date"
+  ],
+  "actions": [
+    "action_schedule_appointment"
+  ]
+}
