@@ -1,0 +1,100 @@
+import psycopg2
+from psycopg2 import Error
+from io import BytesIO
+from rasa.core.agent import Agent
+from rasa.utils.endpoints import EndpointConfig
+from rasa.core.tracker_store import SQLTrackerStore,InMemoryTrackerStore
+from rasa.shared.core.domain import Domain
+from rasa.core.tracker_store import DialogueStateTracker
+import asyncio
+
+
+class skill:
+    async def get_response(self,agent, user_message):
+        # agent=Agent.load("Skill_finder/models")
+        parsed = await agent.parse_message(user_message)
+        print("___________________",parsed["text"])
+        skill_id=parsed["intent"]["name"]
+        print(type(skill_id))
+         
+        return skill_id
+    async def fetch_and_load_model(user_message):
+        connection = None
+        try:
+            connection = psycopg2.connect(
+                dialect="postgresql",
+                host="127.0.0.1",
+                port="5432",
+                username="rasa",
+                password="rasa123",
+                db="rasadb"
+            )
+            cursor = connection.cursor()
+
+            select_query = "SELECT filename, data FROM files;"
+            cursor.execute(select_query)
+            rows = cursor.fetchall()
+
+            for row in rows:
+                filename = row[0]
+                file_content = row[1]
+
+            # Load the Rasa model directly from the tar.gz file content
+                model_buffer = BytesIO(file_content)
+                agent = Agent.load(model_buffer)
+                skillObject=skill()
+                skilData= await skillObject.get_response(agent,user_message)
+
+            print("Rasa trained models loaded successfully.")
+
+        except (Exception, Error) as error:
+            print("Error while fetching and loading the Rasa trained models:", error)
+
+        finally:
+            if connection:
+                cursor.close()
+                connection.close()
+
+    fetch_and_load_model()
+
+
+class Bot:
+    def __init__(self, model_path, endpoint_url, domain,sender_id):
+        endpoint = EndpointConfig(url=endpoint_url)
+        tracker_store = SQLTrackerStore(
+                dialect="postgresql",
+                host="127.0.0.1",
+                port="5432",
+                username="rasa",
+                password="rasa123",
+                db="rasadb"
+                )
+        #tracker_store = InMemoryTrackerStore(max_event_history=10, domain=domain,sender_id=sender_id)
+        self.agent = Agent.load(model_path, action_endpoint=endpoint, tracker_store=tracker_store, domain=domain)
+
+    async def get_conv(self, user_message, sender_id):
+        parsed = await self.agent.parse_message(user_message)
+        # intent = parsed['intent']['name']
+        # confidence = parsed['intent']['confidence']
+        response = await self.agent.handle_text(user_message,sender_id=sender_id)
+        print("____________________",response)
+        print("-------------------",parsed)
+        result = {'text': response, 'intent': parsed}
+       
+    
+        return result
+
+async def main():
+    sk=skill()
+    user_message="book table"
+    
+    endpoint_url = "http://37.224.68.171:5055/webhook"
+    sender_id = "san"
+    skill_id= await sk.fetch_and_load_model(user_message)
+    print(skill_id)
+    domain = Domain.load(skill_id+"/domain.yml")
+    bot = Bot(skill_id+"/models", endpoint_url, domain,sender_id)
+    response = await bot.get_conv(user_message, sender_id)
+    print("_______-------------------",response)
+
+asyncio.run(main())
