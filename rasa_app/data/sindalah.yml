@@ -16,6 +16,16 @@ nlu:
     - I want to book a flight to Sindalah
     - Can I reserve a flight to Sindalah?
     - I'd like to fly to Sindalah
+    - I need a flight to Sindalah
+    - I wish to arrange a flight to Sindalah
+    - I'm planning to visit Sindalah, can you help with the flight?
+    - I want to organise a flight to Sindalah
+    - Is it possible to book a flight to Sindalah?
+    - Let's arrange a flight to Sindalah
+    - I am interested in a flight to Sindalah
+    - I'm looking to book a flight to Sindalah
+    - Could I get a flight to Sindalah?
+    - Sindalah is my next destination, I need to book a flight
 - intent: ask_recommendations
   examples: |
     - What activities would you recommend in Sindalah?
@@ -106,3 +116,4 @@ stories:
     - booking_id: "B1234"
   - action: action_check_booking
   - action: utter_confirm_booking
+
