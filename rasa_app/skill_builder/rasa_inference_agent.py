@@ -1,32 +1,39 @@
+import os
+from flask import Flask, jsonify, request
 from rasa.core.agent import Agent
 from rasa.utils.endpoints import EndpointConfig
-from rasa.core.tracker_store import SQLTrackerStore,InMemoryTrackerStore
+from rasa.core.tracker_store import SQLTrackerStore
 from rasa.shared.core.domain import Domain
 import asyncio
-import json
+import yaml
+
+app = Flask(__name__)
 
 class Bot:
-    def __init__(self, config):
-        model_path = config["model_path"]
-        endpoint_url = config["endpoint_url"]
-        domain = Domain.load(config["domain_path"])
-        #tracker_store = InMemoryTrackerStore(max_event_history=10, domain=domain,sender_id=sender_id)
+    def __init__(self, model_path, config_path, domain_path):
+        with open(config_path, 'r') as config_file:
+            config = yaml.safe_load(config_file)
 
-        tracker_store_config = config["tracker_store"]
+        # Get the necessary configuration values
+        endpoint_url = config['endpoints']['api_url']
+        db_host = config['database']['host']
+        db_port = config['database']['port']
+        db_username = config['database']['username']
+        db_password = config['database']['password']
+        db_name = config['database']['database_name']
+
+        # Set up the endpoint and tracker store
+        endpoint = EndpointConfig(url=endpoint_url)
         tracker_store = SQLTrackerStore(
-            dialect=tracker_store_config["dialect"],
-            url=tracker_store_config["url"],
-            db=tracker_store_config["db"],
-            username=tracker_store_config["username"],
-            password=tracker_store_config["password"],
-            event_broker=None,
-            event_broker_url=None,
-            event_broker_username=None,
-            event_broker_password=None,
+            dialect="postgresql",
+            host=db_host,
+            port=db_port,
+            username=db_username,
+            password=db_password,
+            db=db_name
         )
 
-        endpoint = EndpointConfig(url=endpoint_url)
-        self.agent = Agent.load(model_path, action_endpoint=endpoint, tracker_store=tracker_store, domain=domain)
+        self.agent = Agent.load(model_path, action_endpoint=endpoint, tracker_store=tracker_store, domain=domain_path)
 
     async def get_response(self, user_message, sender_id):
         parsed = await self.agent.parse_message(user_message)
@@ -37,13 +44,26 @@ class Bot:
 
         return result
 
-async def main():
-    with open("rasa_agent_config.json") as config_file:
-        config = json.load(config_file)
+@app.route('/chat', methods=['POST'])
+def chat():
+    data = request.get_json()
+    user_message = data['message']
+    sender_id = data['sender_id']
+    skill_id = data['skill_id']
 
-    bot = Bot(config)
-    sender_id = "123"
-    response = await bot.get_response("book a table", sender_id)
-    print(response)
+    model_path = f"skills/{skill_id}/models/"
+    config_path = "data/db_config.yml"
+    domain_path = f"skills/{skill_id}/domain.yml"
+    domain = Domain.load(domain_path)
 
-asyncio.run(main())
+    if not os.path.exists(model_path) or not os.path.isfile(domain_path):
+        return jsonify({'error': 'Invalid skill_id'})
+
+    bot = Bot(model_path, config_path, domain)
+    response = asyncio.run(bot.get_response(user_message, sender_id))
+    return jsonify(response)
+
+
+if __name__ == '__main__':
+    app.run(debug=False, host='0.0.0.0', port=5055)
+
