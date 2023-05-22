@@ -16,7 +16,7 @@ class RasaFileGenerator:
         self.payload = payload
 
     def create_rasa_folder_structure(self):
-        skill_path = f"./{self.skill_id}"
+        skill_path = f"./skills/{self.skill_id}"
         self.payload_path = f"{skill_path}/data"
 
         try:
@@ -75,7 +75,7 @@ class RasaFileGenerator:
         return rules
 
     def create_combined_yml(self, rules):
-        nlu_file = os.path.join(self.skill_id, "data", "nlu.yml")
+        nlu_file = os.path.join("skills",self.skill_id, "data", "nlu.yml")
         intents = self.payload["intents"]
         yaml_output = "version: '3.1'\n"
         yaml_output += "nlu:\n"
@@ -116,8 +116,9 @@ class RasaFileGenerator:
         rules = self.generate_rules()
         result = self.create_combined_yml(rules)
         return result
+        
     def upload_config_file(self, config_file_path):
-        shutil.copyfile(config_file_path, os.path.join(self.skill_id, 'config.yml'))
+        shutil.copyfile(config_file_path, os.path.join("skills",self.skill_id, 'config.yml'))
         return "Config file uploaded successfully"
 
     def generate_domain_file(self):
@@ -161,7 +162,7 @@ class RasaFileGenerator:
         for key, value in session_config.items():
             yaml_output += f"  {key}: {value}\n"
 
-        domain_file_path = f"{self.skill_id}/domain.yml"
+        domain_file_path = f"./skills/{self.skill_id}/domain.yml"
 
         responses = {}
         actions = []
@@ -297,44 +298,24 @@ class Submit{form}Form(Action):
                 reset_slot_assignments=reset_slot_assignments
             )
 
-        # Read the existing content of the file
         with open("actions/actions.py", "r") as f:
             existing_content = f.read()
 
-        # Append only the new actions content that doesn't already exist
-        new_actions = ""
-        if actions not in existing_content:
-            new_actions = actions
+            # Split the existing content by class definitions
+            existing_classes = existing_content.split("class ")
+
+            # Check if the class already exists in the file
+            class_name = actions.split("class ")[1].split("(")[0]
+            class_exists = any(class_name in c for c in existing_classes)
+
+            # Append only the new actions content that doesn't already exist
+            new_actions = ""
+            if not class_exists:
+                new_actions = actions
 
         # Write the new actions content to the file
-        with open("actions/actions.py", "a") as f:
+        with open("actions/actions.py", "w") as f:
+            f.write(existing_content)
             f.write(new_actions)
 
         return "Actions saved"
-
- 
-with open("restaurant.json", "r") as f:
-    payload = json.load(f)
-skill_id = str(payload["bot_id"])    
-rasa_project = RasaFileGenerator(skill_id,payload)
-rasa_project.create_rasa_folder_structure()
-rasa_project.generate_training_data()
-rasa_project.generate_domain_file()
-rasa_project.upload_config_file("config.yml")
-rasa_project.generate_actions_file()
-
-
-
-"""
-This module automates the generation of necessary Rasa files based on a JSON payload from the Skill Builder. The main functionality of the module includes:
-
-Creating the Rasa folder structure, including the main skill folder, actions folder, and data folder.
-Generating the nlu.yml file, which contains the NLU training data.
-Generating the domain.yml file, which describes the chatbot's domain (intents, entities, actions, etc.).
-Uploading a pre-defined config.yml file.
-Generating an actions.py file with custom action classes for API calls (if any).
-Generating the stories.yml file, which contains example user-bot conversations (deprecated, replaced by rules.yml).
-Generating the rules.yml file, which contains rules that determine the actions to be taken based on the user's intent.
-
-In summary, this module reads the JSON payload, creates the necessary folder structure and generates the required files.
-"""
