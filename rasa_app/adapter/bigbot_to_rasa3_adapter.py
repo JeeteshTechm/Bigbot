@@ -26,6 +26,16 @@ class JSONToYAMLConverter:
                     ]
                 }
                 stories.append(rule)
+                if "slots" in intent:
+                    slot_was_set = []
+                    for slot in intent["slots"]:
+                        slot_name = slot["name"]
+                        examples = slot["examples"]
+                        for example in examples:
+                            slot_was_set.append({slot_name: example})
+
+                    rule["steps"].append({"slot_was_set": slot_was_set})
+                
             else:
                 rule = {
                     "story": f"{intent['name']}",
