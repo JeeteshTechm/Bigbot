@@ -1,10 +1,10 @@
 import yaml
 import json
+import os
 
 class YAMLToJsonConverter:
-    def __init__(self, yaml_file_path, json_file_path):
+    def __init__(self, yaml_file_path):
         self.yaml_file_path = yaml_file_path
-        self.json_file_path = json_file_path
         self.yaml_content = None
         self.json_data = {
             "intents": []
@@ -111,6 +111,19 @@ class YAMLToJsonConverter:
                             }
 
                     break
+        for story in self.yaml_content['stories']:
+            for step in story['steps']:
+                #print(step)
+                if 'slot_was_set' in step:
+                    slot_was_set = step['slot_was_set']
+                    for slot in slot_was_set:
+                        for slot_name, slot_value in slot.items():
+                            for intent in self.json_data['intents']:
+                                if "slots" in intent:
+                                    for slot_info in intent['slots']:
+                                        if slot_info['name'] == slot_name:
+                                            slot_info['examples'].append(slot_value)
+                                
 
     def add_ids_and_relations(self):
         intents = self.json_data['intents']
@@ -139,9 +152,11 @@ class YAMLToJsonConverter:
 
         json_string = json.dumps(self.json_data, indent=4)
 
-        with open(self.json_file_path, 'w') as file:
+        output_file = os.path.splitext(self.yaml_file_path)[0] + ".json"
+
+        with open(output_file, "w") as file:
             file.write(json_string)
 
-
-converter = YAMLToJsonConverter('sindalah.yml', 'sindalah.json')
-converter.convert_to_json()
+    
+#yaml_converter = YAMLToJsonConverter("input/sindalah.yml")
+#json_data = yaml_converter.convert_to_json()
