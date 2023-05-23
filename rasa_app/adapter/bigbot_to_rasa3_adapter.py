@@ -1,5 +1,6 @@
 import json
 import yaml
+import os
 
 class JSONToYAMLConverter:
     def __init__(self, json_file):
@@ -35,7 +36,7 @@ class JSONToYAMLConverter:
                             slot_was_set.append({slot_name: example})
 
                     rule["steps"].append({"slot_was_set": slot_was_set})
-                
+
             else:
                 rule = {
                     "story": f"{intent['name']}",
@@ -122,8 +123,10 @@ class JSONToYAMLConverter:
                 for key, value in step.items():
                     yaml_output += f"      - {key}: {value}\n"
 
-        with open("sample.yml", "w") as yaml_file:
+        output_file = os.path.splitext(self.json_file)[0] + ".yml"
+
+        with open(output_file, "w") as yaml_file:
             yaml_file.write(yaml_output)
 
-converter = JSONToYAMLConverter("sindalah.json")
-converter.convert_to_yaml()
+#json_converter = JSONToYAMLConverter("input/sindalah.json")
+#yml_data = json_converter.convert_to_yaml()
