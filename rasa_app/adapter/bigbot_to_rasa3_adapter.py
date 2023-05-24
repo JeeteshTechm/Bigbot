@@ -3,13 +3,8 @@ import yaml
 import os
 
 class JSONToYAMLConverter:
-    def __init__(self, json_file):
-        self.json_file = json_file
-        self.payload = None
-
-    def load_json(self):
-        with open(self.json_file, "r") as f:
-            self.payload = json.load(f)
+    def __init__(self, json_payload):
+        self.payload = json_payload
 
     def generate_stories(self):
         stories = []
@@ -50,7 +45,6 @@ class JSONToYAMLConverter:
         return stories
 
     def convert_to_yaml(self):
-        self.load_json()
         stories = self.generate_stories()
         intents = self.payload["intents"]
         yaml_output = "version: '3.1'\n"
@@ -123,10 +117,6 @@ class JSONToYAMLConverter:
                 for key, value in step.items():
                     yaml_output += f"      - {key}: {value}\n"
 
-        output_file = os.path.splitext(self.json_file)[0] + ".yml"
-
-        with open(output_file, "w") as yaml_file:
-            yaml_file.write(yaml_output)
-
+        return yaml_output
 #json_converter = JSONToYAMLConverter("input/sindalah.json")
 #yml_data = json_converter.convert_to_yaml()
