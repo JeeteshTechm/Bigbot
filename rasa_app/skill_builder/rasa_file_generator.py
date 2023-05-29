@@ -55,7 +55,7 @@ class RasaFileGenerator:
                         {"action": form_name},
                         {"active_loop":"null"},
                         {"action": "utter_submit"},
-                        {"action": "utter_slots_values"},
+                        {"action": f"utter_{intent['form']}_values"},
                         {"action": f"submit_{intent['form']}_form"}
                     ]
 
@@ -80,16 +80,16 @@ class RasaFileGenerator:
         yaml_output = "version: '3.1'\n"
         yaml_output += "nlu:\n"
         for intent in intents:
-            if "entities" in intent:
+            if "slots" in intent:
                 yaml_output += f"  - intent: {intent['name']}\n"
                 yaml_output += "    examples: |\n"
                 for example in intent['utterances']:
-                    example_with_entities = example
-                    for entity in intent['entities']:
-                        for value in entity['values']:
-                            if str(value) in example_with_entities:
-                                example_with_entities = example_with_entities.replace(str(value), f"[{value}]({entity['name']})")
-                    yaml_output += f"      - {example_with_entities}\n"
+                    yaml_output += f"      - {example}\n"
+                for slot in intent['slots']:
+                    for example in slot['examples']:
+                        example_with_slot = example.replace(example, f"[{example}]({slot['name']})")
+                        yaml_output += f"      - {example_with_slot}\n"
+                        #yaml_output += f"      - {example}\n"
 
             else:
                 yaml_output += f"  - intent: {intent['name']}\n"
@@ -181,7 +181,9 @@ class RasaFileGenerator:
 
 
                     slot_values_template += f"            - {slot['name']}: {{{slot['name']}}}\n"
-                responses['utter_slots_values'] = [{'text': f'"{slot_values_template.replace("{", "{").replace("}", "}")}"'}]
+                #new_action= f"utter_{intent['form']}_values"
+                #actions.append(new_action)
+                responses[f"utter_{intent['form']}_values"] = [{'text': f'"{slot_values_template.replace("{", "{").replace("}", "}")}"'}]
 
 
                 #responses['utter_slots_values'] = [{'text': slot_values_template}]
@@ -319,3 +321,15 @@ class Submit{form}Form(Action):
             f.write(new_actions)
 
         return "Actions saved"
+
+"""with open("input/sindalah.json", "r") as f:
+    payload = json.load(f)
+
+skill_id=str(payload["bot_id"])
+rasa_project = RasaFileGenerator(skill_id, payload)
+
+rasa_project.create_rasa_folder_structure()
+rasa_project.generate_training_data()
+rasa_project.generate_domain_file()
+rasa_project.upload_config_file("input/config.yml")
+rasa_project.generate_actions_file()"""
