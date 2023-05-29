@@ -1,18 +1,25 @@
 import logging
 from flask import Flask, jsonify, request
-from rasa_file_generator import RasaFileGenerator
+from flask_cors import CORS, cross_origin
+from rasa_file_generator_test import RasaFileGenerator
+from create_delegate_utterances import JSONDataProcessor
 from actions.run_actions import ActionServerManager
 import json
 import rasa
-import logging
+
 app = Flask(__name__)
+CORS(app)
 
 logging.basicConfig(level=logging.INFO, filename='logs/skill_builder_train.log')
 logging.basicConfig(level=logging.INFO)
 
+
 def rasa_file_generator(payload):
     skill_id = str(payload["bot_id"])
     logging.info(f"Generating Rasa files for skill ID: {skill_id}")
+    
+    processor = JSONDataProcessor(payload)
+    processor.create_delegate_utterances()
 
     rasa_project = RasaFileGenerator(skill_id, payload)
     rasa_run_actions = ActionServerManager()
@@ -26,6 +33,7 @@ def rasa_file_generator(payload):
 
     logging.info("Rasa files generation completed")
 
+
 def rasa_train(skill_id):
     logging.info(f"Training Rasa model for skill ID: {skill_id}")
 
@@ -38,7 +46,9 @@ def rasa_train(skill_id):
 
     logging.info("Rasa model training completed")
 
+
 @app.route('/skill_builder_train', methods=['POST'])
+@cross_origin()
 def generate():
     try:
         payload = request.get_json()
@@ -51,6 +61,6 @@ def generate():
         logging.error(f"An error occurred: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5006)
-
