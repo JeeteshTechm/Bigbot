@@ -13,7 +13,7 @@ import rasa
 import subprocess
 
 
-class NluGenerator:
+class DelegateNluGenerator:
 
     def __init__(self, skill_id, payload):
         self.skill_id = skill_id
@@ -55,12 +55,21 @@ class NluGenerator:
             return f"Combined YAML file generated and saved in {nlu_file}"
 
     def upload_config_file(self, config_file_path):
-        shutil.copyfile(config_file_path, os.path.join(self.skill_id, 'config.yml'))
+        shutil.copyfile(config_file_path, os.path.join("delegate",self.skill_id, 'config.yml'))
         return "Config file uploaded successfully"
 
-    def train_and_save_model(bot_id):
-        command = f"rasa train nlu --config delegate/config.yml --nlu delegate/data/nlu.yml"
+    def train_and_save_model1(self):
+        print("yess")
 
+        config = f"delegate/{self.skill_id}/config.yml"
+        training_files = f"delegate/{self.skill_id}/data/"
+        output = f"delegate/{self.skill_id}/models/"
+
+        rasa.train(config, [training_files], output, fixed_model_name='rasa_model')
+
+    def train_and_save_model(self):
+        command = f"rasa train nlu --config delegate/{self.skill_id}/config.yml --nlu delegate/{self.skill_id}/data/nlu.yml --out delegate/{self.skill_id}/models"
+        print(command)
         #command = f"rasa train nlu --nlu delegate/data/nlu.yml"
         subprocess.run(command, shell=True)
 
