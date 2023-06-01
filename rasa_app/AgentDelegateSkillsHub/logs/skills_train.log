@@ -1,0 +1,23 @@
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5006
+ * Running on http://192.168.0.134:5006
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.0.134:5001
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:root:Generating Rasa files for skill ID: sindalah
+INFO:root:Rasa files generation completed
+INFO:root:Training Rasa model for skill ID: sindalah
+INFO:rasa.engine.training.hooks:Restored component 'CountVectorsFeaturizer' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'CountVectorsFeaturizer' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'DIETClassifier' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'EntitySynonymMapper' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'LexicalSyntacticFeaturizer' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'MemoizationPolicy' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'RegexFeaturizer' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'RulePolicy' from cache.
+INFO:rasa.engine.training.hooks:Restored component 'TEDPolicy' from cache.
+INFO:root:Rasa model training completed
