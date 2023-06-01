@@ -1,0 +1,30 @@
+{
+    "name": "safana_finedining",
+    "package": "hello",
+    "bot_id": "hr0h",
+    "intents": [
+        {
+            "component": "main.Block.InputText",
+            "id": "hr0h",
+            "parent_id": "-1",
+            "name": "hi",
+            "response": "hi",
+            "required": false,
+            "utterances": [
+                "hey",
+                "hi"
+            ],
+            "read": null,
+            "slots": [
+                {
+                    "name": "date",
+                    "type": "any",
+                    "bot_ask": "aany",
+                    "examples": "12/12/2023"
+                }
+            ],
+            "form": "booking"
+        },
+        {}             
+    ]
+}
