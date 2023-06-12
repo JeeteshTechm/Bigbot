@@ -113,6 +113,17 @@ DATABASES = {
     }
 }
 
+# DATABASES = {
+#     "default": {
+#         "ENGINE": "django_prometheus.db.backends.postgresql",
+#         "NAME": "rasadb",
+#         "USER": "rasa",
+#         "PASSWORD": "rasa123",
+#         "HOST": "37.224.68.171",
+#         "PORT": "5432",
+#     }
+# }
+
 
 # Password validation
 # https://docs.djangoproject.com/en/3.0/ref/settings/#auth-password-validators
@@ -150,7 +161,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
-# STATIC_URL = '/static/'
+STATIC_URL = '/static/'
 
 # STATICFILES_DIRS = [
 #    os.path.join(BASE_DIR,'static'),
@@ -208,25 +219,26 @@ else:
     MEDIA_ROOT = os.path.join(BASE_DIR, "static")
 
 KEYCLOAK_CONFIG = {
-    "KEYCLOAK_SERVER_URL": os.getenv("KEYCLOAK_SERVER_URL"),
-    "KEYCLOAK_REALM": os.getenv("KEYCLOAK_REALM"),
-    "KEYCLOAK_CLIENT_ID": os.getenv("KEYCLOAK_CLIENT_ID"),
-    "KEYCLOAK_CLIENT_SECRET_KEY": os.getenv("KEYCLOAK_CLIENT_SECRET_KEY"),
-    "KEYCLOAK_ADMIN_USERNAME": os.getenv("KEYCLOAK_ADMIN_USERNAME"),
-    "KEYCLOAK_ADMIN_PASSWORD": os.getenv("KEYCLOAK_ADMIN_PASSWORD"),
+    "KEYCLOAK_SERVER_URL": os.getenv("KEYCLOAK_SERVER_URL", "http://keycloak.test.com/"),
+    "KEYCLOAK_REALM": os.getenv("KEYCLOAK_REALM", "splinter-realm"),
+    "KEYCLOAK_CLIENT_ID": os.getenv("KEYCLOAK_CLIENT_ID", "splinter-client"),
+    "KEYCLOAK_CLIENT_SECRET_KEY": os.getenv("KEYCLOAK_CLIENT_SECRET_KEY", "ZcdNjnfI2Qw9X7rfsuLseMvZkgXA7llc"),
+    "KEYCLOAK_ADMIN_USERNAME": os.getenv("KEYCLOAK_ADMIN_USERNAME", "admin"),
+    "KEYCLOAK_ADMIN_PASSWORD": os.getenv("KEYCLOAK_ADMIN_PASSWORD", "admin"),
 }
 
 
 MASTER_REALM = {
-    "KEYCLOAK_SERVER_URL": os.getenv("KEYCLOAK_SERVER_URL"),
-    "KEYCLOAK_REALM": os.getenv("KEYCLOAK_MASTER_REALM"),
-    "KEYCLOAK_CLIENT_ID": os.getenv("KEYCLOAK_MASTER_CLIENT_ID"),
-    "KEYCLOAK_ADMIN_USERNAME": os.getenv("KEYCLOAK_MASTER_USERNAME"),
-    "KEYCLOAK_ADMIN_PASSWORD": os.getenv("KEYCLOAK_MASTER_PASSWORD"),
+    "KEYCLOAK_SERVER_URL": os.getenv("KEYCLOAK_SERVER_URL", "http://keycloak.test.com/"),
+    "KEYCLOAK_REALM": os.getenv("KEYCLOAK_MASTER_REALM", "master"),
+    "KEYCLOAK_CLIENT_ID": os.getenv("KEYCLOAK_MASTER_CLIENT_ID", "admin"),
+    "KEYCLOAK_ADMIN_USERNAME": os.getenv("KEYCLOAK_MASTER_USERNAME", "admin"),
+    "KEYCLOAK_ADMIN_PASSWORD": os.getenv("KEYCLOAK_MASTER_PASSWORD", "admin"),
     "KEYCLOAK_EMAIL_SERVER_PASSWORD": os.getenv("KEYCLOAK_EMAIL_SERVER_PASSWORD", ""),
-    "KEYCLOAK_REGULAR_CLIENT_ID": os.getenv("KEYCLOAK_REGULAR_CLIENT_ID"),
-    "KEYCLOAK_REGULAR_CLIENT_SECRET": os.getenv("KEYCLOAK_REGULAR_CLIENT_SECRET"),
+    "KEYCLOAK_REGULAR_CLIENT_ID": os.getenv("KEYCLOAK_REGULAR_CLIENT_ID", "admin"),
+    "KEYCLOAK_REGULAR_CLIENT_SECRET": os.getenv("KEYCLOAK_REGULAR_CLIENT_SECRET", "DDlKoKUKGzMpd4qof5mnR3VU8Q6nHRRs"),
 }
+
 
 
 # --------------------------------------------------------------------------------------------------

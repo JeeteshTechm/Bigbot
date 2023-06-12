@@ -6,6 +6,7 @@ from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.core.validators import validate_email
 from django.template import Context, Template
+import pickle
 
 from main import Log
 
@@ -25,8 +26,10 @@ def append_url(server, url):
 
 def base64_decode(string):
     base64_bytes = string.encode("ascii")
-    string_bytes = base64.b64decode(base64_bytes)
-    return string_bytes.decode("ascii")
+    # string_bytes = base64.b64decode(base64_bytes)
+    check = pickle.dumps(string)
+    return check
+    # return string_bytes.decode("ascii")
 
 
 def base64_encode(string):
@@ -56,7 +59,8 @@ def build_stack_mail_content(subject, name, instance_uri):
 
 
 def decode_token(encoded_token: str) -> dict:
-    return json.loads(base64_decode(encoded_token))
+    import pickle
+    return json.loads(pickle.loads(base64_decode(encoded_token)))
 
 
 def encode_token(token: dict) -> str:

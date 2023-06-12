@@ -19,7 +19,8 @@ class KeycloakUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        token = request.META.get("HTTP_AUTHORIZATION")
+        token = request.headers.get('Authorization')
+        # token = request.META.get("HTTP_AUTHORIZATION")
         refreshed_token = None
         if token:
             match = token_regex.match(token)
@@ -30,7 +31,7 @@ class KeycloakUserMiddleware:
                     if user is None:
                         refreshed_token = None
                 except Exception as e:
-                    Log.error(e)
+                    Log.error("KeycloakMiddleware",e)
                     refresh_token = None
 
         response = self.get_response(request)

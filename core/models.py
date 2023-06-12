@@ -301,17 +301,27 @@ class KeycloakUserManager(models.Model):
     @staticmethod
     def authenticate_token(encoded_token):
         """Authenticates an existing token"""
-        token = utils.decode_token(encoded_token)
-        realm = KeycloakRealm.objects.filter(realm=token["rlm"]).first()
+        import jwt
+        public_key = "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAt0xiV75777paKo9qwDItqKgUWEBWFKPMxcOuHqjy5dg62TDtxXTGoVgbJowqx/LzP+uYGSRWvVm/b1cb/nNmCDpTEqqAfH7/NPolT+/UE8dROIlAzi54Irf7+Pq/4yCvu8VBiALP8RKP/f63ShupyBEAVmVCgqkfMVeHXsqJQxSFmgGa+3wmGt2Nli3CsGZNa7yhfZ2mhZHI6mRSbDv+peX21sbMrEyMU77PEuTpAa+xQ2Q7NJbDNMOyzX0/1Hi3tDec9Uw0hYsJdRxfWJ7/uVFM94dY4y4imvY1FLogFfohPEXuzeOAot2p0NTO9NKIFvQOCO39/UUFx1A3Zh9jOQIDAQAB"
+        
+        # token = utils.decode_token(encoded_token)
+
+
+        # token = jwt.decode(encoded_token, public_key, algorithms=["RS256"], audience="judge")
+        # token = jwt.decode(encoded_token, public_key, algorithms=["RS256"], audience="account")
+        # token = jwt.decode(encoded_token, algorithms=["RS256"], options={"verify_signature": False})
+        # realm = KeycloakRealm.objects.filter(realm=token["rlm"]).first()
 
         try:
-            user = realm.parse_token(token)
-            if user is None:
-                rc = RealmController(realm.realm, init_admin=False)
-                token = rc.refresh_token(token)
-                user = realm.parse_token(token)
-            return token, {
-                "email": user["email"],
+            user = jwt.decode(encoded_token, algorithms=["RS256"], options={"verify_signature": False})
+
+            # user = realm.parse_token(token)
+            # if user is None:
+            #     rc = RealmController(realm.realm, init_admin=False)
+            #     token = rc.refresh_token(token)
+            #     user = realm.parse_token(token)
+            return encoded_token, {
+                "email": user.get("email", ""),
                 "email_verified": user["email_verified"],
                 "last_name": user.get("family_name", ""),
                 "first_name": user.get("given_name", ""),
@@ -1029,8 +1039,7 @@ class Stack(models.Model):
         self.save()
         Log.info(
             f"Stack <{self.project.name}>",
-            Stack.Step.get_label(self.step),
-            Stack.Status.get_label(self.status),
+            f"{Stack.Step.get_label(self.step)} {Stack.Status.get_label(self.status)}",
         )
 
     def set_step(self, step):
@@ -1039,8 +1048,7 @@ class Stack(models.Model):
         self.save()
         Log.info(
             f"Stack <{self.project.name}>",
-            Stack.Step.get_label(self.step),
-            Stack.Status.get_label(self.status),
+            f"{Stack.Step.get_label(self.step)} {Stack.Status.get_label(self.status)}",
         )
 
     def setup_server(self):

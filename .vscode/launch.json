@@ -25,9 +25,10 @@
                 "--settings=project.settings.development"
             ],
             "env":{
-                "DATABASE_NAME":"postgres",
-                "DATABASE_PASSWORD":"foo",
-                "DATABASE_USER":"postgres",
+                "DATABASE_NAME":"rasadb",
+                "DATABASE_PASSWORD":"rasa123",
+                "DATABASE_USER":"rasa",
+                "DATABASE_HOST": "37.224.68.171",
                 "IS_DEVELOPMENT":"True"
             },
             "django": true

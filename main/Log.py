@@ -18,7 +18,10 @@ def log(tag: str, message: str, foreground_color: Optional[Color]=None, bg_color
     if bg_color:
         log_message = background(f"{tag}: {message}", bg_color.value)
     else:
-        log_message = color(f"{tag}: {message}", foreground_color.value)
+        try:
+            log_message = color(f"{tag}: {message}", foreground_color.value)
+        except AttributeError as ex:
+            pass
     print(log_message)
     if fluentd_logger:
         fluentd_logger.info(message, extra={'tag': tag, 'color': color.name if color else None, 'bg_color': bg_color.name if bg_color else None})

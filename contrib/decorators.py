@@ -12,7 +12,7 @@ from main import Log
 
 def authenticate_user(request, encoded_token: str, permissions: list) -> bool:
     try:
-        decoded_token = decode_token(encoded_token)
+        # decoded_token = decode_token(encoded_token)
         refreshed_token, user = KeycloakUserManager.authenticate_token(encoded_token)
     except Exception as e:
         Log.error("authenticate_user", e)
@@ -122,7 +122,8 @@ def keycloak_authenticate_header(*permissions):
 
     def decorator(func):
         def authenticate(request, *args, **kwargs):
-            token = request.META.get("HTTP_AUTHORIZATION")
+            token = request.headers.get('AUTHORIZATION')
+            # token = request.META.get("HTTP_AUTHORIZATION")
             if token is None:
                 return JsonRPCResponse(error="Unauthorized", status=401)
             token_regex = re.compile(r"^bearer (?P<token>.+)$", re.I)
