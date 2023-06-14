@@ -18,10 +18,23 @@ class JSONDataProcessor:
             "utterances": []
         }
 
-        for intent in self.payload["intents"]:
-            output_data["utterances"].extend(intent["utterances"])
+        # Check if intent with the same name already exists
+        existing_intent_index = None
+        for i, intent in enumerate(main_data["intents"]):
+            if intent["name"] == output_data["name"]:
+                existing_intent_index = i
+                break
 
-        main_data["intents"].append(output_data)
+        # Append utterances to the output_data
+        for intent in self.payload["intents"]:
+            if "utterances" in intent:
+                output_data["utterances"].extend(intent["utterances"])
+
+        # If existing intent found, replace it
+        if existing_intent_index is not None:
+            main_data["intents"][existing_intent_index] = output_data
+        else:
+            main_data["intents"].append(output_data)
 
         with open(self.output_file, 'w') as file:
             json.dump(main_data, file, indent=4)
