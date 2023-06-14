@@ -3,6 +3,7 @@ from flask import Flask, jsonify, request
 from delegate_trainer import DelegateNluGenerator
 from agent_utterance_generator import AgentDataCreator
 from agent_train import AgentNluGenerator
+from flask_cors import CORS, cross_origin
 import json
 import rasa
 import os
@@ -30,6 +31,7 @@ def train_delegates(delegate_name,payload):
 
 
 @app.route('/train_delegate', methods=['POST'])
+@cross_origin()
 def train_delegate():
     try:
         json_data = request.get_json()
@@ -50,7 +52,7 @@ def train_delegate():
 
         train_agent()
 
-        return jsonify({"message": "Rasa model has been trained and saved in models"})
+        return jsonify({"message": "Agent and Delegate models are trained"})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
