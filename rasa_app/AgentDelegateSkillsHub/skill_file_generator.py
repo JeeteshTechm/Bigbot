@@ -9,6 +9,7 @@ from ruamel.yaml import YAML
 from collections import OrderedDict
 import re
 from typing import List
+from remove_empty_keys_yaml import YamlFileProcessor
 
 class RasaFileGenerator:
     def __init__(self, skill_id, payload):
@@ -38,9 +39,9 @@ class RasaFileGenerator:
         for intent in self.payload['intents']:
             if "form" in intent:
                 form_name = intent["form"]
-                trigger_intent = intent["name"]
+                trigger_intent = intent["intent"]
                 rule = {
-                    "rule": f"{intent['name']} activateform",
+                    "rule": f"{intent['intent']} activateform",
                     "steps": [
                         {"intent": trigger_intent},
                         {"action": form_name},
@@ -49,7 +50,7 @@ class RasaFileGenerator:
                 }
                 rules.append(rule)
                 submit={
-                    "rule": f"{intent['name']} submit form ",
+                    "rule": f"{intent['intent']} submit form ",
                     "condition": f"\n    - active_loop: {form_name}",
                     "steps": [
                         {"action": form_name},
@@ -63,10 +64,10 @@ class RasaFileGenerator:
                 rules.append(submit)
             else:
                 rule = {
-                    "rule": f"{intent['name']}",
+                    "rule": f"{intent['intent']}",
                     "steps": [
-                        {"intent": intent['name']},
-                        {"action": f"utter_{intent['name']}"}
+                        {"intent": intent['intent']},
+                        {"action": f"utter_{intent['intent']}"}
                         
                     ]
                 }
@@ -81,7 +82,7 @@ class RasaFileGenerator:
         yaml_output += "nlu:\n"
         for intent in intents:
             if "slots" in intent:
-                yaml_output += f"  - intent: {intent['name']}\n"
+                yaml_output += f"  - intent: {intent['intent']}\n"
                 yaml_output += "    examples: |\n"
                 for example in intent['utterances']:
                     yaml_output += f"      - {example}\n"
@@ -92,7 +93,7 @@ class RasaFileGenerator:
                         #yaml_output += f"      - {example}\n"
 
             else:
-                yaml_output += f"  - intent: {intent['name']}\n"
+                yaml_output += f"  - intent: {intent['intent']}\n"
                 yaml_output += "    examples: |\n"
                 for example in intent['utterances']:
                     yaml_output += f"      - {example}\n"
@@ -121,27 +122,33 @@ class RasaFileGenerator:
         shutil.copyfile(config_file_path, os.path.join("skills",self.skill_id, 'config.yml'))
         return "Config file uploaded successfully"
 
+
     def generate_domain_file(self):
         intents = self.payload["intents"]
         yaml_output = "version: '3.1'\n"
         yaml_output += "intents:\n"
         for intent in intents:
             if "form" in intent:
-                yaml_output += f"  - {intent['name']}\n"
-                #yaml_output += "    use_entities: []\n"
+                yaml_output += f"  - {intent['intent']}\n"
             else:
-                yaml_output += f"  - {intent['name']}\n"
+                yaml_output += f"  - {intent['intent']}\n"
+
+        unique_slots = {}
+        for intent in intents:
+            if "form" in intent:
+                for slot in intent['slots']:
+                    slot_name = slot['name']
+                    if slot_name not in unique_slots:
+                        unique_slots[slot_name] = slot
 
         yaml_output += f"slots:\n"
-        for intent in intents:
-            if "form" in intent:  
-                for slot in intent['slots']:
-                    yaml_output += f"  {slot['name']}:\n"
-                    yaml_output += f"    type: {slot['type']}\n"
-                    yaml_output += f"    influence_conversation: false\n"
-                    yaml_output += f"    mappings:\n"
-                    yaml_output += f"    - type : from_entity\n"
-                    yaml_output += f"      entity : {slot['name']}\n"
+        for slot_name, slot in unique_slots.items():
+            yaml_output += f"  {slot_name}:\n"
+            yaml_output += f"    type: {slot['type']}\n"
+            yaml_output += f"    influence_conversation: false\n"
+            yaml_output += f"    mappings:\n"
+            yaml_output += f"    - type: from_entity\n"
+            yaml_output += f"      entity: {slot['name']}\n"
 
         yaml_output += f"forms:\n"
         for intent in intents:
@@ -152,10 +159,8 @@ class RasaFileGenerator:
                     yaml_output += f"      - {slot['name']}\n"
 
         yaml_output += "entities:\n"
-        for intent in intents:
-            if "form" in intent:
-                for slot in intent['slots']:
-                    yaml_output += f"  - {slot['name']}\n"
+        for slot_name in unique_slots.keys():
+            yaml_output += f"  - {slot_name}\n"
 
         session_config = {'session_expiration_time': 60, 'carry_over_slots_to_new_session': True}
         yaml_output += "session_config:\n"
@@ -170,7 +175,7 @@ class RasaFileGenerator:
             if "form" in intent:
                 actions.append(f'validate_{intent["form"]}_form')
                 actions.append(f'submit_{intent["form"]}_form')
-                
+
                 responses['utter_submit'] = [{'text': "All done!"}]
                 slot_values_template = "I am going to use the following parameters:\n"
                 for slot in intent['slots']:
@@ -179,17 +184,12 @@ class RasaFileGenerator:
                     if "bot_ask_negative" in slot:
                         responses[f"utter_wrong_{slot['name']}"] = [{'text': slot["bot_ask_negative"]}]
 
-
                     slot_values_template += f"            - {slot['name']}: {{{slot['name']}}}\n"
-                #new_action= f"utter_{intent['form']}_values"
-                #actions.append(new_action)
                 responses[f"utter_{intent['form']}_values"] = [{'text': f'"{slot_values_template.replace("{", "{").replace("}", "}")}"'}]
 
-
-                #responses['utter_slots_values'] = [{'text': slot_values_template}]
             else:
-                response_key = f'utter_{intent["name"]}'
-                response_texts = intent['responses']
+                response_key = f'utter_{intent["intent"]}'
+                response_texts = intent['response']
                 responses[response_key] = [{'text': response_text} for response_text in response_texts]
 
         yaml_output += "responses:\n"
@@ -199,13 +199,19 @@ class RasaFileGenerator:
                 yaml_output += f"    - text: {response_text['text']}\n"
 
         yaml_output += "actions:\n"
+
         for action in actions:
             yaml_output += f"  - {action}\n"
-
+        
+       
         with open(domain_file_path, "w") as f:
             f.write(yaml_output)
 
-        return ('Domain saved to given path')
+        processor = YamlFileProcessor(domain_file_path)
+        processor.process_yaml_file()
+
+        return 'Domain saved to the given path'
+
 
 
 
