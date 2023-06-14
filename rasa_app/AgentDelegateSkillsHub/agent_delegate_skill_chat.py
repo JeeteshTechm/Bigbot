@@ -11,6 +11,7 @@ from datetime import datetime
 import yaml
 import os 
 from flask import Flask, jsonify, request
+import json
 
 
 app = Flask(__name__)
@@ -18,23 +19,14 @@ app = Flask(__name__)
 class FetchRecords:
     def __init__(self,sender_id):
         self.sender_id=sender_id
-        
+    
     async def fetch_conversation(self):
         import datetime
-        config_path = "input/db_config.yml"
-        with open(config_path, 'r') as config_file:
-            config = yaml.safe_load(config_file)
-      
-        db_host = config['database']['host']
-        db_username = config['database']['username']
-        db_password = config['database']['password']
-        db_name = config['database']['database_name']
-
         conn = psycopg2.connect(
-        host=db_host,
-        database=db_name,
-        user=db_username,
-        password=db_password
+        host="127.0.0.1",
+        database="rasadb",
+        user="rasa",
+        password="rasa123"
         )
         cursor = conn.cursor()
 
@@ -46,10 +38,7 @@ class FetchRecords:
         one_hour_ago = current_timestamp - datetime.timedelta(hours=1)
         timestamp_unix = one_hour_ago.timestamp()
         timestamp_str = '{:.10f}'.format(timestamp_unix)
-
-        print("Unix timestamp:", timestamp_str)
-
-        query = "SELECT sender_id,intent_name, action_name FROM events WHERE timestamp >= {time} AND sender_id='{sender}' order by id;".format(time=timestamp_str,sender=self.sender_id)
+        query = "SELECT sender_id,intent_name, action_name, data FROM events WHERE timestamp >= {time} AND sender_id='{sender}' order by id DESC LIMIT 10;".format(time=timestamp_str,sender=self.sender_id)
         cursor.execute(query)
         rows = cursor.fetchall()
         cursor.close()
@@ -135,16 +124,13 @@ class SkillStoreandFetch:
         latest_skill_id = sorted_rows.iloc[0]['skill_id']
         latest_status=sorted_rows.iloc[0]['conversation_status']
         data={'skill':latest_skill_id,'status':latest_status}
-        print("LATESTE  SKILL DATA AND STATUS",data)
         return data
 
 
 async def main(user_message,sender_id):
-
     skill_records=FetchRecords(sender_id)
     conv_list= await skill_records.fetch_conversation()
-    store_and_fetch=SkillStoreandFetch(sender_id)
-     
+    store_and_fetch=SkillStoreandFetch(sender_id) 
     skill_id=""
     
     if(len(conv_list)>0):
@@ -153,17 +139,12 @@ async def main(user_message,sender_id):
             skill_id=skill_status['skill']
             skill_process=SkillProcessor(skill_id,user_message,sender_id)
             response=skill_process.skill_processor()
-            print(response)
-            text = response['text']
-
             conv_list= await skill_records.fetch_conversation()
             sub=False
             for i in range(0,len(conv_list)):
                 if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
                     sub=True
-                    print("INSIDE 143 SUBMIT****")
-                    break
-                    
+                    break    
                 else:
                     sub=False
 
@@ -171,33 +152,66 @@ async def main(user_message,sender_id):
                 store_and_fetch.store_sender_skill(skill_id,"completed")
             else:
                 store_and_fetch.store_sender_skill(skill_id,"inprogress")
+      
         else:
             agent=DelegateFinder()
             delegate_id=await agent.get_response(user_message)
-
             delegate=SkillFinder(delegate_id)
             skill_id=await delegate.get_response(user_message)
+
             skill_process=SkillProcessor(skill_id,user_message,sender_id)
             response=skill_process.skill_processor()
-            print(response)
-            text = response['text']
-            if text:
-                store_and_fetch.store_sender_skill(skill_id, "inprogress")
+            sub=False
+            activeStatus=True
+            conv_list= await skill_records.fetch_conversation()
+            for i in range(0,len(conv_list)):
+                if((json.loads(conv_list[i][3])["event"])=="active_loop"):
+                    activeStatus=False  
+            for i in range(0,len(conv_list)):
+                if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
+                    sub=True
+                    break   
+                else:
+                    sub=False
+
+            if activeStatus:
+                store_and_fetch.store_sender_skill(skill_id,"completed") 
+            else:
+                if(sub):
+                    store_and_fetch.store_sender_skill(skill_id,"completed")
+                else:
+                    store_and_fetch.store_sender_skill(skill_id,"inprogress")
     else:
         agent=DelegateFinder()
         delegate_id=await agent.get_response(user_message)
-
         delegate=SkillFinder(delegate_id)
         skill_id=await delegate.get_response(user_message)
-
         skill_process=SkillProcessor(skill_id,user_message,sender_id)
         response=skill_process.skill_processor()
-        text = response['text']
-        if text:
-            store_and_fetch.store_sender_skill(skill_id, "inprogress")
+    
+        sub=False
+        activeStatus=True
+        conv_list= await skill_records.fetch_conversation()
+        for i in range(0,len(conv_list)):
+          if((json.loads(conv_list[i][3])["event"])=="active_loop"):
+              activeStatus=False  
+        for i in range(0,len(conv_list)):
 
-    return text
+                if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
+                    sub=True
+                    break   
+                else:
+                    sub=False
+            
+        if activeStatus:
+           store_and_fetch.store_sender_skill(skill_id,"completed") 
+        else:
+            if(sub):
+                store_and_fetch.store_sender_skill(skill_id,"completed")
+            else:
+                store_and_fetch.store_sender_skill(skill_id,"inprogress")
 
+    return response   
 
 @app.route('/chat', methods=['POST'])
 def chat():
@@ -205,8 +219,8 @@ def chat():
     user_message = data['message']
     sender_id = data['sender_id']
     response=asyncio.run(main(user_message,sender_id))
+    
     return response
-
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5004)
 
