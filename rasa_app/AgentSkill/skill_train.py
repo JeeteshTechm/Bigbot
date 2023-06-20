@@ -5,6 +5,7 @@ from skill_file_generator import RasaFileGenerator
 from skill_utterance_generator import JSONDataProcessor
 from actions.run_actions import ActionServerManager
 from availiable_skills import AvailiableSkills
+from agent_train import AgentNluGenerator
 import json
 import rasa
 
@@ -51,6 +52,16 @@ def rasa_train(skill_id):
 
     logging.info("Rasa model training completed")
 
+def train_agent():
+    with open("input/skills.json", "r") as f:
+        payload = json.load(f)
+    skill_id="agent_bot"
+    agent_train=AgentNluGenerator(skill_id,payload)
+    agent_train.create_rasa_folder_structure()
+    agent_train.nlu_yml()
+    agent_train.upload_config_file("input/config.yml")
+    agent_train.train_and_save_model()
+
 
 @app.route('/skill_builder_train', methods=['POST'])
 @cross_origin()
@@ -61,6 +72,7 @@ def generate():
         skill_id = str(payload["bot_id"])
         rasa_file_generator(payload)
         rasa_train(skill_id)
+        train_agent()
 
         return jsonify({"message": "Rasa model has been trained and saved in models"})
     except Exception as e:
