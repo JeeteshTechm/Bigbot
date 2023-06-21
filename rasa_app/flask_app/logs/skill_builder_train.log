@@ -1,0 +1,30 @@
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5002
+ * Running on http://192.168.0.134:5002
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:root:Generating Rasa files for skill ID: sindalah1
+INFO:root:Rasa files generation completed
+INFO:root:Training Rasa model for skill ID: sindalah1
+INFO:rasa.engine.training.hooks:Starting to train component 'RegexFeaturizer'.
+INFO:rasa.engine.training.hooks:Finished training component 'RegexFeaturizer'.
+INFO:rasa.engine.training.hooks:Starting to train component 'LexicalSyntacticFeaturizer'.
+INFO:rasa.engine.training.hooks:Finished training component 'LexicalSyntacticFeaturizer'.
+INFO:rasa.engine.training.hooks:Starting to train component 'CountVectorsFeaturizer'.
+INFO:rasa.nlu.featurizers.sparse_featurizer.count_vectors_featurizer:54 vocabulary items were created for text attribute.
+INFO:rasa.engine.training.hooks:Finished training component 'CountVectorsFeaturizer'.
+INFO:rasa.engine.training.hooks:Starting to train component 'CountVectorsFeaturizer'.
+INFO:rasa.nlu.featurizers.sparse_featurizer.count_vectors_featurizer:596 vocabulary items were created for text attribute.
+INFO:rasa.engine.training.hooks:Finished training component 'CountVectorsFeaturizer'.
+INFO:rasa.engine.training.hooks:Starting to train component 'DIETClassifier'.
+INFO:rasa.engine.training.hooks:Finished training component 'DIETClassifier'.
+INFO:rasa.engine.training.hooks:Starting to train component 'EntitySynonymMapper'.
+INFO:rasa.engine.training.hooks:Finished training component 'EntitySynonymMapper'.
+INFO:rasa.engine.training.hooks:Starting to train component 'MemoizationPolicy'.
+INFO:rasa.engine.training.hooks:Finished training component 'MemoizationPolicy'.
+INFO:rasa.engine.training.hooks:Starting to train component 'RulePolicy'.
+INFO:rasa.engine.training.hooks:Finished training component 'RulePolicy'.
+INFO:rasa.engine.training.hooks:Starting to train component 'TEDPolicy'.
+INFO:rasa.engine.training.hooks:Finished training component 'TEDPolicy'.
+INFO:root:Rasa model training completed
+INFO:werkzeug:136.226.252.182 - - [21/Jun/2023 19:39:53] "POST /skill_builder_train HTTP/1.1" 200 -

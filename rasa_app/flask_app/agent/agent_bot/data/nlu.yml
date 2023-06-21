@@ -1,0 +1,20 @@
+version: '3.1'
+nlu:
+  - intent: sindalah1
+    examples: |
+      - I want to know more about Sindalah Island
+      - Tell me about Sindalah
+      - What can I expect at Sindalah?
+      - I want to book a flight to Sindalah
+      - Can I reserve a flight to Sindalah?
+      - I'd like to fly to Sindalah
+      - I want to fly to Sindalah on May 2nd 2022 in Business class
+      - Can you book a flight to Sindalah for 06/06/2023 in First class?
+      - I'd like to reserve a flight to Sindalah on next sunday in VIP Private class
+      - What activities would you recommend in Sindalah?
+      - Can you suggest things to do in Sindalah?
+      - I'm looking for recommendations in Sindalah
+      - What's the status of my booking?
+      - Can you confirm my flight details?
+      - I'd like to check my booking for 23456
+      - what is the booking status of 98989?

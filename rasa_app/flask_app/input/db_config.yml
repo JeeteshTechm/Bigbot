@@ -1,0 +1,10 @@
+endpoints:
+  api_url: http://37.224.68.171:5055/webhook
+  skill_url: http://37.224.68.171:5003/chat
+database:
+  dialect: postgresql
+  host: 127.0.0.1
+  port: 5432
+  username: rasa
+  password: rasa123
+  database_name: rasadb

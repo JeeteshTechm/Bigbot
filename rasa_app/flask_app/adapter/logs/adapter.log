@@ -1,0 +1,132 @@
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5001
+ * Running on http://192.168.0.134:5001
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:root:Received YAML file: payload.yml
+INFO:root:Loaded YAML content: {'version': '3.0', 'nlu': [{'intent': 'greet', 'examples': '- hi\n- hello\n- hey\n'}, {'intent': 'inquire_sindalah', 'examples': '- I want to know more about Sindalah Island\n- Tell me about Sindalah\n- What can I expect at Sindalah?\n'}, {'intent': 'book_flight', 'examples': "- I want to book a flight to Sindalah\n- Can I reserve a flight to Sindalah?\n- I'd like to fly to Sindalah\n- I need a flight to Sindalah\n- I wish to arrange a flight to Sindalah\n- I'm planning to visit Sindalah, can you help with the flight?\n- I want to organise a flight to Sindalah\n- Is it possible to book a flight to Sindalah?\n- Let's arrange a flight to Sindalah\n- I am interested in a flight to Sindalah\n- I'm looking to book a flight to Sindalah\n- Could I get a flight to Sindalah?\n- Sindalah is my next destination, I need to book a flight\n"}, {'intent': 'ask_recommendations', 'examples': "- What activities would you recommend in Sindalah?\n- Can you suggest things to do in Sindalah?\n- I'm looking for recommendations in Sindalah\n"}, {'intent': 'inquire_booking_status', 'examples': "- What's the status of my booking?\n- Can you confirm my flight details?\n- I'd like to check my booking\n"}], 'slots': {'travel_date': {'type': 'text', 'influence_conversation': True}, 'travel_class': {'type': 'text', 'influence_conversation': True}, 'booking_id': {'type': 'text', 'influence_conversation': True}}, 'responses': {'utter_greet': [{'text': 'Hello! How can I assist you with your luxury travel plans today?'}], 'utter_sindalah_info': [{'text': 'Sindalah Island is a paradise for luxury travel with pristine beaches, exotic flora and fauna, and our exclusive, futuristic airport. You can expect a truly unique experience.'}], 'utter_ask_travel_date': [{'text': 'When do you plan to travel to Sindalah?'}], 'utter_ask_travel_class': [{'text': 'Which class would you prefer for your flight - First, Business or VIP Private?'}], 'utter_sindalah_recommendations': [{'text': 'In Sindalah, you can enjoy beachfront dining, snorkeling in crystal clear waters, explore exotic wildlife, or simply relax on our pristine beaches.'}], 'utter_ask_booking_id': [{'text': 'Could you please provide your booking ID for me to check your booking details?'}], 'utter_confirm_booking': [{'text': 'Your flight to Sindalah is booked for {travel_date} in {travel_class}. Your booking ID is {booking_id}.'}]}, 'forms': {'flight_booking_form': {'travel_date': [{'type': 'from_text'}], 'travel_class': [{'type': 'from_text'}]}, 'booking_inquiry_form': {'booking_id': [{'type': 'from_text'}]}}, 'actions': ['action_book_flight', 'action_check_booking', 'action_confirm_booking'], 'stories': [{'story': 'Greeting', 'steps': [{'intent': 'greet'}, {'action': 'utter_greet'}]}, {'story': 'Inquire Sindalah', 'steps': [{'intent': 'inquire_sindalah'}, {'action': 'utter_sindalah_info'}]}, {'story': 'Flight booking', 'steps': [{'intent': 'book_flight'}, {'action': 'flight_booking_form'}, {'active_loop': 'flight_booking_form'}, {'active_loop': None}, {'slot_was_set': [{'travel_date': '2023-08-15'}, {'travel_class': 'VIP Private'}]}, {'action': 'action_book_flight'}, {'slot_was_set': [{'booking_id': 'B1234'}]}, {'action': 'action_confirm_booking'}, {'action': 'utter_confirm_booking'}]}, {'story': 'Ask recommendations', 'steps': [{'intent': 'ask_recommendations'}, {'action': 'utter_sindalah_recommendations'}]}, {'story': 'Inquire booking status', 'steps': [{'intent': 'inquire_booking_status'}, {'action': 'booking_inquiry_form'}, {'active_loop': 'booking_inquiry_form'}, {'active_loop': None}, {'slot_was_set': [{'booking_id': 'B1234'}]}, {'action': 'action_check_booking'}, {'action': 'utter_confirm_booking'}]}]}
+INFO:root:Converted YAML to JSON: {
+    "bot_id": "f5fccb16-359c-423c-a758-7decd4cc3aa1",
+    "intents": [
+        {
+            "intent": "greet",
+            "response": [
+                "Hello! How can I assist you with your luxury travel plans today?"
+            ],
+            "utterances": [
+                "hi",
+                "hello",
+                "hey"
+            ],
+            "id": "id_1",
+            "child_id": "id_2"
+        },
+        {
+            "intent": "inquire_sindalah",
+            "response": [
+                "Sindalah Island is a paradise for luxury travel with pristine beaches, exotic flora and fauna, and our exclusive, futuristic airport. You can expect a truly unique experience."
+            ],
+            "utterances": [
+                "I want to know more about Sindalah Island",
+                "Tell me about Sindalah",
+                "What can I expect at Sindalah?"
+            ],
+            "id": "id_2",
+            "child_id": "id_3",
+            "parent_id": "id_1"
+        },
+        {
+            "intent": "book_flight",
+            "response": [
+                "Your flight to Sindalah is booked for {travel_date} in {travel_class}. Your booking ID is {booking_id}."
+            ],
+            "utterances": [
+                "I want to book a flight to Sindalah",
+                "Can I reserve a flight to Sindalah?",
+                "I'd like to fly to Sindalah",
+                "I need a flight to Sindalah",
+                "I wish to arrange a flight to Sindalah",
+                "I'm planning to visit Sindalah, can you help with the flight?",
+                "I want to organise a flight to Sindalah",
+                "Is it possible to book a flight to Sindalah?",
+                "Let's arrange a flight to Sindalah",
+                "I am interested in a flight to Sindalah",
+                "I'm looking to book a flight to Sindalah",
+                "Could I get a flight to Sindalah?",
+                "Sindalah is my next destination, I need to book a flight"
+            ],
+            "form": "flight_booking_form",
+            "slots": [
+                {
+                    "name": "travel_date",
+                    "type": "any",
+                    "bot_ask": "When do you plan to travel to Sindalah?",
+                    "examples": [
+                        "2023-08-15"
+                    ]
+                },
+                {
+                    "name": "travel_class",
+                    "type": "any",
+                    "bot_ask": "Which class would you prefer for your flight - First, Business or VIP Private?",
+                    "examples": [
+                        "VIP Private"
+                    ]
+                }
+            ],
+            "api_call": {
+                "method": "",
+                "url": "",
+                "request_body": []
+            },
+            "id": "id_3",
+            "child_id": "id_4",
+            "parent_id": "id_2"
+        },
+        {
+            "intent": "ask_recommendations",
+            "response": [
+                "In Sindalah, you can enjoy beachfront dining, snorkeling in crystal clear waters, explore exotic wildlife, or simply relax on our pristine beaches."
+            ],
+            "utterances": [
+                "What activities would you recommend in Sindalah?",
+                "Can you suggest things to do in Sindalah?",
+                "I'm looking for recommendations in Sindalah"
+            ],
+            "id": "id_4",
+            "child_id": "id_5",
+            "parent_id": "id_3"
+        },
+        {
+            "intent": "inquire_booking_status",
+            "response": [
+                "Your flight to Sindalah is booked for {travel_date} in {travel_class}. Your booking ID is {booking_id}."
+            ],
+            "utterances": [
+                "What's the status of my booking?",
+                "Can you confirm my flight details?",
+                "I'd like to check my booking"
+            ],
+            "form": "booking_inquiry_form",
+            "slots": [
+                {
+                    "name": "booking_id",
+                    "type": "any",
+                    "bot_ask": "Could you please provide your booking ID for me to check your booking details?",
+                    "examples": [
+                        "B1234",
+                        "B1234"
+                    ]
+                }
+            ],
+            "api_call": {
+                "method": "",
+                "url": "",
+                "request_body": []
+            },
+            "id": "id_5",
+            "parent_id": "id_4"
+        }
+    ]
+}
+INFO:werkzeug:136.226.252.182 - - [21/Jun/2023 19:34:23] "POST /yaml-to-json HTTP/1.1" 200 -
