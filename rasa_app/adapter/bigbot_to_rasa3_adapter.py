@@ -8,41 +8,41 @@ class JSONToYAMLConverter:
 
     def generate_stories(self):
         stories = []
-        for intent in self.payload['intents']:
-            if "form" in intent:
-                form_name = intent["form"]
-                trigger_intent = intent["name"]
-                rule = {
-                    "story": f"{intent['name']}_activateform",
-                    "steps": [
-                        {"intent": trigger_intent},
-                        {"action": form_name},
-                        {"active_loop": form_name},
-                        {"active_loop": None},
-                    ]
-                }
-                stories.append(rule)
-                if "slots" in intent:
-                    slot_was_set = []
-                    for slot in intent["slots"]:
-                        slot_name = slot["name"]
-                        examples = slot["examples"]
-                        for example in examples:
-                            slot_was_set.append({slot_name: example})
+        blocks = {block['id']: block for block in self.payload['blocks']}
+        for block in self.payload['blocks']:
+            for intent in block['intents']:
+                if "form" in block:
+                    form_name = block["form"]["name"]
+                    rule = {
+                        "story": f"{intent['name']}_activateform",
+                        "steps": [
+                            {"intent": intent['name']},
+                            {"action": form_name},
+                            {"active_loop": form_name},
+                            {"active_loop": None},
+                        ]
+                    }
 
-                    rule["steps"].append({"slot_was_set": slot_was_set})
+                    if "slots" in block:
+                        slot_was_set = []
+                        for slot in block["slots"]:
+                            slot_name = slot["name"]
+                            slot_was_set.append({slot_name: None})  # assuming empty slot value
+                            rule["steps"].append({"slot_was_set": slot_was_set})
 
-            else:
-                rule = {
-                    "story": f"{intent['name']}",
-                    "steps": [
-                        {"intent": intent['name']},
-                        {"action": f"utter_{intent['name']}"}
-                    ]
-                }
-                stories.append(rule)
+                    stories.append(rule)
 
+                else:
+                    rule = {
+                        "story": f"{block['id']}_story",
+                        "steps": [
+                            {"intent": intent['name']},
+                            {"action": f"utter_{intent['responses'][0]['name']}"},
+                        ]
+                    }
+                    stories.append(rule)
         return stories
+
 
     def convert_to_yaml(self):
         stories = self.generate_stories()
