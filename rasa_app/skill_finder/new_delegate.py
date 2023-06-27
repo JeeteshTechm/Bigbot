@@ -13,7 +13,7 @@ import os
 from flask import Flask, jsonify, request
 import json
 
-#### IMPLEMENTATION INPROGRESS
+
 app = Flask(__name__)
 
 class FetchRecords:
@@ -21,12 +21,17 @@ class FetchRecords:
         self.sender_id=sender_id
     
     async def fetch_conversation(self):
+        config_path = "db_config.yml"
+        with open(config_path, 'r') as config_file:
+            config = yaml.safe_load(config_file)
+
+        skill_url = config['database']['host']
         import datetime
         conn = psycopg2.connect(
-        host="127.0.0.1",
-        database="rasadb",
-        user="rasa",
-        password="rasa123"
+        host=config['database']['host'],
+        database=config['database']['database_name'],
+        user=config['database']['username'],
+        password=config['database']['password']
         )
         cursor = conn.cursor()
 
@@ -42,12 +47,10 @@ class FetchRecords:
 
         print("Unix timestamp:", timestamp_str)
 
-        query = "SELECT sender_id,intent_name, action_name, data FROM events WHERE timestamp >= {time} AND sender_id='{sender}' order by id DESC LIMIT 10;".format(time=timestamp_str,sender=self.sender_id)
+        query = config['query']['query_data'].format(time=timestamp_str,sender=self.sender_id)
         cursor.execute(query)
         rows = cursor.fetchall()
         print(rows)
-        # print(rows[0])
-        # print("Current timestamp:", current_timestamp)
         cursor.close()
         conn.close()
         return rows
@@ -143,12 +146,39 @@ class SkillStoreandFetch:
         print("LATESTE  SKILL DATA AND STATUS",data)
         return data
 
+    async def fetchData_UpdateStatus(self,skill_id):
+        skill_records=FetchRecords(self.sender_id)
+        sub=False
+        activeStatus=True
+        conv_list= await skill_records.fetch_conversation()
+        for i in range(0,len(conv_list)):
+            if((json.loads(conv_list[i][3])["event"])=="active_loop"):
+                activeStatus=False  
+        for i in range(0,len(conv_list)):
+
+            if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
+                sub=True
+                break
+                    
+            else:
+                sub=False
+
+        if activeStatus:
+            self.store_sender_skill(skill_id,"completed") 
+        else:
+            if(sub):
+                self.store_sender_skill(skill_id,"completed")
+            else:
+                self.store_sender_skill(skill_id,"inprogress")
+
 
 async def main(user_message,sender_id):
 
     skill_records=FetchRecords(sender_id)
     conv_list= await skill_records.fetch_conversation()
-    print("........................................................")
+    delegate_path="Delegate"
+    delegate_id="default delegate id"
+    DefaultSkill="default skill"
     print(conv_list)
 
     store_and_fetch=SkillStoreandFetch(sender_id) 
@@ -157,77 +187,39 @@ async def main(user_message,sender_id):
     if(len(conv_list)>0):
 
         skill_status=store_and_fetch.get_latest_skill_id()
-        print("LINE 131 ******",skill_status)
         if(skill_status['status']=='inprogress'):
             skill_id=skill_status['skill']
+
             skill_process=SkillProcessor(skill_id,user_message,sender_id)
             response=skill_process.skill_processor()
-            print("LINE 137 CONV CONTINUE**********",response)
             conv_list= await skill_records.fetch_conversation()
             sub=False
             for i in range(0,len(conv_list)):
                 if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
                     sub=True
-                    print("INSIDE 143 SUBMIT****")
                     break
                     
                 else:
                     sub=False
-                    print("LINE 146 *******ELSE OF SUBMIT")
 
             if(sub):
                 store_and_fetch.store_sender_skill(skill_id,"completed")
-                #sk.store_sender_skill(sender_id,skill_id,"completed")
             else:
                 store_and_fetch.store_sender_skill(skill_id,"inprogress")
-                #sk.store_sender_skill(sender_id,skill_id,"inprogress")
-                print("LINE 152 NO SUBMIT*****")
-        # elif(skill_status['status']=='completed'):
         else:
-            # agent=AgentSkillFinder()
-            # agent_skill_id=await agent.get_response(user_message)
-            # print("else loop ....")
-            # print("delegate_id",agent_skill_id)
+            
 
             delegate=DelegateSkillFinder(delegate_id)
             skill_id=await delegate.get_response(user_message)
-
-            skill_process=SkillProcessor(skill_id,user_message,sender_id)
+            
+            skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
+            skill_process=SkillProcessor(skill_path,user_message,sender_id)
             response=skill_process.skill_processor()
             print(response)
 
-            # store_and_fetch.store_sender_skill(skill_id,"inprogress")
-            print("inprogress")
-            sub=False
-            activeStatus=True
-            conv_list= await skill_records.fetch_conversation()
-            for i in range(0,len(conv_list)):
-                if((json.loads(conv_list[i][3])["event"])=="active_loop"):
-                    activeStatus=False  
-            for i in range(0,len(conv_list)):
-
-                if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
-                    sub=True
-                    print("INSIDE 210 SUBMIT****")
-                    break
-                    
-                else:
-                    sub=False
-                    print("LINE 215 *******ELSE OF SUBMIT")
-
-            if activeStatus:
-                store_and_fetch.store_sender_skill(skill_id,"completed") 
-            else:
-                if(sub):
-                    store_and_fetch.store_sender_skill(skill_id,"completed")
-                else:
-                    store_and_fetch.store_sender_skill(skill_id,"inprogress")
+            store_and_fetch.fetchData_UpdateStatus(skill_id)
+           
     else:       #When first message arrives
-        # agent=AgentSkillFinder()
-        # agent_skill_id=await agent.get_response(user_message)
-        # print("delegate_id",agent_skill_id)
-
-        DefaultSkill=""
         delegate=DelegateSkillFinder(DefaultSkill)
         skill_id=await delegate.get_response(user_message)
         print(skill_id)
@@ -236,67 +228,22 @@ async def main(user_message,sender_id):
             agent=AgentSkillFinder()
             agent_skill_id=await agent.get_response(user_message)
             print("delegate_id",agent_skill_id)
-            delegate_path="Delegate"
+            
             skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
             skill_process=SkillProcessor(skill_path,user_message,sender_id)
             response=skill_process.skill_processor()
             print(response)
-            sub=False
-            activeStatus=True
-            conv_list= await skill_records.fetch_conversation()
-            for i in range(0,len(conv_list)):
-                if((json.loads(conv_list[i][3])["event"])=="active_loop"):
-                    activeStatus=False  
-            for i in range(0,len(conv_list)):
+            store_and_fetch.fetchData_UpdateStatus(skill_id)
+            
 
-                if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
-                    sub=True
-                    print("INSIDE 210 SUBMIT****")
-                    break
-                    
-                else:
-                    sub=False
-                    print("LINE 215 *******ELSE OF SUBMIT")
-
-            if activeStatus:
-                store_and_fetch.store_sender_skill(skill_id,"completed") 
-            else:
-                if(sub):
-                    store_and_fetch.store_sender_skill(skill_id,"completed")
-                else:
-                    store_and_fetch.store_sender_skill(skill_id,"inprogress")
-
-        else:       
-            skill_process=SkillProcessor(skill_id,user_message,sender_id)
+        else:
+            skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)       
+            skill_process=SkillProcessor(skill_path,user_message,sender_id)
             response=skill_process.skill_processor()
             print(response)
 
-        # store_and_fetch.store_sender_skill(skill_id,"inprogress")
-            print("inprogress")
-            sub=False
-            activeStatus=True
-            conv_list= await skill_records.fetch_conversation()
-            for i in range(0,len(conv_list)):
-                if((json.loads(conv_list[i][3])["event"])=="active_loop"):
-                    activeStatus=False  
-            for i in range(0,len(conv_list)):
-
-                if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
-                    sub=True
-                    print("INSIDE 210 SUBMIT****")
-                    break
-                    
-                else:
-                    sub=False
-                    print("LINE 215 *******ELSE OF SUBMIT")
-
-            if activeStatus:
-                store_and_fetch.store_sender_skill(skill_id,"completed") 
-            else:
-                if(sub):
-                    store_and_fetch.store_sender_skill(skill_id,"completed")
-                else:
-                    store_and_fetch.store_sender_skill(skill_id,"inprogress")
+            store_and_fetch.fetchData_UpdateStatus(skill_id)
+            
 
     return response   
 
