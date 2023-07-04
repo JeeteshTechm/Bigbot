@@ -21,7 +21,7 @@ class FetchRecords:
         self.sender_id=sender_id
     
     async def fetch_conversation(self):
-        config_path = "db_config.yml"
+        config_path = "input/db_config.yml"
         with open(config_path, 'r') as config_file:
             config = yaml.safe_load(config_file)
 
@@ -79,6 +79,7 @@ class DelegateSkillFinder:
         self.agent = Agent.load(f"delegate/{delegate_id}/models")
 
     async def get_response(self, user_message):
+        
         parsed = await self.agent.parse_message(user_message)
         skill_id = parsed["intent"]["name"]
         return skill_id
@@ -148,6 +149,7 @@ class SkillStoreandFetch:
 
     async def fetchData_UpdateStatus(self,skill_id):
         skill_records=FetchRecords(self.sender_id)
+        # store_and_fetch=SkillStoreandFetch(self.sender_id)
         sub=False
         activeStatus=True
         conv_list= await skill_records.fetch_conversation()
@@ -173,12 +175,13 @@ class SkillStoreandFetch:
 
 
 async def main(user_message,sender_id):
-
+    # user_message=input("Enter user message: ")
+    # sender_id = input("Sender id: ")
     skill_records=FetchRecords(sender_id)
     conv_list= await skill_records.fetch_conversation()
     delegate_path="Delegate"
-    delegate_id="default delegate id"
-    DefaultSkill="default skill"
+    default_delegate_id="faq_delegate"
+    # DefaultSkill="default skill"
     print(conv_list)
 
     store_and_fetch=SkillStoreandFetch(sender_id) 
@@ -207,43 +210,52 @@ async def main(user_message,sender_id):
             else:
                 store_and_fetch.store_sender_skill(skill_id,"inprogress")
         else:
-            
-
-            delegate=DelegateSkillFinder(delegate_id)
+            agent=AgentSkillFinder()
+            delegate=DelegateSkillFinder(default_delegate_id)
             skill_id=await delegate.get_response(user_message)
+            if(skill_id=="nlu_fallback"):
+                
+                agent_skill_id=await agent.get_response(user_message)
+                print("delegate_id",agent_skill_id)
             
-            skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
-            skill_process=SkillProcessor(skill_path,user_message,sender_id)
-            response=skill_process.skill_processor()
-            print(response)
+                # skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
+                skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
+                response=skill_process.skill_processor()
+                print(response)
+                await store_and_fetch.fetchData_UpdateStatus(skill_id)
+            else:
+                skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
+                skill_process=SkillProcessor(skill_path,user_message,sender_id)
+                response=skill_process.skill_processor()
+                print(response)
 
-            store_and_fetch.fetchData_UpdateStatus(skill_id)
-           
+                await store_and_fetch.fetchData_UpdateStatus(skill_id)
+            
     else:       #When first message arrives
-        delegate=DelegateSkillFinder(DefaultSkill)
+        agent=AgentSkillFinder()
+        delegate=DelegateSkillFinder(default_delegate_id)
         skill_id=await delegate.get_response(user_message)
         print(skill_id)
         
         if(skill_id=="nlu_fallback"):
-            agent=AgentSkillFinder()
-            agent_skill_id=await agent.get_response(user_message)
-            print("delegate_id",agent_skill_id)
             
-            skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
-            skill_process=SkillProcessor(skill_path,user_message,sender_id)
+            agent_skill_id=await agent.get_response(user_message)
+            
+            # skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
+            skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
             response=skill_process.skill_processor()
             print(response)
-            store_and_fetch.fetchData_UpdateStatus(skill_id)
+            await store_and_fetch.fetchData_UpdateStatus(skill_id)
             
 
         else:
-            skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)       
-            skill_process=SkillProcessor(skill_path,user_message,sender_id)
+            # skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)       
+            skill_process=SkillProcessor(skill_id,user_message,sender_id)
             response=skill_process.skill_processor()
             print(response)
 
-            store_and_fetch.fetchData_UpdateStatus(skill_id)
-            
+            await store_and_fetch.fetchData_UpdateStatus(skill_id)
+           
 
     return response   
 
@@ -258,7 +270,7 @@ def chat():
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0', port=5004)
 
-        
+response=asyncio.run(main())       
     
 
 
