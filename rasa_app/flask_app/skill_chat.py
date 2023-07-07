@@ -9,7 +9,6 @@ from rasa.shared.core.domain import Domain
 import asyncio
 import yaml
 from datetime import datetime
-import pandas as pd
 
 app = Flask(__name__)
 CORS(app)
@@ -53,20 +52,6 @@ class Bot:
         result = {'text': response, 'intent': parsed}
 
         return result
-
-def store_sender_skill(sender_id, skill_id):
-    excel_file = 'input/sender_skill_data.xlsx'
-    if not os.path.isfile(excel_file):
-        df = pd.DataFrame(columns=['sender_id', 'skill_id', 'time'])
-        df.to_excel(excel_file, index=False)
-    df = pd.read_excel(excel_file)
-    current_time = datetime.now()
-
-    new_row = pd.DataFrame({'sender_id': [sender_id], 'skill_id': [skill_id], 'time': [current_time]})
-    df = pd.concat([df, new_row], ignore_index=True)
-    df.to_excel(excel_file, index=False)
-
-    print(f"Data saved to {excel_file} successfully.")
 
 
 @app.route('/chat', methods=['POST'])
