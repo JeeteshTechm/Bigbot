@@ -1,17 +1,91 @@
 recipe: default.v1
 language: en
 
+# assistant_id: default_spacy_bot
+# SKLEARN 
+# pipeline:
+#   - name: SpacyNLP
+#     model: en_core_web_md
+#   - name: SpacyTokenizer
+#   - name: SpacyFeaturizer
+#   - name: RegexFeaturizer
+#   - name: LexicalSyntacticFeaturizer
+#   - name: CountVectorsFeaturizer
+#   - name: CountVectorsFeaturizer
+#     analyzer: "char_wb"
+#     min_ngram: 1
+#     max_ngram: 4
+#   - name: SklearnIntentClassifier
+#     epochs: 300
+#   - name: EntitySynonymMapper
+#   - name: ResponseSelector
+#     epochs: 100
+#   - name: FallbackClassifier
+#     threshold: 0.5
+#     ambiguity_threshold: 0.1
+
+# MIEIT CLASSIFIER
+# pipeline:
+#   - name: "MitieTokenizer"
+#   - name: "MitieFeaturizer"
+#   - name: "MitieIntentClassifier"
+#     epochs: 300
+#   - name: FallbackClassifier
+#     threshold: 0.5
+#     ambiguity_threshold: 0.1
+
+# pipeline:
+#  - name: "WhitespaceTokenizer"
+#  - name: LanguageModelFeaturizer
+#    model_name: "bert"
+#    model_weights: "rasa/LaBSE"
+#    cache_dir: null
+#  - name: "DIETClassifier"
+#    epochs: 100
+#  - name: "FallbackClassifier"
+#    threshold: 0.4
+#    ambiguity_threshold: 0.1
+#  - name: "EntitySynonymMapper"
+
 pipeline:
   - name: "WhitespaceTokenizer"
   - name: "RegexFeaturizer"
   - name: "LexicalSyntacticFeaturizer"
   - name: "CountVectorsFeaturizer"
+    analyzer: "char_wb"
+    min_ngram: 1
+    max_ngram: 4
   - name: "DIETClassifier"
-    epochs: 100
+    epochs: 300
   - name: FallbackClassifier
-    threshold: 0.6
+    threshold: 0.5
     ambiguity_threshold: 0.1
   - name: "EntitySynonymMapper"
+  
+# pipeline:
+#   - name: SpacyNLP
+#     model: en_core_web_sm
+#   - name: SpacyTokenizer
+#   - name: SpacyFeaturizer
+#   - name: DIETClassifier
+#     epochs: 300
+  # - name: FallbackClassifier
+  #   threshold: 0.5
+  #   ambiguity_threshold: 0.1
+
+# pipeline:
+#   - name: "WhitespaceTokenizer"
+#   - name: "CountVectorsFeaturizer"
+#   - name: "EmbeddingIntentClassifier"
+#     intent_tokenization_flag: true
+#     intent_split_symbol: "+"
+#   - name: "DIETClassifier"
+#     epochs: 100
+#   - name: FallbackClassifier
+#     threshold: 0.5
+#     ambiguity_threshold: 0.1
+
+
 
 policies:
   - name: TEDPolicy
