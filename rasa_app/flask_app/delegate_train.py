@@ -1,6 +1,6 @@
 from delegate_utterance_generator import IntentFilter
 from flask import Flask, jsonify, request
-from delegate_trainer import DelegateNluGenerator
+from delegate_nlu_model import DelegateNluGenerator
 from agent_utterance_generator import AgentDataCreator
 from agent_train import AgentNluGenerator
 from flask_cors import CORS, cross_origin
