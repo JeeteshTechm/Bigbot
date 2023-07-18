@@ -42,6 +42,9 @@ class FetchRecords:
         one_hour_ago = current_timestamp - datetime.timedelta(hours=1)
         timestamp_unix = one_hour_ago.timestamp()
         timestamp_str = '{:.10f}'.format(timestamp_unix)
+
+        # print("Unix timestamp:", timestamp_str)
+
         query = config['query']['query_data'].format(time=timestamp_str,sender=self.sender_id)
         cursor.execute(query)
         rows = cursor.fetchall()
@@ -72,6 +75,7 @@ class DelegateSkillFinder:
 
 class SkillProcessor:
     def __init__(self,skill_id,message,sender_id):
+        # endpoint = EndpointConfig(url=endpoint_url)
         self.skill_id=skill_id
         self.message=message
         self.sender_id=sender_id
@@ -203,12 +207,11 @@ async def main(user_message,sender_id):
     if(len(conv_list)>0):
 
         skill_status=store_and_fetch.get_latest_skill_id()
-        print("LINE 131 ******",skill_status)
         if(skill_status['status']=='inprogress'):
             skill_id=skill_status['skill']
 
             skill_process=SkillProcessor(skill_id,user_message,sender_id)
-            response=skill_process.skill_processor()
+            response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(skill_id)}
             conv_list= await skill_records.fetch_conversation()
             sub=False
             for i in range(0,len(conv_list)):
@@ -233,18 +236,17 @@ async def main(user_message,sender_id):
                 
                 agent_skill_id=await agent.agent_get_response(user_message)
                 print("delegate_id",agent_skill_id)
-            
-                # skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
-                skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
-                response=skill_process.skill_processor()
-                print(response)
-                await store_and_fetch.fetchData_UpdateStatus(agent_skill_id)
-            else:
-                # skill_path,delegate_skill=agent.search_delegate_skill_path(delegate_path,agent_skill_id)
-                skill_process=SkillProcessor(skill_id,user_message,sender_id)
-                response=skill_process.skill_processor()
-                print(response)
+                if(agent_skill_id=="nlu_fallback"):
+                    response={"Response":"No Skill, Could you please rephrase your query","Current deletage":default_delegate_id}
 
+                else:
+                    skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
+                    response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(agent_skill_id)}
+                    print(response)
+                    await store_and_fetch.fetchData_UpdateStatus(agent_skill_id)
+            else:
+                skill_process=SkillProcessor(skill_id,user_message,sender_id)
+                response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(skill_id)}
                 await store_and_fetch.fetchData_UpdateStatus(skill_id)
             
     else:       #When first message arrives
@@ -256,19 +258,17 @@ async def main(user_message,sender_id):
         if(skill_id=="nlu_fallback"):
             
             agent_skill_id=await agent.agent_get_response(user_message)
-            print("delegate_id",agent_skill_id)
-            
-            skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
-            response=skill_process.skill_processor()
-            print(response)
-            await store_and_fetch.fetchData_UpdateStatus(skill_id)
+            if(agent_skill_id=="nlu_fallback"):
+                response={"Response":"No Skill, Could you please rephrase your query","Current deletage":default_delegate_id}
+            else:
+                skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
+                response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(agent_skill_id)}
+                await store_and_fetch.fetchData_UpdateStatus(agent_skill_id)
             
 
         else:
             skill_process=SkillProcessor(skill_id,user_message,sender_id)
-            response=skill_process.skill_processor()
-            print(response)
-
+            response={"Response from skill":skill_process.skill_processor(),"Current deletage":default_delegate_id}
             await store_and_fetch.fetchData_UpdateStatus(skill_id)
            
 
