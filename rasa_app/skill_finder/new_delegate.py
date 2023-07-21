@@ -15,44 +15,6 @@ import json
 
 
 app = Flask(__name__)
-class FetchRecords:
-    def __init__(self,sender_id):
-        self.sender_id=sender_id
-    
-    async def fetch_conversation(self):
-        config_path = "input/db_config.yml"
-        with open(config_path, 'r') as config_file:
-            config = yaml.safe_load(config_file)
-
-        skill_url = config['database']['host']
-        import datetime
-        conn = psycopg2.connect(
-        host=config['database']['host'],
-        database=config['database']['database_name'],
-        user=config['database']['username'],
-        password=config['database']['password']
-        )
-        cursor = conn.cursor()
-
-        # Execute the SQL query to get the current timestamp
-        cursor.execute("SELECT current_timestamp;")
-
-        # Fetch the result of the query
-        current_timestamp = cursor.fetchone()[0]
-        one_hour_ago = current_timestamp - datetime.timedelta(hours=1)
-        timestamp_unix = one_hour_ago.timestamp()
-        timestamp_str = '{:.10f}'.format(timestamp_unix)
-
-        # print("Unix timestamp:", timestamp_str)
-
-        query = config['query']['query_data'].format(time=timestamp_str,sender=self.sender_id)
-        cursor.execute(query)
-        rows = cursor.fetchall()
-        cursor.close()
-        conn.close()
-        return rows
-
-
 class AgentSkillFinder:
     def __init__(self):
         self.agent = Agent.load("agent/agent_bot/models")
@@ -103,47 +65,73 @@ class SkillProcessor:
             return None
 
 
-class SkillStoreandFetch:
+class FetchRecords:
     def __init__(self,sender_id):
+        import datetime
         self.sender_id=sender_id
-        self.file_location='input/sender_skill_data.xlsx'
+        # self.file_location='input/sender_skill_data.xlsx'
+        self.config_path = "input/db_config.yml"
+        with open(self.config_path, 'r') as config_file:
+            self.config = yaml.safe_load(config_file)
+        self.conn = psycopg2.connect(
+            host=self.config['database']['host'],
+            database=self.config['database']['database_name'],
+            user=self.config['database']['username'],
+            password=self.config['database']['password']
+            )    
 
+    async def fetch_conversation(self,query_type):
+        try:
+            import datetime
+            cursor = self.conn.cursor()
+
+            cursor.execute("SELECT current_timestamp;")
+
+            # Fetch the result of the query
+            current_timestamp = cursor.fetchone()[0]
+            one_hour_ago = current_timestamp - datetime.timedelta(hours=1)
+            print(one_hour_ago)
+            timestamp_unix = one_hour_ago.timestamp()
+            timestamp_str = '{:.10f}'.format(timestamp_unix)
+
+            print("Unix timestamp:", query_type)
+            query = self.config['query'][query_type].format(time=timestamp_str,sender=self.sender_id)
+            cursor.execute(query)
+            rows = cursor.fetchall()
+            cursor.close()
+            return rows
+
+        except (Exception, psycopg2.Error) as error:
+            print("Error while connecting to PostgreSQL:", error)
+             
     def store_sender_skill(self,skill_id,conversation_status):
-        if not os.path.isfile(self.file_location):
-            df = pd.DataFrame(columns=['sender_id', 'skill_id', 'time','conversation_status'])
-            df.to_excel(self.file_location, index=False)
+        try:
 
-        df = pd.read_excel(self.file_location)
-        current_time = datetime.now()
-        new_row = pd.DataFrame({'sender_id': [self.sender_id], 'skill_id': [skill_id], 'time': [current_time],'conversation_status':[conversation_status]})
+            current_time = datetime.now()
+            cursor = self.conn.cursor()
+            insert_query = """
+                INSERT INTO conversation_info(sender_id, skill_id, time, conversation_status)
+                VALUES (%s, %s, %s, %s);
+            """
 
-        df = pd.concat([df, new_row], ignore_index=True)
-        df.to_excel(self.file_location, index=False)
-        print(f"Data saved to {self.file_location} successfully.")
+            data = [
+                (self.sender_id, skill_id,current_time , conversation_status),
+            ]
+            cursor.executemany(insert_query, data)
+            self.conn.commit()
+            print("Table created successfully!")
+            cursor.close()
+            self.conn.close()
 
-    def get_latest_skill_id(self):
-        if not os.path.isfile(self.file_location):
-            df = pd.DataFrame(columns=['sender_id', 'skill_id', 'time','conversation_status'])
-            df.to_excel(self.file_location, index=False)
-
-        df = pd.read_excel(self.file_location)
-        sender_rows = df[df['sender_id'] == self.sender_id]
-        if sender_rows.empty:
-            return None
-
-        sorted_rows = sender_rows.sort_values(by='time', ascending=False)
-        latest_skill_id = sorted_rows.iloc[0]['skill_id']
-        latest_status=sorted_rows.iloc[0]['conversation_status']
-        data={'skill':latest_skill_id,'status':latest_status}
-        print("LATESTE  SKILL DATA AND STATUS",data)
-        return data
+        except (Exception, psycopg2.Error) as error:
+            print("Error while connecting to PostgreSQL:", error)
 
     async def fetchData_UpdateStatus(self,skill_id):
         skill_records=FetchRecords(self.sender_id)
-        # store_and_fetch=SkillStoreandFetch(self.sender_id)
         sub=False
         activeStatus=True
-        conv_list= await skill_records.fetch_conversation()
+        conv_list= await skill_records.fetch_conversation("query_data")
+        print("_------------------------------------",conv_list)
         for i in range(0,len(conv_list)):
             if((json.loads(conv_list[i][3])["event"])=="active_loop"):
                 activeStatus=False  
@@ -196,23 +184,22 @@ async def main(user_message,sender_id):
 #     user_message=input("Enter user message: ")
 #     sender_id = input("Sender id: ")
     skill_records=FetchRecords(sender_id)
-    conv_list= await skill_records.fetch_conversation()
-    # delegate_path="Delegate"
+    conv_list= await skill_records.fetch_conversation("query_data")
+    print("__________________",conv_list)
     default_delegate_id="faq_delegate"
-    # print(conv_list)
-
-    store_and_fetch=SkillStoreandFetch(sender_id) 
     skill_id=""
     
     if(len(conv_list)>0):
+    # if(conv_list!=None):
 
-        skill_status=store_and_fetch.get_latest_skill_id()
-        if(skill_status['status']=='inprogress'):
-            skill_id=skill_status['skill']
+        # skill_status=store_and_fetch.get_latest_skill_id()
+        skill_status= await skill_records.fetch_conversation("context_data")
+        if(skill_status[0][3]=='inprogress'):
+            skill_id=skill_status[0][1]
 
             skill_process=SkillProcessor(skill_id,user_message,sender_id)
-            response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(skill_id)}
-            conv_list= await skill_records.fetch_conversation()
+            response={"Response from skill":skill_process.skill_processor(),"Current deletage":await skill_records.active_delegate_fxn(skill_id)}
+            conv_list= await skill_records.fetch_conversation("query_data")
             sub=False
             for i in range(0,len(conv_list)):
                 if(conv_list[i][2] is not None and ("submit_" in conv_list[i][2]) and ("_form" in conv_list[i][2])):
@@ -223,13 +210,13 @@ async def main(user_message,sender_id):
                     sub=False
 
             if(sub):
-                store_and_fetch.store_sender_skill(skill_id,"completed")
+                skill_records.store_sender_skill(skill_id,"completed")
             else:
-                store_and_fetch.store_sender_skill(skill_id,"inprogress")
+                skill_records.store_sender_skill(skill_id,"inprogress")
         else: #COMPLETED STATUS
             agent=AgentSkillFinder()
-            skill_id=skill_status['skill']
-            active_delegate=await store_and_fetch.active_delegate_fxn(skill_id)
+            skill_id=skill_status[0][1]
+            active_delegate=await skill_records.active_delegate_fxn(skill_id)
             delegate=DelegateSkillFinder(active_delegate)
             skill_id=await delegate.delegate_get_response(user_message)
             if(skill_id=="nlu_fallback"):
@@ -241,13 +228,14 @@ async def main(user_message,sender_id):
 
                 else:
                     skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
-                    response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(agent_skill_id)}
+                    response={"Response from skill":skill_process.skill_processor(),"Current deletage":await skill_records.active_delegate_fxn(agent_skill_id)}
                     print(response)
-                    await store_and_fetch.fetchData_UpdateStatus(agent_skill_id)
+                    await skill_records.fetchData_UpdateStatus(agent_skill_id)
             else:
                 skill_process=SkillProcessor(skill_id,user_message,sender_id)
-                response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(skill_id)}
-                await store_and_fetch.fetchData_UpdateStatus(skill_id)
+                response={"Response from skill":skill_process.skill_processor(),"Current deletage":await skill_records.active_delegate_fxn(skill_id)}
+                
+                await skill_records.fetchData_UpdateStatus(skill_id)
             
     else:       #When first message arrives
         agent=AgentSkillFinder()
@@ -260,16 +248,21 @@ async def main(user_message,sender_id):
             agent_skill_id=await agent.agent_get_response(user_message)
             if(agent_skill_id=="nlu_fallback"):
                 response={"Response":"No Skill, Could you please rephrase your query","Current deletage":default_delegate_id}
+                print("delegate_id",agent_skill_id)
             else:
                 skill_process=SkillProcessor(agent_skill_id,user_message,sender_id)
-                response={"Response from skill":skill_process.skill_processor(),"Current deletage":await store_and_fetch.active_delegate_fxn(agent_skill_id)}
-                await store_and_fetch.fetchData_UpdateStatus(agent_skill_id)
+                response={"Response from skill":skill_process.skill_processor(),"Current deletage":await skill_records.active_delegate_fxn(agent_skill_id)}
+                print(response)
+                await skill_records.fetchData_UpdateStatus(agent_skill_id)
             
 
         else:
             skill_process=SkillProcessor(skill_id,user_message,sender_id)
             response={"Response from skill":skill_process.skill_processor(),"Current deletage":default_delegate_id}
-            await store_and_fetch.fetchData_UpdateStatus(skill_id)
+
+            print(response)
+
+            await skill_records.fetchData_UpdateStatus(skill_id)
            
 
     return response   
