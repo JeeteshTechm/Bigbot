@@ -1,0 +1,127 @@
+{
+    "bot_id": "chitchat",
+    "intents": [
+        {
+            "id":"id_01",
+            "intent": "greet",
+            "utterances": [
+              "Hi",
+              "Hello",
+              "Hey",
+              "Hi there"
+            ],
+            "response": [
+              "Hello! How can I assist you?"
+            ],
+            "parent_id":-1,
+            "child_id":"id_02"
+          },
+          {
+            "id":"id_02",
+            "intent": "goodbye",
+            "utterances": [
+            "good bye",
+            "bye",
+            "see you later",
+            "bye bye",
+            "see you around",
+            "have a nice day"
+            ],
+            "response": [
+              "Hello! How can I assist you?"
+            ],
+            "parent_id":"id_01",
+            "child_id":"id_03"
+          },
+        {
+        "intent": "chitchat/ask_name",
+        "response": [
+          "My name is Safana."
+        ],
+        "utterances": [
+            "What is your name?",
+            "May I know your name?",
+            "What do people call you?",
+            "Do you have a name for yourself?",
+            "how do I call you"
+          ],
+        "id": "id_4",
+        "child_id": "id_05",
+        "parent_id": "id_3"
+      },
+      {
+        "intent": "chitchat/ask_weather",
+        "response": [
+          "The weather at your location is good"
+        ],
+        "utterances": [
+            "What's the weather like today?",
+            "Does it look sunny outside today?",
+            "Oh, do you mind checking the weather for me please?",
+            "I like sunny days in Berlin.",
+            "do you mind providing weather information to me"
+        ],
+        "id": "id_5",
+        "child_id": "id_06",
+        "parent_id": "id_4"
+    },
+        
+    {
+        "intent": "chitchat/ask_wherefrom",
+        "response": [
+          "I am from NEOM."
+        ],
+        "utterances": [
+             "Are you from around here?",
+             "Around where are you from?",
+             "Do you know where you come from?",
+             "From where did you come?",
+             "So where are you from",
+             "What area are you from?",
+             "What citizenship do you lay claim to?",
+             "What city are you in?",
+             "What city do you claim to for your birth?",
+             "What city were you born in?",
+             "What country are you from?"
+          ],
+        "id": "id_6",
+        "child_id": "id_7",
+        "parent_id": "id_5"
+      },
+      {
+        "intent": "chitchat/ask_whatfeature",
+        "response": [
+          "I am having capability of booking flight, restaurant, provide information about Sindalah"
+        ],
+        "utterances": [
+        "can you tell me the features of yours",
+        "what are the capabilities you are having",
+        "can you specify what atre the activites you can perform",
+        "do you have any capability",
+        "do you know how to perfrom any activity"
+
+          ],
+        "id": "id_7",
+        "child_id": "id_8",
+        "parent_id": "id_6"
+      }
+      ]
+    }
+  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
