@@ -1,0 +1,36 @@
+version: "3.0"
+
+nlu:
+- intent: <intent_name>
+  examples: |
+    - <example_1>
+    - <example_2>
+    - <example_3>
+
+slots:
+  <slot_name>:
+    type: <slot_type>
+    influence_conversation: <boolean_value>
+
+responses:
+  <response_id>:
+  - text: <response_text>
+
+forms:
+  <form_name>:
+    <slot_name>:
+    - type: <extraction_method>
+
+actions:
+- <action_name>
+
+stories:
+- story: <story_name>
+  steps:
+  - intent: <intent_name>
+  - action: <action_name>
+  - active_loop: <form_name>
+  - active_loop: null
+  - slot_was_set:
+    - <slot_name>: <slot_value>
+  - action: <action_name>
