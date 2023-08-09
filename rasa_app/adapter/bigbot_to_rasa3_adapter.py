@@ -11,9 +11,9 @@ class JSONToYAMLConverter:
         for intent in self.payload['intents']:
             if "form" in intent:
                 form_name = intent["form"]
-                trigger_intent = intent["name"]
+                trigger_intent = intent["intent"]
                 rule = {
-                    "story": f"{intent['name']}_activateform",
+                    "story": f"{intent['intent']}_activateform",
                     "steps": [
                         {"intent": trigger_intent},
                         {"action": form_name},
@@ -34,10 +34,10 @@ class JSONToYAMLConverter:
 
             else:
                 rule = {
-                    "story": f"{intent['name']}",
+                    "story": f"{intent['intent']}",
                     "steps": [
-                        {"intent": intent['name']},
-                        {"action": f"utter_{intent['name']}"}
+                        {"intent": intent['intent']},
+                        {"action": f"utter_{intent['intent']}"}
                     ]
                 }
                 stories.append(rule)
@@ -54,13 +54,13 @@ class JSONToYAMLConverter:
         forms = {}
 
         for intent in intents:
-            yaml_output += f"  - intent: {intent['name']}\n"
+            yaml_output += f"  - intent: {intent['intent']}\n"
             yaml_output += "    examples: |\n"
             for example in intent['utterances']:
                 yaml_output += f"      - {example}\n"
 
-            response_key = f'utter_{intent["name"]}'
-            response_texts = intent['responses']
+            response_key = f'utter_{intent["intent"]}'
+            response_texts = intent['response']
             responses[response_key] = [{'text': response_text} for response_text in response_texts]
 
             if "slots" in intent:
@@ -118,5 +118,6 @@ class JSONToYAMLConverter:
                     yaml_output += f"      - {key}: {value}\n"
 
         return yaml_output
+
 #json_converter = JSONToYAMLConverter("input/sindalah.json")
 #yml_data = json_converter.convert_to_yaml()
