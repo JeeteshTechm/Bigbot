@@ -5,6 +5,8 @@ from flask_cors import CORS, cross_origin
 import openai
 import tempfile
 from rasa3_to_bigbot_adapter import YAMLToJsonConverter
+from bigbot_to_rasa3_adapter import JSONToYAMLConverter
+from deepdiff import DeepDiff
 from datetime import date
 
 app = Flask(__name__)
@@ -50,6 +52,11 @@ def replace_in_structure(data, old_value, new_value):
         return new_value(data)
     return data
 
+def calculate_similarity_ratio(yaml_text1,yaml_text2):
+    diff = DeepDiff(yaml_text1, yaml_text2)
+    similarity_percentage = (1 - (len(diff) / (len(yaml_text1) + len(yaml_text2)))) * 100
+    return similarity_percentage
+
 @app.route('/data_generator', methods=['POST'])
 @cross_origin()
 def chat():
@@ -59,18 +66,29 @@ def chat():
 
     yaml_content = yaml.safe_load(response)
     yaml_content = replace_in_structure(yaml_content, date, date.isoformat)
-
+    
+    ##Yaml to JSON Conversion   
     yaml_converter = YAMLToJsonConverter(yaml_content)
     json_data = yaml_converter.convert_to_json()
 
+    ##JSON to Yaml conversion 
+    json_converter = JSONToYAMLConverter(json_data)
+    yaml_data = json_converter.convert_to_yaml()
+    
+    ##Checks similarity b/w ChatGPT generated yaml and converted yaml
+    similarity_percentage = calculate_similarity_ratio(yaml_content, yaml_data)
+    
     with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as temp_file:
         temp_file.write(json_data.encode('utf-8'))
 
     temp_filename = temp_file.name
     response = send_file(temp_filename, mimetype='text/json')
     response.headers['Content-Disposition'] = 'attachment; filename=output.json'
-
-    return response
+    if similarity_percentage > 95:
+        return response
+    else:
+        response["message"] = "Similarity between generated YAML and converted YAML is below 95%"
+        return response
 
 if __name__ == '__main__':
     HOST = os.getenv("HOST", '0.0.0.0')
