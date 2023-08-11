@@ -19,8 +19,7 @@ class KeycloakUserMiddleware:
         self.get_response = get_response
 
     def __call__(self, request):
-        token = request.headers.get('Authorization')
-        # token = request.META.get("HTTP_AUTHORIZATION")
+        token = request.META.get("HTTP_AUTHORIZATION")
         refreshed_token = None
         if token:
             match = token_regex.match(token)
