@@ -98,8 +98,8 @@ def get_blocks():
     data = []
     reg = Registry()
     for block in reg.blocks:
-            block_object = block(context=None, id=None, properties=None, connections=None)
-            data.append(block_object.serialize())
+        block_object = block(context=None, id=None, properties=None, connections=None)
+        data.append(block_object.serialize())
     return data
 
 
@@ -115,7 +115,7 @@ def get_connections(component_name, properties):
     reg = Registry()
     for block in reg.blocks:
         if block.__module__ + "." + block.__name__ == component_name:
-            block_object = block(None, None, None, None)
+            block_object = block(context=None, id=None, properties=None, connections=None)
             return block_object.get_connections(properties)
     return None
 
