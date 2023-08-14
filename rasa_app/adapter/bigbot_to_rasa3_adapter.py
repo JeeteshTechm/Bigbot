@@ -13,7 +13,7 @@ class JSONToYAMLConverter:
                 form_name = intent["form"]
                 trigger_intent = intent["intent"]
                 rule = {
-                    "story": f"{intent['intent']}_activateform",
+                    "story": intent["story_name"],
                     "steps": [
                         {"intent": trigger_intent},
                         {"action": form_name},
@@ -34,13 +34,15 @@ class JSONToYAMLConverter:
 
             else:
                 rule = {
-                    "story": f"{intent['intent']}",
+                    "story": intent["story_name"],
                     "steps": [
                         {"intent": intent['intent']},
                         {"action": f"utter_{intent['intent']}"}
                     ]
                 }
                 stories.append(rule)
+
+
 
         return stories
 
@@ -52,6 +54,7 @@ class JSONToYAMLConverter:
         responses = {}
         slots = {}
         forms = {}
+        actions = set() 
 
         for intent in intents:
             yaml_output += f"  - intent: {intent['intent']}\n"
@@ -71,7 +74,7 @@ class JSONToYAMLConverter:
                     responses[slot_response_key] = [{'text': slot_bot_ask}]
                     slot_type = slot["type"]
                     slots[slot_name] = {
-                        "type": slot_type,
+                        "type": "text",
                         "influence_conversation": True
                     }
 
@@ -84,10 +87,20 @@ class JSONToYAMLConverter:
                     form_slots = forms[form_name]
                     for slot in intent["slots"]:
                         slot_name = slot["name"]
-                        slot_type = slot["type"]
                         if slot_name not in form_slots:
                             form_slots[slot_name] = []
-                        form_slots[slot_name].append({"type": slot_type})
+                        form_slots[slot_name].append({"type": "from_text"})
+           
+            for action in intent.get("actions", []):
+                if not (action.startswith("utter_") or action.endswith("form")):
+                    actions.add(action)
+        
+        # Output actions
+        yaml_output += "actions:\n"
+        for action in actions:
+            yaml_output += f"  - {action}\n"
+
+            
 
         yaml_output += "responses:\n"
         for response_key, response_texts in responses.items():
@@ -121,3 +134,4 @@ class JSONToYAMLConverter:
 
 #json_converter = JSONToYAMLConverter("input/sindalah.json")
 #yml_data = json_converter.convert_to_yaml()
+#print(yaml_data)
