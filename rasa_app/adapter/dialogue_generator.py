@@ -8,6 +8,8 @@ from rasa3_to_bigbot_adapter import YAMLToJsonConverter
 from bigbot_to_rasa3_adapter import JSONToYAMLConverter
 from deepdiff import DeepDiff
 from datetime import date
+from validate_update_json import JsonUpdater
+import json
 
 app = Flask(__name__)
 CORS(app)
@@ -70,6 +72,9 @@ def chat():
     ##Yaml to JSON Conversion   
     yaml_converter = YAMLToJsonConverter(yaml_content)
     json_data = yaml_converter.convert_to_json()
+    json_data = json.loads(json_data)
+    updater = JsonUpdater(json_data)
+    updated_data = updater.update_intents()
 
     ##JSON to Yaml conversion 
     json_converter = JSONToYAMLConverter(json_data)
@@ -79,6 +84,7 @@ def chat():
     similarity_percentage = calculate_similarity_ratio(yaml_content, yaml_data)
     
     with tempfile.NamedTemporaryFile(suffix='.json', delete=False) as temp_file:
+        json_data = json.dumps(updated_data, indent=4)
         temp_file.write(json_data.encode('utf-8'))
 
     temp_filename = temp_file.name
