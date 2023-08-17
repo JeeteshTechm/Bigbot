@@ -64,15 +64,19 @@ class YAMLToJsonConverter:
             for step in story['steps']:
                 if 'intent' in step:
                     intent_name = step['intent']
+                    print(intent_name)
                 if 'action' in step and step['action'].startswith('utter_'):
                     response_key = step['action']
+                    print(response_key)
                     if response_key in self.yaml_content['responses']:
+                        #intent['response_name'] = response_key
                         response_value = self.yaml_content['responses'][response_key]
                         if isinstance(response_value, list):
                             for response in response_value:
                                 # Find the intent in the existing JSON structure and append the response
                                 for existing_intent in self.json_data['intents']:
                                     if existing_intent['intent'] == intent_name:
+                                        existing_intent['response_name'] = response_key 
                                         existing_intent['response'].append(response['text'])
                                         break
                         elif isinstance(response_value, dict):
@@ -170,6 +174,7 @@ class YAMLToJsonConverter:
         json_string = json.dumps(self.json_data, indent=4)
 
         return json_string
+
 
  
 #with open("input/sindalah1.yml", 'r') as file:
