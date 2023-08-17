@@ -22,16 +22,35 @@ class JSONToYAMLConverter:
                     ]
                 }
                 stories.append(rule)
+
                 if "slots" in intent:
-                    slot_was_set = []
+                    form_name = intent["form"]
+                    trigger_intent = intent["intent"]
+                    rule = {
+                        "story": intent["story_name"],
+                        "steps": [
+                            {"intent": trigger_intent},
+                            {"action": form_name},
+                            {"active_loop": form_name},
+                        ]
+                    }
+
                     for slot in intent["slots"]:
                         slot_name = slot["name"]
                         examples = slot["examples"]
                         for example in examples:
-                            slot_was_set.append({slot_name: example})
+                            slot_was_set = {"slot_was_set": [{slot_name: example}]}
+                            rule["steps"].extend([
+                                {"active_loop": form_name},
+                                slot_was_set,
+                                {"action": form_name}
+                            ])
 
-                    rule["steps"].append({"slot_was_set": slot_was_set})
+                    rule["steps"].extend([
+                        {"action": form_name + "_action"}
+                    ])
 
+                    stories.append(rule)       
             else:
                 rule = {
                     "story": intent["story_name"],
@@ -62,7 +81,7 @@ class JSONToYAMLConverter:
             for example in intent['utterances']:
                 yaml_output += f"      - {example}\n"
 
-            response_key = f'utter_{intent["intent"]}'
+            response_key = intent['response_name']
             response_texts = intent['response']
             responses[response_key] = [{'text': response_text} for response_text in response_texts]
 
@@ -99,8 +118,7 @@ class JSONToYAMLConverter:
         yaml_output += "actions:\n"
         for action in actions:
             yaml_output += f"  - {action}\n"
-
-            
+        
 
         yaml_output += "responses:\n"
         for response_key, response_texts in responses.items():
