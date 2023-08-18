@@ -1,4 +1,23 @@
 import json
+import openai
+
+config_path = "db_config.yml"
+with open(config_path, 'r') as config_file:
+    config = yaml.safe_load(config_file)
+
+openai.api_key = config['endpoints']['api_url']
+
+def get_completion(prompt):
+    #model="gpt-4"
+    model="gpt-3.5-turbo"
+    messages = [{"role": "user", "content": prompt}]
+    response = openai.ChatCompletion.create(
+    model=model,
+    messages=messages,
+    temperature=0,
+    )
+    return response.choices[0].message["content"]
+
 
 class JsonUpdater:
     def __init__(self, json_data):
@@ -47,7 +66,10 @@ class JsonUpdater:
             "bot_id": self.json_data.get("bot_id"),
             "intents": updated_intents
         }
-        return updated_data
+        result = json.dumps(updated_data, indent=4)
+        prompt="fill the missing values in below json ,update each intent with 10 utterances ,give 4 examples for each slot"+result
+        response = get_completion(prompt)
+        return response
 
 
 # Example usage
