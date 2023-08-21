@@ -10,19 +10,6 @@ class JSONToYAMLConverter:
         stories = []
         for intent in self.payload['intents']:
             if "form" in intent:
-                form_name = intent["form"]
-                trigger_intent = intent["intent"]
-                rule = {
-                    "story": intent["story_name"],
-                    "steps": [
-                        {"intent": trigger_intent},
-                        {"action": form_name},
-                        {"active_loop": form_name},
-                        {"active_loop": None},
-                    ]
-                }
-                stories.append(rule)
-
                 if "slots" in intent:
                     form_name = intent["form"]
                     trigger_intent = intent["intent"]
@@ -31,7 +18,6 @@ class JSONToYAMLConverter:
                         "steps": [
                             {"intent": trigger_intent},
                             {"action": form_name},
-                            {"active_loop": form_name},
                         ]
                     }
 
@@ -46,19 +32,26 @@ class JSONToYAMLConverter:
                                 {"action": form_name}
                             ])
 
-                    rule["steps"].extend([
+                    for action in intent["actions"]:
+                        if not action.endswith("_form"):
+                            rule["steps"].append({"action": action})
+
+
+                    """rule["steps"].extend([
                         {"action": form_name + "_action"}
-                    ])
+                    ])"""
 
                     stories.append(rule)       
             else:
                 rule = {
                     "story": intent["story_name"],
                     "steps": [
-                        {"intent": intent['intent']},
-                        {"action": f"utter_{intent['intent']}"}
+                        {"intent": intent['intent']}
                     ]
                 }
+                
+                for action in intent["actions"]:
+                    rule["steps"].append({"action": action})
                 stories.append(rule)
 
 
@@ -146,7 +139,14 @@ class JSONToYAMLConverter:
             yaml_output += "    steps:\n"
             for step in story['steps']:
                 for key, value in step.items():
-                    yaml_output += f"      - {key}: {value}\n"
+                    #yaml_output += f"      - {key}: {value}\n"
+                    if isinstance(value, list) and key == "slot_was_set":
+                        yaml_output += f"      - {key}:\n"
+                        for slot_item in value:
+                            for slot_k, slot_v in slot_item.items():
+                                yaml_output += f"        - {slot_k}: \"{slot_v}\"\n"
+                    else:
+                        yaml_output += f"      - {key}: {value}\n"
 
         return yaml_output
 
